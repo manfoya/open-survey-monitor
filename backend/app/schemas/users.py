@@ -1,3 +1,5 @@
+# backend/app/schemas/users.py
+
 from pydantic import BaseModel
 from typing import Optional
 from app.models.users import RoleEnum

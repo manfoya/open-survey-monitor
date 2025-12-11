@@ -11,8 +11,8 @@ app = FastAPI(
 )
 
 # On inclut nos routes
-app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentification"])
 
 @app.get("/")
 def read_root():
-    return {"message": "Bienvenue sur l'API Open Survey Monitor 🚀"}
+    return {"message": "Bienvenue sur l'API Open Survey Monitor"}
