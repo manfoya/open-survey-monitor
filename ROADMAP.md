@@ -18,14 +18,14 @@
     - [x] `survey.py` (Données collectées + Sexe + Statut).
     - [x] `settings.py` (Paramètres Directeur).
 - [x] Mise en place d'**Alembic** (Système de migration).
-- [ ] Première migration : Création effective des tables dans PostgreSQL.
+- [x] Première migration : Création effective des tables dans PostgreSQL.
 
 ## Jalon 2 : Authentification & Hiérarchie (Qui est qui ?)
 *Objectif : On peut créer des utilisateurs et se connecter.*
-- [ ] Script de "Seed" (Remplissage initial) : Créer le compte "Directeur" par défaut.
-- [ ] Codage de `app/schemas/users.py` (Validation des données entrée/sortie).
-- [ ] Codage de `app/core/security.py` (Hashage mot de passe + Token JWT).
-- [ ] Route API `POST /login` (Récupérer un Token).
+- [x] Script de "Seed" (Remplissage initial) : Créer le compte "Directeur" par défaut.
+- [x] Codage de `app/schemas/users.py` (Validation des données entrée/sortie).
+- [x] Codage de `app/core/security.py` (Hashage mot de passe + Token JWT).
+- [x] Route API `POST /login` (Récupérer un Token).
 - [ ] Route API `GET /users/me` (Tester "Qui suis-je ?").
 - [ ] Gestion des permissions : Vérifier qu'un Agent ne peut pas voir les infos du Directeur.
 
