@@ -1,6 +1,6 @@
 # backend/app/models/zones.py
 
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Boolean, JSON
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 
@@ -20,6 +20,10 @@ class Zone(Base):
     # calculer les distances
     latitude_centrale = Column(Float, nullable=False)
     longitude_centrale = Column(Float, nullable=False)
+
+    # Le rayon du cercle
+    # Par défaut 500m, mais modifiable si le village est très grand
+    rayon_tolerance_metres = Column(Integer, default=500)
     
     # Relation : Une zone peut avoir plusieurs affectations dans le temps
     affectations = relationship("Affectation", back_populates="zone")
@@ -52,6 +56,17 @@ class Affectation(Base):
     # Ou carrément permet de définir la durée théorique de l'enquête 
     date_debut = Column(DateTime, nullable=True)
     date_fin = Column(DateTime, nullable=True)
+
+    
+    # 1. Permet de fermer une affectation (mission terminée) sans la supprimer
+    est_actif = Column(Boolean, default=True)
+
+    # Souvent pour les enquêtes, les quotas ne sont pas juste un eff général de 
+    # personne à questionner, des fois on doit atteindre un effectif par modalité de 
+    # variable, c'est ce que nous faisons en créant un fichier de configuration
+    # 2. C'est ici qu'on va mettre cette configuration de quotas par variables
+    # Ex: { "sexe": {"H": 10, "F": 10}, "ethnie": {"A": 5, "B": 5} }
+    objectifs_quota = Column(JSON, nullable=True)
 
     # Relations de navigation
     controleur = relationship("User", back_populates="affectations")
