@@ -12,7 +12,7 @@ from app.schemas.users import UserCreate, UserOut, UserUpdate
 
 router = APIRouter()
 
-# 1. PROFIL : Voir qui je suis
+# 1. Voir qui je suis
 @router.get("/me", response_model=UserOut)
 def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
@@ -41,12 +41,36 @@ def create_user_shell(
     if db.query(User).filter(User.username == user_in.username).first():
         raise HTTPException(status_code=400, detail="Ce nom d'utilisateur existe déjà.")
 
-    # Vérifier que le chef existe vraiment (si un chef est indiqué)
+  
+    # Vérification de la hiérachie
     if user_in.chef_id:
-        chef_exist = db.query(User).filter(User.id == user_in.chef_id).first()
-        if not chef_exist:
+        chef = db.query(User).filter(User.id == user_in.chef_id).first()
+        
+        # 1. Est-ce que le chef existe ?
+        if not chef:
             raise HTTPException(status_code=400, detail=f"Le chef avec l'ID {user_in.chef_id} n'existe pas.")
+        
+        # 2.Un agent doit être sous un contôleur
+        if user_in.role == RoleEnum.agent and chef.role != RoleEnum.controleur:
+            raise HTTPException(
+                status_code=400, 
+                detail="Hiérarchie invalide : Un Agent doit obligatoirement être sous les ordres d'un Contrôleur."
+            )
 
+        # 3. Un Contrôleur doit être sous un Superviseur
+        if user_in.role == RoleEnum.controleur and chef.role != RoleEnum.superviseur:
+            raise HTTPException(
+                status_code=400, 
+                detail="Hiérarchie invalide : Un Contrôleur doit obligatoirement être sous les ordres d'un Superviseur."
+            )
+
+        # 4. Un Superviseur doit être sous le Directeur
+        if user_in.role == RoleEnum.superviseur and chef.role != RoleEnum.directeur:
+            raise HTTPException(
+                status_code=400, 
+                detail="Hiérarchie invalide : Un Superviseur doit être sous les ordres directs du Directeur."
+            )
+    
     new_user = User(
         username=user_in.username,
         password_hash=get_password_hash(user_in.password),
@@ -76,7 +100,7 @@ def update_user_assignment(
     if not user_db:
         raise HTTPException(status_code=404, detail="Utilisateur introuvable")
 
-    # érification des droits (cette partie est importante)
+    # Vérification des droits (cette partie est importante)
     is_directeur = (current_user.role == RoleEnum.directeur)
     is_mon_subordonne = (user_db.chef_id == current_user.id)
     
