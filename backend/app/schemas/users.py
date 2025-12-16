@@ -19,6 +19,7 @@ class UserBase(BaseModel):
 # Autrement, ce qu'on envoie pour créer un compte
 class UserCreate(UserBase):
     password: str
+    chef_id: Optional[int] = None
 
 # 3. Schéma pour le LOGIN
 # Ce qu'on envoie pour se connecter
@@ -39,4 +40,12 @@ class UserOut(UserBase):
         # 'orm_mode = True' dans Pydantic V1
         from_attributes = True
 
+
+class UserUpdate(BaseModel):
+    """
+    Utilisé quand un chef assigne un nom réel à un code.
+    Tous les champs sont optionnels car on ne modifie que ce qui est nécessaire.
+    """
+    username: Optional[str] = None # Pour mettre le vrai nom (ex: "Kouadio")
+    password: Optional[str] = None # Pour définir le mot de passe personnel
 
