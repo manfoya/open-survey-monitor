@@ -38,7 +38,8 @@ class User(Base):
     chef_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     
     # 'remote_side' est nécessaire pour dire à SQLAlchemy que c'est une boucle sur la même table.
-    subordonnes = relationship("User", backref="chef", remote_side=[id])
+    # subordonnes = relationship("User", backref="chef", remote_side=[id])
+    chef = relationship("User", remote_side=[id], backref="subordonnes")
     
     # RELATIONS
     # On utilise "Affectation" en string pour éviter les erreurs d'import circulaire (Circular Import).
