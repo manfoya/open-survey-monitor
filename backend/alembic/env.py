@@ -1,7 +1,6 @@
 import os
 import sys
-
-sys.path.append(os.getcwd()) # Ça permet à Alembic de "voir" ton dossier 'app'
+sys.path.append(os.getcwd()) # ça permet à Alembic de "voir" le dossier 'app'
 
 from logging.config import fileConfig
 
@@ -12,6 +11,8 @@ from alembic import context
 
 from app.core.database import Base
 from app.models import users, zones, survey, settings
+from app.models import dictionary
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
