@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 from app.api.v1 import auth
 from app.models import users, zones, survey, settings
-from app.api.v1 import auth, users
+from app.api.v1 import auth, users, maps
 
 
 app = FastAPI(
@@ -14,7 +14,8 @@ app = FastAPI(
 
 # On inclut nos routes
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentification"])
-app.include_router(users.router, prefix="/api/v1/users", tags=["Utilisateurs"])  
+app.include_router(users.router, prefix="/api/v1/users", tags=["Utilisateurs"])
+app.include_router(maps.router, prefix="/api/v1/maps", tags=["Maps & Quotas"]) 
 
 
 @app.get("/")
