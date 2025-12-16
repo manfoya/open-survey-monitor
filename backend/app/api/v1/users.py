@@ -12,24 +12,24 @@ from app.schemas.users import UserCreate, UserOut, UserUpdate
 
 router = APIRouter()
 
-## Cette fonction permet de récupérer toute la descendance (enfants + petits-enfants...)
+# Cette fonction permet de récupérer toute la descendance (enfants + petits-enfants...)
 def get_all_subordinates_recursive(user: User) -> List[User]:
     subordinates = []
     # user.subordonnes fonctionne grâce à la correction dans models.py
     # (
     for child in user.subordonnes: 
         subordinates.append(child)
-        # On appelle la fonction sur l'enfant (Récursivité)
+        # On appelle la fonction sur l'enfant (récursivité)
         subordinates.extend(get_all_subordinates_recursive(child))
     return subordinates
-## 
+#
 
 # 1. Voir qui je suis
 @router.get("/me", response_model=UserOut)
 def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
 
-## Route pour voir mes enfants (ma team)
+# Route pour voir mes mes subordonnés (ma team)
 @router.get("/", response_model=List[UserOut])
 def read_my_team(
     db: Session = Depends(get_db),
@@ -182,6 +182,26 @@ def update_user_assignment(
         user_db.username = user_update.username
     if user_update.password:
         user_db.password_hash = get_password_hash(user_update.password)
+    
+    # changement de chef
+    if user_update.chef_id:
+        # Seul le Directeur peut faire des affectations d'équipes (pour éviter le désordre)
+        if not is_directeur:
+             raise HTTPException(status_code=403, detail="Seul le Directeur peut réaffecter un agent à un autre chef.")
+
+        nouveau_chef = db.query(User).filter(User.id == user_update.chef_id).first()
+        if not nouveau_chef:
+            raise HTTPException(status_code=400, detail="Le nouveau chef indiqué n'existe pas.")
+
+        # On revérifie la hiérarchie stricte pour le nouveau chef
+        if user_db.role == RoleEnum.agent and nouveau_chef.role != RoleEnum.controleur:
+            raise HTTPException(status_code=400, detail="Mutation invalide : Un Agent doit aller sous un Contrôleur.")
+        
+        if user_db.role == RoleEnum.controleur and nouveau_chef.role != RoleEnum.superviseur:
+            raise HTTPException(status_code=400, detail="Mutation invalide : Un Contrôleur doit aller sous un Superviseur.")
+
+        # Si tout est bon, on applique la mutation ou l'affectation
+        user_db.chef_id = user_update.chef_id
 
     db.commit()
     db.refresh(user_db)

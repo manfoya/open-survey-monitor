@@ -27,7 +27,7 @@ class UserLogin(BaseModel):
     username: str
     password: str
 
-# 4. Schéma pour la LECTURE ( ce que l'API renvoir au frontend)
+# 4. Schéma pour la lecture ( ce que l'API renvoie au frontend)
 # Pour ne pas renvoyer de mot de passe, on utilise 
 # UserOut comme "response_model" dans FastAPI, le champ 'password'
 # (qui est dans UserCreate) sera automatiquement exclu.
@@ -48,4 +48,4 @@ class UserUpdate(BaseModel):
     """
     username: Optional[str] = None # Pour mettre le vrai nom (ex: "Kouadio")
     password: Optional[str] = None # Pour définir le mot de passe personnel
-
+    chef_id: Optional[int] = None  # pour permettre de changer de chef après
