@@ -12,11 +12,78 @@ from app.schemas.users import UserCreate, UserOut, UserUpdate
 
 router = APIRouter()
 
+## Cette fonction permet de récupérer toute la descendance (enfants + petits-enfants...)
+def get_all_subordinates_recursive(user: User) -> List[User]:
+    subordinates = []
+    # user.subordonnes fonctionne grâce à la correction dans models.py
+    # (
+    for child in user.subordonnes: 
+        subordinates.append(child)
+        # On appelle la fonction sur l'enfant (Récursivité)
+        subordinates.extend(get_all_subordinates_recursive(child))
+    return subordinates
+## 
+
 # 1. Voir qui je suis
 @router.get("/me", response_model=UserOut)
 def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
 
+## Route pour voir mes enfants (ma team)
+@router.get("/", response_model=List[UserOut])
+def read_my_team(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Retourne la liste des utilisateurs visibles.
+    - Directeur : voit tout le monde.
+    - Autres : Voient uniquement leurs subordonnés (directs et indirects).
+    """
+    if current_user.role == RoleEnum.directeur:
+        # Le boss voit tout la base
+        return db.query(User).all()
+    
+    # Pour les autres, on lance la recherche dans leur descendance
+    my_team = get_all_subordinates_recursive(current_user)
+    return my_team
+##
+
+## Route pour chercher par code
+@router.get("/code/{cspro_code}", response_model=UserOut)
+def read_user_by_code(
+    cspro_code: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Cherche un utilisateur par son code (ex: AG005).
+    Sécurité : Je ne peux voir le résultat que si c'est quelqu'un de mon équipe.
+    """
+    # 1. On cherche si le code existe
+    target_user = db.query(User).filter(User.cspro_code == cspro_code).first()
+    if not target_user:
+        raise HTTPException(status_code=404, detail="Utilisateur introuvable avec ce code.")
+
+    # 2. Si je suis Directeur, c'est feu vert & Open Bar
+    if current_user.role == RoleEnum.directeur:
+        return target_user
+
+    # 3. Si je suis le chef, je vérifie si c'est un de mes descendants
+    # On récupère les IDs de toute mon équipe grâce à la fonction récursive
+    my_team_ids = [u.id for u in get_all_subordinates_recursive(current_user)]
+    
+    # On ajoute mon propre ID (si je veux me chercher moi-même)
+    my_team_ids.append(current_user.id)
+
+    if target_user.id not in my_team_ids:
+        raise HTTPException(
+            status_code=403, 
+            detail="Accès refusé : Cet agent ne fait pas partie de votre équipe."
+        )
+
+    return target_user
+##
 # 2. Créer un compte (Réservé au super_admin seul.)
 @router.post("/", response_model=UserOut)
 def create_user_shell(
@@ -41,7 +108,7 @@ def create_user_shell(
     if db.query(User).filter(User.username == user_in.username).first():
         raise HTTPException(status_code=400, detail="Ce nom d'utilisateur existe déjà.")
 
-  
+   
     # Vérification de la hiérachie
     if user_in.chef_id:
         chef = db.query(User).filter(User.id == user_in.chef_id).first()
