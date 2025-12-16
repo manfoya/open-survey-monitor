@@ -72,6 +72,12 @@ def create_affectation(
     db.add(affectation)
     db.commit()
     db.refresh(affectation)
+
+    # On force le remplissage des noms pour l'affichage immédiat
+    # SQLAlchemy va chercher les infos grâce aux relations
+    affectation.nom_zone = affectation.zone.nom_zone
+    affectation.nom_controleur = affectation.controleur.username
+    
     return affectation
 
 @router.get("/affectations/", response_model=List[AffectationOut])
