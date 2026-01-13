@@ -1,9 +1,10 @@
-import { getMe } from "@/features/auth/services/auth";
+import { getMe, UserRole } from "@/features/auth/services/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button"; // Assure-toi d'avoir le bouton
 import { User, ShieldCheck, Hash, Fingerprint, Pencil } from "lucide-react";
 import Link from "next/link";
+import { RoleGuard } from "@/features/auth/components/role-guard";
 
 export default async function ProfilePage() {
   const user = await getMe();
@@ -21,12 +22,14 @@ export default async function ProfilePage() {
         </div>
         
         {/* Bouton d'édition pointant vers ta route dynamique [id] */}
-        <Button asChild variant="outline" size="sm" className="gap-2">
+        <RoleGuard allowedRoles={[UserRole.DIRECTEUR]}>
+          <Button asChild variant="outline" size="sm" className="gap-2">
           <Link href={`/users/${user.id}/edit`}>
             <Pencil className="h-4 w-4" />
             Modifier
           </Link>
         </Button>
+        </RoleGuard>
       </div>
 
       <div className="grid gap-4">
@@ -53,7 +56,7 @@ export default async function ProfilePage() {
                   <Hash className="h-4 w-4" />
                   <span>Code CSPro</span>
                 </div>
-                <span className="font-bold text-primary">{user.cspro_code}</span>
+                <span className="font-bold text-primary">{user.cspro_code || "N/A"}</span>
               </div>
 
               <div className="flex items-center justify-between p-4">
