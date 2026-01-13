@@ -6,10 +6,12 @@ from jose import jwt
 from passlib.context import CryptContext
 import os
 
-# Puisqu'on ne chiffre pas un mot de passe ( ça serait reversible ), on le hash
-# et avec Bcrypt on ajoute un peu d'aléatoire pour que deux mots de passe identiques 
-# "admin123" n'aient jamais le même hash en base.
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Configuration de bcrypt avec une version compatible
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto",
+    bcrypt__rounds=12
+)
 
 # Si la variable d'environnement n'existe pas, le code plante ou utilise une clé faible.
 # En production, il est important que SECRET_KEY soit chargé depuis le .env.
