@@ -1,4 +1,3 @@
-
 // La route par défaut vers laquelle l'utilisateur est redirigé après le login
 export const DEFAULT_LOGIN_REDIRECT = "/overview";
 

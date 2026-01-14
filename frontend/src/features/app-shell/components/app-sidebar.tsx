@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { MonitorCheck, LogOut } from "lucide-react"
+import * as React from "react";
+import { MonitorCheck, LogOut } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -12,14 +12,14 @@ import {
   SidebarMenuItem,
   SidebarGroup,
   SidebarGroupLabel,
-} from "@/components/ui/sidebar"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { logoutAction } from "@/features/auth/actions"
-import { navGroups } from "@/features/app-shell/nav-data"
+} from "@/components/ui/sidebar";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { logoutAction } from "@/features/auth/actions";
+import { navGroups } from "@/features/app-shell/nav-data";
 
 export default function AppSideBar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
@@ -30,7 +30,9 @@ export default function AppSideBar() {
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">Open Survey</span>
-            <span className="truncate text-xs text-muted-foreground">Monitor v1.0</span>
+            <span className="truncate text-xs text-muted-foreground">
+              Monitor v1.0
+            </span>
           </div>
         </div>
       </SidebarHeader>
@@ -42,8 +44,8 @@ export default function AppSideBar() {
             <SidebarMenu>
               {group.items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
+                  <SidebarMenuButton
+                    asChild
                     tooltip={item.title}
                     isActive={pathname === item.url}
                   >
@@ -63,7 +65,7 @@ export default function AppSideBar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <form action={logoutAction} className="w-full">
-              <SidebarMenuButton 
+              <SidebarMenuButton
                 type="submit"
                 className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
               >
@@ -75,5 +77,5 @@ export default function AppSideBar() {
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

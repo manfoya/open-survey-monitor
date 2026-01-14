@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useEffect, useMemo, useActionState, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  useMemo,
+  useActionState,
+  useCallback,
+} from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -24,17 +30,26 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils"; 
+import { cn } from "@/lib/utils";
 
 import { UserProfile } from "@/features/auth/services/auth";
-import { getUsers } from "@/features/users/services";
-import { createUserAction, CreateUserState } from "@/features/users/actions";
-import { AlertCircle, CheckCircle2, RefreshCw, Check, ChevronsUpDown } from "lucide-react";
+import { getSubordinates } from "@/features/users/services";
+import {
+  createUserAction,
+  CreateUserState,
+} from "@/features/users/actions/create-user-action";
+import {
+  AlertCircle,
+  CheckCircle2,
+  RefreshCw,
+  Check,
+  ChevronsUpDown,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 // Mapping des poids pour la hiérarchie stricte
-const ROLE_WEIGHTS: Record<string, number> = {
+export const ROLE_WEIGHTS: Record<string, number> = {
   agent: 1,
   controleur: 2,
   superviseur: 3,
@@ -42,46 +57,55 @@ const ROLE_WEIGHTS: Record<string, number> = {
 };
 
 // Rôles créables (Directeur exclu)
-const ASSIGNABLE_ROLES = [
+export const ASSIGNABLE_ROLES = [
   { value: "agent", label: "Agent Enquêteur" },
   { value: "controleur", label: "Contrôleur" },
   { value: "superviseur", label: "Superviseur" },
 ] as const;
 
-function errorDiv(messages: string[] | undefined) {
+export function errorDiv(messages: string[] | undefined) {
   if (!messages || messages.length === 0) return null;
-  return (
-    <div className="mt-1 text-sm text-red-600">
-      {messages[0]}
-    </div>
-  );
+  return <div className="mt-1 text-sm text-red-600">{messages[0]}</div>;
 }
 
-function getRequiredChefRoleLabel(targetRole: string): string {
+export function getRequiredChefRoleLabel(targetRole: string): string {
   switch (targetRole) {
-    case "agent": return "Contrôleur";
-    case "controleur": return "Superviseur";
-    case "superviseur": return "Directeur";
-    default: return "Supérieur";
+    case "agent":
+      return "Contrôleur";
+    case "controleur":
+      return "Superviseur";
+    case "superviseur":
+      return "Directeur";
+    default:
+      return "Supérieur";
   }
+}
+
+export function filterEligibleChefs(
+  targetRole: string,
+  users: UserProfile[],
+): UserProfile[] {
+  const targetWeight = ROLE_WEIGHTS[targetRole] || 0;
+  const requiredChefWeight = targetWeight + 1;
+  return users.filter((user) => ROLE_WEIGHTS[user.role] === requiredChefWeight);
 }
 
 export default function CreateUserForm() {
   const [targetRole, setTargetRole] = useState<string>("agent");
   const [selectedChef, setSelectedChef] = useState<string>("");
   const [openCombobox, setOpenCombobox] = useState(false); // État pour ouvrir/fermer la combobox
-  
+
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
   const [usersError, setUsersError] = useState<string | null>(null);
-  
+
   const [formKey, setFormKey] = useState(0);
 
   const loadUsers = useCallback(async () => {
     try {
       setIsLoadingUsers(true);
       setUsersError(null);
-      const fetchedUsers = await getUsers();
+      const fetchedUsers = await getSubordinates();
       setUsers(fetchedUsers);
     } catch (error) {
       setUsersError("Erreur lors du chargement des utilisateurs");
@@ -96,18 +120,21 @@ export default function CreateUserForm() {
   }, [loadUsers]);
 
   const eligibleChefs = useMemo(() => {
-    const targetWeight = ROLE_WEIGHTS[targetRole] || 0;
-    const requiredChefWeight = targetWeight + 1; 
-    return users.filter((user) => ROLE_WEIGHTS[user.role] === requiredChefWeight);
+    return filterEligibleChefs(targetRole, users);
   }, [targetRole, users]);
 
   useEffect(() => {
-    if (selectedChef && !eligibleChefs.some(chef => chef.id.toString() === selectedChef)) {
+    if (
+      selectedChef &&
+      !eligibleChefs.some((chef) => chef.id.toString() === selectedChef)
+    ) {
       setSelectedChef("");
     }
   }, [eligibleChefs, selectedChef]);
 
-  const [state, formAction, isPending] = useActionState(createUserAction, { success: false });
+  const [state, formAction, isPending] = useActionState(createUserAction, {
+    success: false,
+  });
 
   useEffect(() => {
     if (state.success) {
@@ -121,21 +148,17 @@ export default function CreateUserForm() {
   const requiredRoleLabel = getRequiredChefRoleLabel(targetRole);
 
   return (
-    <form 
-      key={formKey} 
-      className="space-y-6" 
-      action={formAction}
-    >
+    <form key={formKey} className="space-y-6" action={formAction}>
       {alertMessage(state)}
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* CHOIX DU RÔLE */}
         <div className="space-y-2">
           <Label htmlFor="role">Rôle à créer</Label>
-          <Select 
+          <Select
             name="role"
             value={targetRole}
-            onValueChange={setTargetRole} 
+            onValueChange={setTargetRole}
             disabled={isPending}
           >
             <SelectTrigger id="role" aria-invalid={!!state.errors?.role}>
@@ -150,7 +173,10 @@ export default function CreateUserForm() {
             </SelectContent>
           </Select>
           <div className="text-xs text-muted-foreground">
-            Hiérarchie : {targetRole === 'agent' ? 'Bas de l\'échelle' : 'Niveau intermédiaire'}
+            Hiérarchie :{" "}
+            {targetRole === "agent"
+              ? "Bas de l'échelle"
+              : "Niveau intermédiaire"}
           </div>
           {errorDiv(state.errors?.role)}
         </div>
@@ -170,7 +196,9 @@ export default function CreateUserForm() {
               className="h-6 px-2 text-xs"
               title="Actualiser la liste"
             >
-              <RefreshCw className={`h-3 w-3 ${isLoadingUsers ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`h-3 w-3 ${isLoadingUsers ? "animate-spin" : ""}`}
+              />
             </Button>
           </div>
 
@@ -184,18 +212,22 @@ export default function CreateUserForm() {
                 variant="outline"
                 role="combobox"
                 aria-expanded={openCombobox}
-                disabled={isPending || isLoadingUsers || eligibleChefs.length === 0}
+                disabled={
+                  isPending || isLoadingUsers || eligibleChefs.length === 0
+                }
                 className={cn(
                   "w-full justify-between font-normal",
                   !selectedChef && "text-muted-foreground",
-                  !!state.errors?.chef_id && "border-red-500" // Style d'erreur visuel
+                  !!state.errors?.chef_id && "border-red-500", // Style d'erreur visuel
                 )}
               >
                 {selectedChef
-                  ? eligibleChefs.find((chef) => chef.id.toString() === selectedChef)?.username
-                  : isLoadingUsers 
-                    ? "Chargement..." 
-                    : eligibleChefs.length === 0 
+                  ? eligibleChefs.find(
+                      (chef) => chef.id.toString() === selectedChef,
+                    )?.username
+                  : isLoadingUsers
+                    ? "Chargement..."
+                    : eligibleChefs.length === 0
                       ? `Aucun ${requiredRoleLabel} dispo`
                       : "Sélectionner un responsable..."}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -203,7 +235,9 @@ export default function CreateUserForm() {
             </PopoverTrigger>
             <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
               <Command>
-                <CommandInput placeholder={`Rechercher un ${requiredRoleLabel}...`} />
+                <CommandInput
+                  placeholder={`Rechercher un ${requiredRoleLabel}...`}
+                />
                 <CommandList>
                   <CommandEmpty>Aucun responsable trouvé.</CommandEmpty>
                   <CommandGroup>
@@ -219,7 +253,9 @@ export default function CreateUserForm() {
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            selectedChef === chef.id.toString() ? "opacity-100" : "opacity-0"
+                            selectedChef === chef.id.toString()
+                              ? "opacity-100"
+                              : "opacity-0",
                           )}
                         />
                         <div className="flex flex-col">
@@ -235,18 +271,19 @@ export default function CreateUserForm() {
               </Command>
             </PopoverContent>
           </Popover>
-          
+
           {/* Messages d'aide contextuels */}
           {!isLoadingUsers && !usersError && eligibleChefs.length === 0 && (
             <p className="text-xs text-amber-600 font-medium mt-1">
-               Aucun <strong>{requiredRoleLabel}</strong> n&apos;a été trouvé pour encadrer ce rôle.
+              Aucun <strong>{requiredRoleLabel}</strong> n&apos;a été trouvé
+              pour encadrer ce rôle.
             </p>
           )}
-          
+
           {usersError && (
             <p className="text-xs text-red-600 mt-1">{usersError}</p>
           )}
-          
+
           {errorDiv(state.errors?.chef_id)}
         </div>
       </div>
@@ -255,9 +292,9 @@ export default function CreateUserForm() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="username">Username</Label>
-          <Input 
-            id="username" 
-            name="username" 
+          <Input
+            id="username"
+            name="username"
             placeholder="ex: kavol_dash"
             disabled={isPending}
             defaultValue={state.data?.username}
@@ -267,9 +304,9 @@ export default function CreateUserForm() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="cspro_code">Code CSPro</Label>
-          <Input 
-            id="cspro_code" 
-            name="cspro_code" 
+          <Input
+            id="cspro_code"
+            name="cspro_code"
             placeholder="ex: 101"
             defaultValue={state.data?.cspro_code?.toString()}
             disabled={isPending}
@@ -281,9 +318,9 @@ export default function CreateUserForm() {
 
       <div className="space-y-2">
         <Label htmlFor="password">Mot de passe temporaire</Label>
-        <Input 
-          id="password" 
-          name="password" 
+        <Input
+          id="password"
+          name="password"
           type="password"
           disabled={isPending}
           aria-invalid={!!state.errors?.password}
@@ -291,33 +328,37 @@ export default function CreateUserForm() {
         {errorDiv(state.errors?.password)}
       </div>
 
-      <Button type="submit" className="w-full" disabled={isPending || isLoadingUsers}>
+      <Button
+        type="submit"
+        className="w-full"
+        disabled={isPending || isLoadingUsers}
+      >
         {isPending ? "Création en cours..." : "Créer l'utilisateur"}
       </Button>
     </form>
-  ); 
+  );
 }
 
 function alertMessage(state: CreateUserState) {
-  return (<>
-    {state.message && !state.success && (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Erreur</AlertTitle>
-        <AlertDescription>
-          {state.message}
-        </AlertDescription>
-      </Alert>
-    )}
+  return (
+    <>
+      {state.message && !state.success && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Erreur</AlertTitle>
+          <AlertDescription>{state.message}</AlertDescription>
+        </Alert>
+      )}
 
-    {state.success && (
-      <Alert className="border-green-600/50 text-green-600 dark:border-green-500 dark:text-green-500 [&>svg]:text-green-600">
-        <CheckCircle2 className="h-4 w-4" />
-        <AlertTitle>Succès</AlertTitle>
-        <AlertDescription>
-          Utilisateur créé avec succès ! Le formulaire a été réinitialisé.
-        </AlertDescription>
-      </Alert>
-    )}
-  </>);
+      {state.success && (
+        <Alert className="border-green-600/50 text-green-600 dark:border-green-500 dark:text-green-500 [&>svg]:text-green-600">
+          <CheckCircle2 className="h-4 w-4" />
+          <AlertTitle>Succès</AlertTitle>
+          <AlertDescription>
+            Utilisateur créé avec succès ! Le formulaire a été réinitialisé.
+          </AlertDescription>
+        </Alert>
+      )}
+    </>
+  );
 }

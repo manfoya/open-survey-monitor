@@ -1,5 +1,5 @@
-import { LoginForm } from "@/features/auth/components/login-form"
-import { Suspense } from "react"
+import { LoginForm } from "@/features/auth/components/login-form";
+import { Suspense } from "react";
 
 export default function Page() {
   return (
@@ -10,5 +10,5 @@ export default function Page() {
         </Suspense>
       </div>
     </div>
-  )
+  );
 }

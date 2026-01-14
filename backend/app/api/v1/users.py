@@ -83,6 +83,49 @@ def read_user_by_code(
         )
 
     return target_user
+
+## Route pour chercher par son id
+@router.get("/{user_id}", response_model=UserOut)
+def read_user_by_id(
+    user_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Cherche un utilisateur par son id (ex: AG005).
+    Sécurité : Je ne peux voir le résultat que si c'est moi-même ou un de mes subordnnées (direct comme indirect).
+    """
+    # 1. On cherche si l'ID existe
+    if user_id == "me":
+        return current_user
+    if not user_id.isdigit():
+        raise HTTPException(status_code=400, detail="L'ID utilisateur doit être un entier.")
+    
+    user_id = int(user_id)
+    target_user = db.query(User).filter(User.id == user_id).first()
+    if not target_user:
+        raise HTTPException(status_code=404, detail="Utilisateur introuvable avec ce ID.")
+
+    # 2. Si je suis Directeur, c'est feu vert & Open Bar
+    if current_user.role == RoleEnum.directeur:
+        return target_user
+
+    # 3. Si je suis le chef, je vérifie si c'est un de mes descendants
+    # On récupère les IDs de toute mon équipe grâce à la fonction récursive
+    my_team_ids = [u.id for u in get_all_subordinates_recursive(current_user)]
+    
+    # On ajoute mon propre ID (si je veux me chercher moi-même)
+    my_team_ids.append(current_user.id)
+
+    if target_user.id not in my_team_ids:
+        raise HTTPException(
+            status_code=403, 
+            detail="Accès refusé : Cet agent ne fait pas partie de votre équipe."
+        )
+
+    return target_user
+
+
 ##
 # 2. Créer un compte (Réservé au super_admin seul.)
 @router.post("/", response_model=UserOut)
@@ -166,6 +209,11 @@ def update_user_assignment(
     user_db = db.query(User).filter(User.id == user_id).first()
     if not user_db:
         raise HTTPException(status_code=404, detail="Utilisateur introuvable")
+    
+    # Empêche l'utilisation d'un username déjà pris
+    if user_update.username and user_update.username != user_db.username:
+        if db.query(User).filter(User.username == user_update.username).first():
+            raise HTTPException(status_code=400, detail="Ce nom d'utilisateur est déjà pris.")
 
     # Vérification des droits (cette partie est importante)
     is_directeur = (current_user.role == RoleEnum.directeur)
@@ -235,3 +283,5 @@ def delete_user(
     db.delete(user_db)
     db.commit()
     return None # 204 No Content
+
+

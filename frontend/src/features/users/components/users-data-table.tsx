@@ -1,25 +1,39 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { 
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { 
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Search, UserCog, Hash, Shield, Briefcase } from "lucide-react";
+import { Search, Hash, Shield, Briefcase } from "lucide-react";
 import { UserProfile } from "@/features/auth/services/auth";
 
 // Helper pour les couleurs des badges de rôle
 const getRoleBadgeColor = (role: string) => {
   switch (role) {
-    case "directeur": return "bg-purple-100 text-purple-800 hover:bg-purple-100 border-purple-200"; // Violet
-    case "superviseur": return "bg-blue-100 text-blue-800 hover:bg-blue-100 border-blue-200"; // Bleu
-    case "controleur": return "bg-orange-100 text-orange-800 hover:bg-orange-100 border-orange-200"; // Orange
-    case "agent": return "bg-slate-100 text-slate-800 hover:bg-slate-100 border-slate-200"; // Gris
-    default: return "";
+    case "directeur":
+      return "bg-purple-100 text-purple-800 hover:bg-purple-100 border-purple-200"; // Violet
+    case "superviseur":
+      return "bg-blue-100 text-blue-800 hover:bg-blue-100 border-blue-200"; // Bleu
+    case "controleur":
+      return "bg-orange-100 text-orange-800 hover:bg-orange-100 border-orange-200"; // Orange
+    case "agent":
+      return "bg-slate-100 text-slate-800 hover:bg-slate-100 border-slate-200"; // Gris
+    default:
+      return "";
   }
 };
 
@@ -35,9 +49,10 @@ export function UsersDataTable({ initialUsers }: UsersDataTableProps) {
   const filteredUsers = useMemo(() => {
     return initialUsers.filter((user) => {
       // 1. Filtre Texte (Username ou CSPro)
-      const matchesSearch = 
+      const matchesSearch =
         user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (user.cspro_code &&user.cspro_code.toLowerCase().includes(searchTerm.toLowerCase()));
+        (user.cspro_code &&
+          user.cspro_code.toLowerCase().includes(searchTerm.toLowerCase()));
 
       // 2. Filtre Rôle
       const matchesRole = roleFilter === "all" || user.role === roleFilter;
@@ -50,7 +65,7 @@ export function UsersDataTable({ initialUsers }: UsersDataTableProps) {
   const getChefName = (chefId: number | null) => {
     if (!chefId) return "-";
     // On cherche dans la liste complète initiale
-    const chef = null //! getUserById(chefId);
+    const chef = null; //! getUserById(chefId);
     return chef ? "chef.username" : "Chef (ID: " + chefId + ")";
   };
 
@@ -67,7 +82,7 @@ export function UsersDataTable({ initialUsers }: UsersDataTableProps) {
             className="pl-8"
           />
         </div>
-        
+
         <Select value={roleFilter} onValueChange={setRoleFilter}>
           <SelectTrigger className="w-full sm:w-[180px]">
             <div className="flex items-center gap-2">
@@ -109,7 +124,10 @@ export function UsersDataTable({ initialUsers }: UsersDataTableProps) {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={`${getRoleBadgeColor(user.role)} capitalize`}>
+                    <Badge
+                      variant="outline"
+                      className={`${getRoleBadgeColor(user.role)} capitalize`}
+                    >
                       {user.role}
                     </Badge>
                   </TableCell>
@@ -129,7 +147,9 @@ export function UsersDataTable({ initialUsers }: UsersDataTableProps) {
                           </span>
                         </>
                       ) : (
-                        <span className="text-muted-foreground/50 italic text-xs">Aucun</span>
+                        <span className="text-muted-foreground/50 italic text-xs">
+                          Aucun
+                        </span>
                       )}
                     </div>
                   </TableCell>
@@ -145,9 +165,10 @@ export function UsersDataTable({ initialUsers }: UsersDataTableProps) {
           </TableBody>
         </Table>
       </div>
-      
+
       <div className="text-xs text-muted-foreground text-right">
-        Affichage de {filteredUsers.length} sur {initialUsers.length} utilisateur(s)
+        Affichage de {filteredUsers.length} sur {initialUsers.length}{" "}
+        utilisateur(s)
       </div>
     </div>
   );

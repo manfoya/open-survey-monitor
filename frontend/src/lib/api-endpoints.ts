@@ -4,6 +4,6 @@ export const API_ENDPOINTS = {
     ME: "/users/me",
   },
   USERS: {
-    BASE: "/users/",
+    BASE: "/users",
   },
 } as const;

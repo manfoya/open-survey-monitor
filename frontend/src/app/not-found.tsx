@@ -15,19 +15,15 @@ export default function NotFound() {
       <h1 className="text-4xl font-bold tracking-tight sm:text-6xl mb-4">
         404
       </h1>
-      <h2 className="text-xl font-semibold mb-2">
-        Page introuvable
-      </h2>
+      <h2 className="text-xl font-semibold mb-2">Page introuvable</h2>
       <p className="text-muted-foreground max-w-md mb-8">
-        La ressource que vous recherchez n&apos;existe pas ou a été déplacée. 
+        La ressource que vous recherchez n&apos;existe pas ou a été déplacée.
       </p>
 
       {/* Actions */}
       <div className="flex flex-col sm:flex-row gap-4">
         <Button asChild variant="default" size="lg">
-          <Link href="/overview">
-            Retour au Dashboard
-          </Link>
+          <Link href="/overview">Retour au Dashboard</Link>
         </Button>
         <Button asChild variant="ghost" size="lg">
           <Link href="/" className="flex items-center gap-2">

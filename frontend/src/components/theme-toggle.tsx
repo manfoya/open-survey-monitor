@@ -1,30 +1,32 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Moon, Sun, Monitor } from "lucide-react"
-import { useTheme } from "next-themes"
+import * as React from "react";
+import { Moon, Sun, Monitor } from "lucide-react";
+import { useTheme } from "next-themes";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
 export function ThemeToggle() {
-  const { setTheme } = useTheme()
-  const [mounted, setMounted] = React.useState(false)
+  const { setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
 
   // On attend que le composant soit monté côté client
   React.useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
-  // Tant que ce n'est pas monté, on rend un bouton vide ou un squelette 
+  // Tant que ce n'est pas monté, on rend un bouton vide ou un squelette
   // pour éviter le mismatch d'ID
   if (!mounted) {
-    return <Button variant="ghost" size="icon" className="h-9 w-9 px-0" disabled />
+    return (
+      <Button variant="ghost" size="icon" className="h-9 w-9 px-0" disabled />
+    );
   }
 
   return (
@@ -51,5 +53,5 @@ export function ThemeToggle() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

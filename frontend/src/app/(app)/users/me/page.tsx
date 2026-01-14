@@ -20,15 +20,15 @@ export default async function ProfilePage() {
             Identifiants système et accès terrain.
           </p>
         </div>
-        
+
         {/* Bouton d'édition pointant vers ta route dynamique [id] */}
         <RoleGuard allowedRoles={[UserRole.DIRECTEUR]}>
           <Button asChild variant="outline" size="sm" className="gap-2">
-          <Link href={`/users/${user.id}/edit`}>
-            <Pencil className="h-4 w-4" />
-            Modifier
-          </Link>
-        </Button>
+            <Link href={`/users/${user.id}/edit`}>
+              <Pencil className="h-4 w-4" />
+              Modifier
+            </Link>
+          </Button>
         </RoleGuard>
       </div>
 
@@ -56,7 +56,9 @@ export default async function ProfilePage() {
                   <Hash className="h-4 w-4" />
                   <span>Code CSPro</span>
                 </div>
-                <span className="font-bold text-primary">{user.cspro_code || "N/A"}</span>
+                <span className="font-bold text-primary">
+                  {user.cspro_code || "N/A"}
+                </span>
               </div>
 
               <div className="flex items-center justify-between p-4">
@@ -75,8 +77,9 @@ export default async function ProfilePage() {
         <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 p-4 rounded-lg flex gap-3">
           <ShieldCheck className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0" />
           <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
-            Votre <strong>Code CSPro</strong> est requis pour la synchronisation des données sur tablette. 
-            Si ce code ne correspond pas à votre matériel, contactez votre supérieur.
+            Votre <strong>Code CSPro</strong> est requis pour la synchronisation
+            des données sur tablette. Si ce code ne correspond pas à votre
+            matériel, contactez votre supérieur.
           </p>
         </div>
       </div>

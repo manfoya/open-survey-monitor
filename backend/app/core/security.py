@@ -5,6 +5,10 @@ from typing import Any, Union, Optional
 from jose import jwt
 from passlib.context import CryptContext
 import os
+import dotenv
+
+# Charger les variables d'environnement depuis le fichier .env
+dotenv.load_dotenv()
 
 # Configuration de bcrypt avec une version compatible
 pwd_context = CryptContext(
@@ -18,7 +22,7 @@ pwd_context = CryptContext(
 # On va juste mettre ceci par defaut au cas où le .env manque
 SECRET_KEY = os.getenv("SECRET_KEY", "une_cle_par_defaut_si_env_n_existe_pas")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "720"))
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """

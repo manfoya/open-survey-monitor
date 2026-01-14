@@ -1,16 +1,16 @@
 "use server";
 
-import { cache } from 'react'
+import { cache } from "react";
 import { apiClient, ApiError } from "@/lib/api-client";
 import { API_ENDPOINTS } from "@/lib/api-endpoints";
 import { cookies } from "next/headers";
 
 export enum UserRole {
-    DIRECTEUR = 'directeur',
-    SUPERVISEUR = 'superviseur',
-    CONTROLEUR = 'controleur',
-    AGENT = 'agent',
-  }
+  DIRECTEUR = "directeur",
+  SUPERVISEUR = "superviseur",
+  CONTROLEUR = "controleur",
+  AGENT = "agent",
+}
 
 export interface UserProfile {
   id: number; // ! garder œil sur ce type
@@ -30,13 +30,13 @@ export const getAccessToken = async (): Promise<string | null> => {
   const cookieStore = await cookies();
   const token = cookieStore.get("access_token")?.value;
   return token || null;
-}
+};
 
 // On enveloppe la fonction dans cache()
 // Next.js va mémoriser le résultat pour TOUTE la durée d'une seule requête HTTP.
 export const getMe = cache(async (): Promise<UserProfile | null> => {
   const token = await getAccessToken();
-  
+
   if (!token) return null;
 
   try {

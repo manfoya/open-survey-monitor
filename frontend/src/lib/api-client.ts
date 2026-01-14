@@ -8,7 +8,7 @@ export class ApiError extends Error {
   constructor(
     public status: number,
     public message: string,
-    public detail?: any,
+    public detail?: unknown,
   ) {
     super(message);
     this.name = "ApiError";
@@ -17,7 +17,7 @@ export class ApiError extends Error {
 
 export async function apiClient<T>(
   endpoint: string,
-  { params, ...customConfig }: FetchOptions = {}
+  { params, ...customConfig }: FetchOptions = {},
 ): Promise<T> {
   const headers = {
     "Content-Type": "application/json",
@@ -47,7 +47,7 @@ export async function apiClient<T>(
       throw new ApiError(
         response.status,
         errorData.detail || "Une erreur est survenue",
-        errorData
+        errorData,
       );
     }
 

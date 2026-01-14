@@ -9,10 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useActionState, useEffect } from "react";
 import { authenticate } from "../actions";
@@ -29,7 +26,7 @@ export function LoginForm({
     success: false,
     message: "",
   });
-  
+
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || DEFAULT_LOGIN_REDIRECT;
   const sessionExpired = searchParams.get("sessionExpired");
@@ -37,7 +34,9 @@ export function LoginForm({
   // Affichage d'un toast si la session a expiré
   useEffect(() => {
     if (sessionExpired) {
-      toast.error("Votre session a expiré. Veuillez vous reconnecter.", { duration: 5000 });
+      toast.error("Votre session a expiré. Veuillez vous reconnecter.", {
+        duration: 5000,
+      });
     }
   }, [sessionExpired]);
 
@@ -65,11 +64,13 @@ export function LoginForm({
         <CardContent>
           <form action={formAction}>
             <input type="hidden" name="callbackUrl" value={callbackUrl} />
-            
+
             <FieldGroup className="space-y-4">
               {/* Champ Username */}
               <div className="space-y-2">
-                <FieldLabel htmlFor="username">Nom d&apos;utilisateur</FieldLabel>
+                <FieldLabel htmlFor="username">
+                  Nom d&apos;utilisateur
+                </FieldLabel>
                 <Input
                   id="username"
                   type="text"
@@ -91,10 +92,10 @@ export function LoginForm({
                 <div className="flex items-center justify-between">
                   <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
                 </div>
-                <PasswordInput 
-                  id="password" 
-                  name="password" 
-                  required 
+                <PasswordInput
+                  id="password"
+                  name="password"
+                  required
                   className={state.errors?.password ? "border-destructive" : ""}
                 />
                 {state.errors?.password && (

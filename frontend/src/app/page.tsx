@@ -13,10 +13,10 @@ export default function HomePage() {
           avec une précision <span className="text-primary">Backend</span>.
         </h1>
         <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-          Interface open-source pour monitorer vos flux de données Python en temps réel. 
-          Simple, robuste et typé.
+          Interface open-source pour monitorer vos flux de données Python en
+          temps réel. Simple, robuste et typé.
         </p>
-        
+
         <div className="flex justify-center gap-4">
           <Button asChild size="lg">
             <Link href="/login">
@@ -32,17 +32,17 @@ export default function HomePage() {
       {/* Features Grid pour tester les Cards */}
       <section className="container py-12">
         <div className="grid gap-6 md:grid-cols-3">
-          <FeatureCard 
+          <FeatureCard
             icon={<Zap className="h-10 w-10 text-primary" />}
             title="Temps Réel"
             description="Connexion directe à votre API Python pour un monitoring instantané."
           />
-          <FeatureCard 
+          <FeatureCard
             icon={<BarChart3 className="h-10 w-10 text-primary" />}
             title="Analytique"
             description="Visualisation des données agrégées via des composants performants."
           />
-          <FeatureCard 
+          <FeatureCard
             icon={<ShieldCheck className="h-10 w-10 text-primary" />}
             title="Sécurisé"
             description="Validation Zod et authentification JWT Server-to-Server."
@@ -54,7 +54,15 @@ export default function HomePage() {
 }
 
 // Petit composant interne pour le test
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
+function FeatureCard({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
   return (
     <Card className="border-2">
       <CardContent className="pt-6">

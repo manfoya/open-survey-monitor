@@ -20,12 +20,12 @@ export default function RootLayout({
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
-          inter.className
+          inter.className,
         )}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <Toaster />
-            {children}
+          <Toaster />
+          {children}
         </ThemeProvider>
       </body>
     </html>

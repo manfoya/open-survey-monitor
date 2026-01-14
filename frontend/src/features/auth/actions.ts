@@ -28,14 +28,15 @@ const LoginFormSchema = z.object({
 
 export async function authenticate(
   prevState: LoginState,
-  formData: FormData
+  formData: FormData,
 ): Promise<LoginState> {
   // Validation "fail-fast" avec Zod (Côté serveur Next.js)
   const validatedFields = LoginFormSchema.safeParse({
     username: formData.get("username"),
     password: formData.get("password"),
   });
-  const callbackUrl = (formData.get("callbackUrl") as string) || DEFAULT_LOGIN_REDIRECT;
+  const callbackUrl =
+    (formData.get("callbackUrl") as string) || DEFAULT_LOGIN_REDIRECT;
 
   if (!validatedFields.success) {
     return {
@@ -57,7 +58,8 @@ export async function authenticate(
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: (Number(process.env?.ACCESS_TOKEN_EXPIRE_MINUTES) || 24 * 60) * 60, // en secondes
+      maxAge:
+        (Number(process.env?.ACCESS_TOKEN_EXPIRE_MINUTES) || 24 * 60) * 60, // en secondes
     });
 
     // Pas de return ici si on redirige car redirect() lève une erreur interne gérée par Next (laquelle serait attrapé)

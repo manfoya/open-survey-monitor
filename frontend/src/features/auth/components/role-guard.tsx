@@ -6,12 +6,11 @@ interface RoleGuardProps {
   fallback?: React.ReactNode; // Ce qu'on affiche si pas autorisé (ex: un message ou rien)
 }
 
-export async function RoleGuard({ 
-  children, 
-  allowedRoles, 
-  fallback = null 
+export async function RoleGuard({
+  children,
+  allowedRoles,
+  fallback = null,
 }: RoleGuardProps) {
-
   const user = await getMe();
 
   const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
