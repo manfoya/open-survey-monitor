@@ -8,13 +8,14 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MapPin, Edit, Navigation } from "lucide-react";
+import { ArrowLeft, MapPin, Edit, Maximize2 } from "lucide-react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { notFound } from "next/navigation";
 import { getZoneById } from "@/features/zones/services";
 import ZoneMap from "@/features/zones/components/zone-map";
 import DeleteZoneForm from "@/features/zones/components/delete-zone-form";
+import NavigationGPSButton from "@/features/zones/components/navigation-gps-button";
 
 interface ZoneDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -168,10 +169,7 @@ async function ZoneDetailsAsync({ zoneId }: { zoneId: number }) {
                     Modifier
                   </Link>
                 </Button>
-                <Button variant="outline" size="sm">
-                  <Navigation className="mr-2 h-4 w-4" />
-                  Navigation GPS
-                </Button>
+                <NavigationGPSButton zone={zone} />
                 <DeleteZoneForm
                   zoneId={zone.id}
                   zoneName={zone.nom_zone}
@@ -217,10 +215,19 @@ async function ZoneDetailsAsync({ zoneId }: { zoneId: number }) {
         <div className="sticky top-6">
           <Card className="h-fit">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <MapPin className="h-4 w-4" />
-                Localisation
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <MapPin className="h-4 w-4" />
+                  Localisation
+                </CardTitle>
+                {/* Icône pour voir la carte en grand */}
+                <Button asChild variant="ghost" size="sm" className="h-8 w-8 p-0">
+                  <Link href={`/zones/${zone.id}/map`}>
+                    <Maximize2 className="h-4 w-4" />
+                    <span className="sr-only">Voir la carte en grand</span>
+                  </Link>
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="p-0">
               <ZoneMap zone={zone} height="70vh" />

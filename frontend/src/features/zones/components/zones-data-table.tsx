@@ -94,9 +94,11 @@ function ZoneActionsDropdown({ zone }: ZoneActionsDropdownProps) {
         </DropdownMenuItem>
         
         {/* Action Voir sur carte */}
-        <DropdownMenuItem>
-          <MapPin className="mr-2 h-4 w-4" />
-          Voir sur carte
+        <DropdownMenuItem asChild>
+          <Link href={`/zones/${zone.id}/map`} className="cursor-pointer">
+            <MapPin className="mr-2 h-4 w-4" />
+            Voir sur carte
+          </Link>
         </DropdownMenuItem>
         
         {/* Action Suppression avec composant réutilisable */}
@@ -145,7 +147,11 @@ export default function ZonesDataTable({
         <TableBody>
           {paginatedZones.length > 0 ? (
             paginatedZones.map((zone: Zone) => (
-              <TableRow key={zone.id}>
+              <TableRow 
+                key={zone.id}
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => window.location.href = `/zones/${zone.id}`}
+              >
                 <TableCell className="font-medium">{zone.id}</TableCell>
                 <TableCell className="font-medium">{zone.nom_zone}</TableCell>
                 <TableCell>
