@@ -3,6 +3,8 @@
 import sys
 import os
 
+from app.models.settings import GlobalSettings
+
 # On utilise os.path.dirname pour pouvoir trouver le dossier app
 # peu importe d'où on lance le script dans le terminal.
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -35,6 +37,21 @@ def init_db(db: Session):
         print("Directeur créé ! Login: 'admin' / Pass: 'admin123'")
     else:
         print("Le Directeur existe déjà. Rien à faire.")
+
+def init_global_settings(db: Session):
+    """
+    Initialise les paramètres globaux de l'application.
+    """
+    # Exemple d'initialisation des paramètres globaux
+    settings = db.query(GlobalSettings).first()
+    if not settings:
+        print("Initialisation des paramètres globaux...")
+        settings = GlobalSettings()
+        db.add(settings)
+        db.commit()
+        print("Paramètres globaux initialisés.")
+    else:
+        print("Les paramètres globaux existent déjà. Rien à faire.")
 
 def main():
     # Création de la session BDD juste pour ce script

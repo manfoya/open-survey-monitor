@@ -1,9 +1,10 @@
-import { getMe, UserRole } from "@/features/auth/services/auth";
+import { getMe } from "@/features/auth/services/auth";
+import { UserRole } from "@/features/auth/types";
 
 interface RoleGuardProps {
   children: React.ReactNode;
   allowedRoles: UserRole | UserRole[];
-  fallback?: React.ReactNode; // Ce qu'on affiche si pas autorisé (ex: un message ou rien)
+  fallback?: React.ReactNode;
 }
 
 export async function RoleGuard({

@@ -5,7 +5,8 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { getMe, UserRole } from "@/features/auth/services/auth";
+import { getMe } from "@/features/auth/services/auth";
+import { UserRole } from "@/features/auth/types";
 import UpdateUserForm from "@/features/users/components/update-user-form";
 import { getSubordinates, getUserById } from "@/features/users/services";
 

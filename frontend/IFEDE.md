@@ -16,5 +16,8 @@
 
 ## Fonctionnalité en cours
 
-- Création d'un utilisateur (achevé)
-- Mise à jour (correctement faire la requete vers l'API, la route n'existant pas encore)
+- Vérifier le bon fonctionnement des routes pour les zones
+- Pour l'affichage des entrées dans le tableau, le clic sur la ligne doit lancer l'action "Détails"
+- La carte affichée sur la page de détails d'une zone doit comporté un lien vers la page qui ne contient que la map
+- Implémenter une route zones/1/map pour voir (en grand) une zone
+- 

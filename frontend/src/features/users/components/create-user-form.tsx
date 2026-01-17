@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-import { UserProfile } from "@/features/auth/services/auth";
+import { UserProfile } from "@/features/auth/types";
 import { getSubordinates } from "@/features/users/services";
 import {
   createUserAction,

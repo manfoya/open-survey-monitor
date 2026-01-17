@@ -6,4 +6,7 @@ export const API_ENDPOINTS = {
   USERS: {
     BASE: "/users",
   },
+  SETTINGS: {
+    GLOBAL: "/api/global-settings",
+  },
 } as const;

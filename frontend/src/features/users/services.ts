@@ -1,8 +1,9 @@
 "use server";
 
 import { apiClient } from "@/lib/api-client";
-import { getAccessToken, UserProfile } from "../auth/services/auth";
+import { getAccessToken } from "@/features/auth/services/auth";
 import { API_ENDPOINTS } from "@/lib/api-endpoints";
+import { UserProfile } from "@/features/auth/types";
 
 export const getSubordinates = async (): Promise<UserProfile[]> => {
   const token = await getAccessToken();

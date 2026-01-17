@@ -6,7 +6,7 @@ from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.models.users import User, RoleEnum
 from app.models.zones import Zone, Affectation
-from app.schemas.maps import ZoneCreate, ZoneOut, AffectationCreate, AffectationOut, AffectationUpdate
+from app.schemas.maps import ZoneCreate, ZoneOut, ZoneUpdate, AffectationCreate, AffectationOut, AffectationUpdate
 
 router = APIRouter()
 
@@ -35,6 +35,77 @@ def read_zones(
 ):
     """Lister toutes les zones."""
     return db.query(Zone).offset(skip).limit(limit).all()
+
+@router.get("/zones/{zone_id}", response_model=ZoneOut)
+def read_zone(
+    zone_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Récupérer une zone spécifique par son ID."""
+    zone = db.query(Zone).filter(Zone.id == zone_id).first()
+    if not zone:
+        raise HTTPException(status_code=404, detail="Zone introuvable.")
+    
+    return zone
+
+@router.put("/zones/{zone_id}", response_model=ZoneOut)
+def update_zone(
+    zone_id: int,
+    zone_update: ZoneUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Modifier une zone existante (Admin seulement)."""
+    if current_user.role != RoleEnum.directeur:
+        raise HTTPException(status_code=403, detail="Seul le Directeur peut modifier les zones.")
+    
+    # Vérifier que la zone existe
+    zone = db.query(Zone).filter(Zone.id == zone_id).first()
+    if not zone:
+        raise HTTPException(status_code=404, detail="Zone introuvable.")
+    
+    # Appliquer les modifications (seulement les champs non-None)
+    update_data = zone_update.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(zone, field, value)
+    
+    db.commit()
+    db.refresh(zone)
+    return zone
+
+@router.delete("/zones/{zone_id}")
+def delete_zone(
+    zone_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Supprimer une zone (Admin seulement). Attention aux affectations liées !"""
+    if current_user.role != RoleEnum.directeur:
+        raise HTTPException(status_code=403, detail="Seul le Directeur peut supprimer les zones.")
+    
+    # Vérifier que la zone existe
+    zone = db.query(Zone).filter(Zone.id == zone_id).first()
+    if not zone:
+        raise HTTPException(status_code=404, detail="Zone introuvable.")
+    
+    # Vérifier s'il y a des affectations actives liées à cette zone
+    affectations_actives = db.query(Affectation).filter(
+        Affectation.zone_id == zone_id,
+        Affectation.est_actif == True
+    ).count()
+    
+    if affectations_actives > 0:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Impossible de supprimer la zone. {affectations_actives} affectation(s) active(s) sont liées à cette zone. Veuillez d'abord les désactiver."
+        )
+    
+    # Supprimer la zone
+    db.delete(zone)
+    db.commit()
+    
+    return {"message": f"Zone '{zone.nom_zone}' supprimée avec succès."}
 
 # Gestion des affectations (missions et quotas)
 

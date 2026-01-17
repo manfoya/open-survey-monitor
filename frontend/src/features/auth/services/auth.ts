@@ -4,21 +4,8 @@ import { cache } from "react";
 import { apiClient, ApiError } from "@/lib/api-client";
 import { API_ENDPOINTS } from "@/lib/api-endpoints";
 import { cookies } from "next/headers";
+import { UserProfile } from "../types";
 
-export enum UserRole {
-  DIRECTEUR = "directeur",
-  SUPERVISEUR = "superviseur",
-  CONTROLEUR = "controleur",
-  AGENT = "agent",
-}
-
-export interface UserProfile {
-  id: number; // ! garder œil sur ce type
-  username: string;
-  role: UserRole;
-  cspro_code: string | null;
-  chef_id: number | null; //! garder œil sur ce type
-}
 
 export const isUserLoggedIn = async (): Promise<boolean> => {
   //! Si une route /auth/check-session/ existe côté backend, on pourrait l'utiliser ici.

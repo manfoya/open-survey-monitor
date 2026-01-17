@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { UserRole } from "../../auth/services/auth";
+import { UserRole } from "@/features/auth/types";
 import { postUser } from "../services";
 import { ApiError } from "@/lib/api-client";
 import { revalidatePath } from "next/cache";

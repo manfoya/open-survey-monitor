@@ -1,7 +1,8 @@
-import { getMe, UserRole } from "@/features/auth/services/auth";
+import { getMe } from "@/features/auth/services/auth";
+import { UserRole } from "@/features/auth/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button"; // Assure-toi d'avoir le bouton
+import { Button } from "@/components/ui/button";
 import { User, ShieldCheck, Hash, Fingerprint, Pencil } from "lucide-react";
 import Link from "next/link";
 import { RoleGuard } from "@/features/auth/components/role-guard";

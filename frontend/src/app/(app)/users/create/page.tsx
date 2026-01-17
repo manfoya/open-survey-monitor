@@ -1,5 +1,5 @@
 import { RoleGuard } from "@/features/auth/components/role-guard";
-import { UserRole } from "@/features/auth/services/auth";
+import { UserRole } from "@/features/auth/types";
 import {
   Card,
   CardContent,

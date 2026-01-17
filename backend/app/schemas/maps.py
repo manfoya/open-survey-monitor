@@ -35,6 +35,13 @@ class ZoneBase(BaseModel):
 class ZoneCreate(ZoneBase):
     pass
 
+class ZoneUpdate(BaseModel):
+    """Pour modifier une zone existante"""
+    nom_zone: Optional[str] = None
+    latitude_centrale: Optional[float] = None
+    longitude_centrale: Optional[float] = None
+    rayon_tolerance_metres: Optional[int] = None
+
 class ZoneOut(ZoneBase):
     id: int
     class Config:

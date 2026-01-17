@@ -35,7 +35,7 @@ import { toast } from "sonner";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 // Assure-toi que les chemins d'import correspondent à ton projet
-import { UserProfile } from "@/features/auth/services/auth";
+import { UserProfile } from "@/features/auth/types";
 import { getSubordinates } from "@/features/users/services";
 import { updateUserAction } from "@/features/users/actions/update-user-action";
 import {
