@@ -1,5 +1,11 @@
 import { Suspense } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RoleGuard } from "@/features/auth/components/role-guard";
@@ -35,7 +41,8 @@ async function CreateZoneFormAsync() {
           Nouvelle zone géographique
         </CardTitle>
         <CardDescription>
-          Définissez les coordonnées centrales et le rayon de tolérance de votre zone.
+          Définissez les coordonnées centrales et le rayon de tolérance de votre
+          zone.
         </CardDescription>
       </CardHeader>
       <CardContent>

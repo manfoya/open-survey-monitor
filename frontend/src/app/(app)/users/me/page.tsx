@@ -28,7 +28,7 @@ export default async function ProfilePage() {
 
 async function ProfileAsync() {
   let user;
-  
+
   try {
     user = await getMe();
   } catch (error) {
@@ -81,7 +81,7 @@ async function ProfileAsync() {
             </RoleGuard>
           </div>
         </CardHeader>
-        
+
         <CardContent className="p-0">
           <div className="divide-y text-sm">
             {/* Code CSPro */}
@@ -138,7 +138,7 @@ function ProfileSkeleton() {
             <Skeleton className="h-8 w-20" />
           </div>
         </CardHeader>
-        
+
         <CardContent className="p-0">
           <div className="divide-y">
             {Array.from({ length: 2 }).map((_, i) => (
@@ -153,7 +153,7 @@ function ProfileSkeleton() {
           </div>
         </CardContent>
       </Card>
-      
+
       <div className="p-4 rounded-lg border">
         <Skeleton className="h-12 w-full" />
       </div>

@@ -51,17 +51,17 @@ export default async function ZonesPage(props: {
   );
 }
 
-async function ZonesTableAsync({ 
-  query, 
-  page, 
-  per_page 
-}: { 
-  query: string; 
-  page: number; 
-  per_page: number; 
+async function ZonesTableAsync({
+  query,
+  page,
+  per_page,
+}: {
+  query: string;
+  page: number;
+  per_page: number;
 }) {
   const currentUser = await getMe();
-  
+
   if (!currentUser) {
     return <div>Erreur lors du chargement du profil utilisateur.</div>;
   }

@@ -41,7 +41,8 @@ async function CreateUserFormAsync() {
           Nouveau compte utilisateur
         </CardTitle>
         <CardDescription>
-          Configurez le nom d&apos;utilisateur, le rôle et les paramètres d&apos;accès.
+          Configurez le nom d&apos;utilisateur, le rôle et les paramètres
+          d&apos;accès.
         </CardDescription>
       </CardHeader>
       <CardContent>

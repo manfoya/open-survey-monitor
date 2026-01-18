@@ -5,7 +5,7 @@ export interface LoginResponse {
 
 export enum UserRole {
   DIRECTEUR = "directeur",
-  SUPERVISEUR = "superviseur", 
+  SUPERVISEUR = "superviseur",
   CONTROLEUR = "controleur",
   AGENT = "agent",
 }

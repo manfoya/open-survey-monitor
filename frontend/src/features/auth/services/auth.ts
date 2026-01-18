@@ -6,7 +6,6 @@ import { API_ENDPOINTS } from "@/lib/api-endpoints";
 import { cookies } from "next/headers";
 import { UserProfile } from "../types";
 
-
 export const isUserLoggedIn = async (): Promise<boolean> => {
   //! Si une route /auth/check-session/ existe côté backend, on pourrait l'utiliser ici.
   const user = await getMe();

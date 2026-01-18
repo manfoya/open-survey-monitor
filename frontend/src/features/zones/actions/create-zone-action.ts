@@ -69,10 +69,7 @@ export async function createZoneAction(
 
   // Appel au backend pour créer la zone
   try {
-    console.log(
-      "Données validées pour création zone :",
-      parsedData.data,
-    );
+    console.log("Données validées pour création zone :", parsedData.data);
     await postZone(parsedData.data);
   } catch (error) {
     console.error("Erreur lors de la création de la zone :", error);

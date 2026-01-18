@@ -64,8 +64,6 @@ export const ASSIGNABLE_ROLES = [
   { value: "superviseur", label: "Superviseur" },
 ] as const;
 
-
-
 export function getRequiredChefRoleLabel(targetRole: string): string {
   switch (targetRole) {
     case "agent":

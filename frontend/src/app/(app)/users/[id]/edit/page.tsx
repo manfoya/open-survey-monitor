@@ -53,7 +53,7 @@ async function UpdateUserFormAsync({ userId }: { userId: number }) {
     [user, currentUser, subordinates] = await Promise.all([
       getUserById(userId),
       getMe(),
-      getSubordinates()
+      getSubordinates(),
     ]);
   } catch (error) {
     console.error("Erreur lors du chargement de l'utilisateur:", error);
@@ -72,7 +72,8 @@ async function UpdateUserFormAsync({ userId }: { userId: number }) {
 
   // Vérifier les autorisations - Protection au niveau serveur
   const subordinateIds = subordinates.map((u) => u.id);
-  const canEdit = currentUser.role === UserRole.DIRECTEUR || subordinateIds.includes(user.id);
+  const canEdit =
+    currentUser.role === UserRole.DIRECTEUR || subordinateIds.includes(user.id);
 
   if (!canEdit) {
     return (
@@ -86,7 +87,8 @@ async function UpdateUserFormAsync({ userId }: { userId: number }) {
   }
 
   // Déterminer si l'utilisateur peut changer le chef
-  const canChangeChef = currentUser.role === UserRole.DIRECTEUR || user.chef_id !== currentUser.id;
+  const canChangeChef =
+    currentUser.role === UserRole.DIRECTEUR || user.chef_id !== currentUser.id;
 
   return (
     <Card>
@@ -96,7 +98,8 @@ async function UpdateUserFormAsync({ userId }: { userId: number }) {
           {user.username}
         </CardTitle>
         <CardDescription>
-          Modifiez uniquement les informations nécessaires. Les champs non modifiés conserveront leurs valeurs actuelles.
+          Modifiez uniquement les informations nécessaires. Les champs non
+          modifiés conserveront leurs valeurs actuelles.
         </CardDescription>
       </CardHeader>
       <CardContent>

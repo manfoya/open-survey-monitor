@@ -14,17 +14,19 @@ interface DeleteZoneFormProps {
   redirectOnSuccess?: boolean;
 }
 
-export default function DeleteZoneForm({ 
+export default function DeleteZoneForm({
   zoneId,
   className = "inline",
   buttonClassName = "flex w-full items-center text-destructive cursor-pointer",
   showIcon = true,
   buttonText = "Supprimer",
-  redirectOnSuccess = false
+  redirectOnSuccess = false,
 }: DeleteZoneFormProps) {
-
   const deleteZoneActionWithId = deleteZoneAction.bind(null, zoneId);
-  const [state, formAction, isPending] = useActionState(deleteZoneActionWithId, {});
+  const [state, formAction, isPending] = useActionState(
+    deleteZoneActionWithId,
+    {},
+  );
 
   useEffect(() => {
     if (state.success === true) {
@@ -32,7 +34,7 @@ export default function DeleteZoneForm({
     } else if (state.success === false) {
       toast.error(state.message || "Erreur lors de la suppression de la zone.");
     }
-  }, [state])
+  }, [state]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     if (!confirm("Êtes-vous sûr de vouloir supprimer cette zone ?")) {
@@ -42,15 +44,15 @@ export default function DeleteZoneForm({
 
   return (
     <form action={formAction} className={className} onSubmit={handleSubmit}>
-      <button 
-        type="submit" 
-        className={buttonClassName}
-        disabled={isPending}
-      >
+      <button type="submit" className={buttonClassName} disabled={isPending}>
         {showIcon && <Trash2 className="mr-4 h-4 w-4" />}
         {isPending ? "Suppression..." : buttonText}
       </button>
-      <input type="hidden" name="redirect" value={redirectOnSuccess.toString()} />
+      <input
+        type="hidden"
+        name="redirect"
+        value={redirectOnSuccess.toString()}
+      />
     </form>
   );
 }

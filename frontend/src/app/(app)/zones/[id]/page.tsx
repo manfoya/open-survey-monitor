@@ -20,13 +20,19 @@ import PageHeader from "@/components/page-header";
 import ErrorState from "@/components/error-state";
 import { RoleGuard } from "@/features/auth/components/role-guard";
 import { UserRole } from "@/features/auth/types";
-import { formatCoordinate, formatRadius, calculateZoneArea } from "@/features/zones/utils";
+import {
+  formatCoordinate,
+  formatRadius,
+  calculateZoneArea,
+} from "@/features/zones/utils";
 
 interface ZoneDetailsPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function ZoneDetailsPage({ params }: ZoneDetailsPageProps) {
+export default async function ZoneDetailsPage({
+  params,
+}: ZoneDetailsPageProps) {
   const { id } = await params;
   const zoneId = Number(id);
 
@@ -36,7 +42,7 @@ export default async function ZoneDetailsPage({ params }: ZoneDetailsPageProps) 
 
   return (
     <div className="container mx-auto py-6">
-      <PageHeader 
+      <PageHeader
         title="Détails de la zone"
         description="Informations détaillées et localisation géographique."
         backHref="/zones"
@@ -124,7 +130,8 @@ async function ZoneDetailsAsync({ zoneId }: { zoneId: number }) {
                 <div className="text-sm text-muted-foreground">
                   <div>Rayon de {zone.rayon_tolerance_metres} mètres</div>
                   <div className="text-xs">
-                    Aire d&apos;environ {calculateZoneArea(zone.rayon_tolerance_metres)} km²
+                    Aire d&apos;environ{" "}
+                    {calculateZoneArea(zone.rayon_tolerance_metres)} km²
                   </div>
                 </div>
               </div>
@@ -144,9 +151,9 @@ async function ZoneDetailsAsync({ zoneId }: { zoneId: number }) {
                     </Link>
                   </Button>
                 </RoleGuard>
-                
+
                 <NavigationGPSButton zone={zone} />
-                
+
                 <RoleGuard allowedRoles={[UserRole.DIRECTEUR]}>
                   <DeleteZoneForm
                     zoneId={zone.id}
@@ -170,7 +177,12 @@ async function ZoneDetailsAsync({ zoneId }: { zoneId: number }) {
                 <CardTitle className="flex items-center gap-2 text-base">
                   Localisation
                 </CardTitle>
-                <Button asChild variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                >
                   <Link href={`/zones/${zone.id}/map`}>
                     <Maximize2 className="h-4 w-4" />
                     <span className="sr-only">Voir la carte en grand</span>
@@ -218,7 +230,7 @@ function ZoneDetailsSkeleton() {
                 </div>
               </div>
             </div>
-            
+
             {/* Actions skeleton */}
             <div className="pt-4 space-y-3">
               <Skeleton className="h-4 w-16" />

@@ -30,7 +30,7 @@ export default async function ZoneMapPage({ params }: ZoneMapPageProps) {
 
 async function ZoneMapAsync({ zoneId }: { zoneId: number }) {
   let zone;
-  
+
   try {
     zone = await getZoneById(zoneId);
   } catch (error) {
@@ -57,7 +57,7 @@ async function ZoneMapAsync({ zoneId }: { zoneId: number }) {
       </div>
     );
   }
-  
+
   if (!zone) {
     notFound();
   }
@@ -68,7 +68,10 @@ async function ZoneMapAsync({ zoneId }: { zoneId: number }) {
       <div className="bg-background border-b px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild>
-            <Link href={`/zones/${zone.id}`} className="flex items-center gap-2">
+            <Link
+              href={`/zones/${zone.id}`}
+              className="flex items-center gap-2"
+            >
               <ArrowLeft className="h-4 w-4" />
               Retour aux détails
             </Link>
@@ -81,7 +84,7 @@ async function ZoneMapAsync({ zoneId }: { zoneId: number }) {
             </span>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Maximize2 className="h-4 w-4" />
           Vue cartographique étendue
@@ -90,11 +93,7 @@ async function ZoneMapAsync({ zoneId }: { zoneId: number }) {
 
       {/* Carte pleine hauteur */}
       <div className="flex-1">
-        <ZoneMap 
-          zone={zone} 
-          height="100%" 
-          showPopup={true}
-        />
+        <ZoneMap zone={zone} height="100%" showPopup={true} />
       </div>
     </>
   );
@@ -111,7 +110,9 @@ function MapPageSkeleton() {
         <div className="w-32 h-5 bg-muted rounded animate-pulse" />
       </div>
       <div className="flex-1 bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-        <div className="text-sm text-muted-foreground">Chargement de la carte...</div>
+        <div className="text-sm text-muted-foreground">
+          Chargement de la carte...
+        </div>
       </div>
     </div>
   );

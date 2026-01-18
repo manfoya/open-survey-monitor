@@ -51,17 +51,17 @@ export default async function UsersPage(props: {
   );
 }
 
-async function UsersTableAsync({ 
-  query, 
-  page, 
-  per_page 
-}: { 
-  query: string; 
-  page: number; 
-  per_page: number; 
+async function UsersTableAsync({
+  query,
+  page,
+  per_page,
+}: {
+  query: string;
+  page: number;
+  per_page: number;
 }) {
   const currentUser = await getMe();
-  
+
   if (!currentUser) {
     return <div>Erreur lors du chargement du profil utilisateur.</div>;
   }
@@ -72,7 +72,9 @@ async function UsersTableAsync({
     return (
       <div className="text-center py-12">
         <UserPlus className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-semibold mb-2">Aucun utilisateur sous votre responsabilité</h3>
+        <h3 className="text-lg font-semibold mb-2">
+          Aucun utilisateur sous votre responsabilité
+        </h3>
         <p className="text-muted-foreground mb-4">
           Vous n&apos;avez aucun utilisateur dans votre équipe pour le moment.
         </p>

@@ -1,10 +1,5 @@
 import { Suspense } from "react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -31,7 +26,7 @@ export default async function UserDetailsPage(props: {
 
   return (
     <div className="container mx-auto py-6 max-w-2xl">
-      <PageHeader 
+      <PageHeader
         title={`Utilisateur #${userId}`}
         description="Informations détaillées et paramètres du compte."
         backHref="/users"
@@ -54,7 +49,7 @@ async function UserDetailsAsync({ userId }: { userId: number }) {
     [user, currentUser, subordinates] = await Promise.all([
       getUserById(userId),
       getMe(),
-      getSubordinates()
+      getSubordinates(),
     ]);
   } catch (error) {
     console.error("Erreur lors du chargement de l'utilisateur:", error);
@@ -73,8 +68,8 @@ async function UserDetailsAsync({ userId }: { userId: number }) {
 
   // Vérifier les permissions
   const subordinateIds = subordinates.map((u) => u.id);
-  const canView = 
-    currentUser.role === UserRole.DIRECTEUR || 
+  const canView =
+    currentUser.role === UserRole.DIRECTEUR ||
     subordinateIds.includes(user.id) ||
     user.id === currentUser.id;
 
@@ -89,14 +84,17 @@ async function UserDetailsAsync({ userId }: { userId: number }) {
     );
   }
 
-  const canEdit = currentUser.role === UserRole.DIRECTEUR || subordinateIds.includes(user.id);
-  const canDelete = 
-    currentUser.role === UserRole.DIRECTEUR && 
+  const canEdit =
+    currentUser.role === UserRole.DIRECTEUR || subordinateIds.includes(user.id);
+  const canDelete =
+    currentUser.role === UserRole.DIRECTEUR &&
     user.role !== UserRole.DIRECTEUR &&
     user.id !== currentUser.id;
 
   // Trouver le chef
-  const chef = user.chef_id ? subordinates.find(u => u.id === user.chef_id) : null;
+  const chef = user.chef_id
+    ? subordinates.find((u) => u.id === user.chef_id)
+    : null;
 
   return (
     <div className="space-y-6">
@@ -115,11 +113,19 @@ async function UserDetailsAsync({ userId }: { userId: number }) {
                 </Badge>
               </div>
             </div>
-            
+
             {/* Boutons d'actions - Protégés par RoleGuard */}
             <div className="flex items-center gap-2">
-              <RoleGuard 
-                allowedRoles={canEdit ? [UserRole.DIRECTEUR, UserRole.SUPERVISEUR, UserRole.CONTROLEUR] : []}
+              <RoleGuard
+                allowedRoles={
+                  canEdit
+                    ? [
+                        UserRole.DIRECTEUR,
+                        UserRole.SUPERVISEUR,
+                        UserRole.CONTROLEUR,
+                      ]
+                    : []
+                }
               >
                 <Button asChild variant="outline" size="sm">
                   <Link href={`/users/${user.id}/edit`}>
@@ -128,7 +134,7 @@ async function UserDetailsAsync({ userId }: { userId: number }) {
                   </Link>
                 </Button>
               </RoleGuard>
-              
+
               <RoleGuard allowedRoles={[UserRole.DIRECTEUR]}>
                 {canDelete && (
                   <DeleteUserForm
@@ -142,7 +148,7 @@ async function UserDetailsAsync({ userId }: { userId: number }) {
             </div>
           </div>
         </CardHeader>
-        
+
         <CardContent className="p-0">
           <div className="divide-y text-sm">
             {/* Code CSPro */}
@@ -194,8 +200,8 @@ async function UserDetailsAsync({ userId }: { userId: number }) {
       <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 p-4 rounded-lg flex gap-3">
         <ShieldCheck className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0" />
         <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
-          Le <strong>Code CSPro</strong> est requis pour la synchronisation
-          des données terrain. Il doit être unique dans le système.
+          Le <strong>Code CSPro</strong> est requis pour la synchronisation des
+          données terrain. Il doit être unique dans le système.
         </p>
       </div>
     </div>
@@ -221,7 +227,7 @@ function UserDetailsSkeleton() {
             </div>
           </div>
         </CardHeader>
-        
+
         <CardContent className="p-0">
           <div className="divide-y">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -236,7 +242,7 @@ function UserDetailsSkeleton() {
           </div>
         </CardContent>
       </Card>
-      
+
       <div className="p-4 rounded-lg border">
         <Skeleton className="h-16 w-full" />
       </div>

@@ -5,7 +5,10 @@ import { getAccessToken } from "@/features/auth/services/auth";
 import { Zone, CreateZoneData, UpdateZoneData } from "./types";
 import { API_ENDPOINTS } from "@/lib/api-endpoints";
 
-export const getZones = async (skip: number = 0, limit: number = 100): Promise<Zone[]> => {
+export const getZones = async (
+  skip: number = 0,
+  limit: number = 100,
+): Promise<Zone[]> => {
   const token = await getAccessToken();
   if (!token) return [];
 

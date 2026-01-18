@@ -15,24 +15,36 @@ interface ZoneMapInnerProps {
   showPopup: boolean;
 }
 
-export default function ZoneMapInner({ zone, height, showPopup }: ZoneMapInnerProps) {
+export default function ZoneMapInner({
+  zone,
+  height,
+  showPopup,
+}: ZoneMapInnerProps) {
   useEffect(() => {
     // Correction des icônes Leaflet (spécifique au client)
     // Utilisation de CDN ou assets locaux
     const DefaultIcon = L.icon({
       iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-      iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-      shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+      iconRetinaUrl:
+        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+      shadowUrl:
+        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
       iconSize: [25, 41],
       iconAnchor: [12, 41],
     });
     L.Marker.prototype.options.icon = DefaultIcon;
   }, []);
 
-  const center: [number, number] = [zone.latitude_centrale, zone.longitude_centrale];
+  const center: [number, number] = [
+    zone.latitude_centrale,
+    zone.longitude_centrale,
+  ];
 
   return (
-    <div style={{ height }} className="rounded-lg overflow-hidden border w-full">
+    <div
+      style={{ height }}
+      className="rounded-lg overflow-hidden border w-full"
+    >
       <MapContainer
         center={center}
         zoom={getOptimalZoomLevel(zone.rayon_tolerance_metres)}
@@ -46,12 +58,16 @@ export default function ZoneMapInner({ zone, height, showPopup }: ZoneMapInnerPr
         <Circle
           center={center}
           radius={zone.rayon_tolerance_metres}
-          pathOptions={{ color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.1 }}
+          pathOptions={{
+            color: "#3b82f6",
+            fillColor: "#3b82f6",
+            fillOpacity: 0.1,
+          }}
         />
         <Marker position={center}>
           {showPopup && (
             <Popup>
-               <div className="text-sm p-1">
+              <div className="text-sm p-1">
                 <p className="font-bold">{zone.nom_zone}</p>
                 <p className="text-xs">Rayon: {zone.rayon_tolerance_metres}m</p>
               </div>

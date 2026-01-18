@@ -21,7 +21,7 @@ interface UpdateZoneFormProps {
 export default function UpdateZoneForm({ zone }: UpdateZoneFormProps) {
   const [state, formAction, isPending] = useActionState(
     updateZoneAction.bind(null, zone.id),
-    { success: false }
+    { success: false },
   );
 
   useEffect(() => {
@@ -64,7 +64,9 @@ export default function UpdateZoneForm({ zone }: UpdateZoneFormProps) {
             max="90"
             placeholder="ex: 48.8566"
             disabled={isPending}
-            defaultValue={state.data?.latitude_centrale || zone.latitude_centrale}
+            defaultValue={
+              state.data?.latitude_centrale || zone.latitude_centrale
+            }
             aria-invalid={!!state.errors?.latitude_centrale}
           />
           <div className="text-xs text-muted-foreground">
@@ -84,7 +86,9 @@ export default function UpdateZoneForm({ zone }: UpdateZoneFormProps) {
             max="180"
             placeholder="ex: 2.3522"
             disabled={isPending}
-            defaultValue={state.data?.longitude_centrale || zone.longitude_centrale}
+            defaultValue={
+              state.data?.longitude_centrale || zone.longitude_centrale
+            }
             aria-invalid={!!state.errors?.longitude_centrale}
           />
           <div className="text-xs text-muted-foreground">
@@ -96,7 +100,9 @@ export default function UpdateZoneForm({ zone }: UpdateZoneFormProps) {
 
       {/* Rayon de tolérance */}
       <div className="space-y-2">
-        <Label htmlFor="rayon_tolerance_metres">Rayon de tolérance (mètres)</Label>
+        <Label htmlFor="rayon_tolerance_metres">
+          Rayon de tolérance (mètres)
+        </Label>
         <Input
           id="rayon_tolerance_metres"
           name="rayon_tolerance_metres"
@@ -116,11 +122,7 @@ export default function UpdateZoneForm({ zone }: UpdateZoneFormProps) {
         {errorDiv(state.errors?.rayon_tolerance_metres)}
       </div>
 
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isPending}
-      >
+      <Button type="submit" className="w-full" disabled={isPending}>
         {isPending ? "Mise à jour en cours..." : "Mettre à jour la zone"}
       </Button>
     </form>
@@ -142,9 +144,7 @@ function alertMessage(state: UpdateZoneState) {
         <Alert className="border-green-600/50 text-green-600 dark:border-green-500 dark:text-green-500 [&>svg]:text-green-600">
           <CheckCircle2 className="h-4 w-4" />
           <AlertTitle>Succès</AlertTitle>
-          <AlertDescription>
-            Zone mise à jour avec succès !
-          </AlertDescription>
+          <AlertDescription>Zone mise à jour avec succès !</AlertDescription>
         </Alert>
       )}
     </>

@@ -14,11 +14,11 @@ interface ErrorStateProps {
   showRefresh?: boolean;
 }
 
-export default function ErrorState({ 
-  title, 
-  message, 
+export default function ErrorState({
+  title,
+  message,
   primaryAction,
-  showRefresh = true 
+  showRefresh = true,
 }: ErrorStateProps) {
   return (
     <Card>
@@ -31,9 +31,7 @@ export default function ErrorState({
             {showRefresh && <RefreshButton />}
             {primaryAction && (
               <Button asChild>
-                <Link href={primaryAction.href}>
-                  {primaryAction.label}
-                </Link>
+                <Link href={primaryAction.href}>{primaryAction.label}</Link>
               </Button>
             )}
           </div>

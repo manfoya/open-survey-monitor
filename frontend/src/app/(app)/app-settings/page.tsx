@@ -1,8 +1,8 @@
 import { Suspense } from "react";
-import { getGlobalSettings } from '@/features/app-settings/services';
-import GlobalSettingsForm from '@/features/app-settings/components/global-settings-form';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { getGlobalSettings } from "@/features/app-settings/services";
+import GlobalSettingsForm from "@/features/app-settings/components/global-settings-form";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RoleGuard } from "@/features/auth/components/role-guard";
 import { UserRole } from "@/features/auth/types";
@@ -11,7 +11,7 @@ import PageHeader from "@/components/page-header";
 
 export default async function AppSettingsPage() {
   return (
-    <RoleGuard 
+    <RoleGuard
       allowedRoles={[UserRole.DIRECTEUR]}
       fallback={
         <div className="container mx-auto py-6 max-w-4xl">
@@ -45,7 +45,7 @@ async function AppSettingsFormAsync() {
   try {
     settings = await getGlobalSettings();
   } catch (err) {
-    console.error('Erreur lors du chargement des paramètres:', err);
+    console.error("Erreur lors du chargement des paramètres:", err);
     error = err;
   }
 
@@ -54,8 +54,8 @@ async function AppSettingsFormAsync() {
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          Impossible de charger les paramètres de l&apos;application. 
-          Veuillez vérifier que le serveur est accessible et réessayer.
+          Impossible de charger les paramètres de l&apos;application. Veuillez
+          vérifier que le serveur est accessible et réessayer.
         </AlertDescription>
       </Alert>
     );

@@ -46,7 +46,7 @@ function filterZones(zones: Zone[], query: string) {
       zone.nom_zone.toLowerCase().includes(lowerQuery) ||
       zone.id.toString().includes(lowerQuery) ||
       zone.latitude_centrale.toString().includes(lowerQuery) ||
-      zone.longitude_centrale.toString().includes(lowerQuery)
+      zone.longitude_centrale.toString().includes(lowerQuery),
   );
 }
 
@@ -78,7 +78,7 @@ function ZoneActionsDropdown({ zone, currentUser }: ZoneActionsDropdownProps) {
             Détails
           </Link>
         </DropdownMenuItem>
-        
+
         {/* Action Édition - Protégée pour directeurs seulement */}
         <ClientRoleGuard allowedRoles={[UserRole.DIRECTEUR]} user={currentUser}>
           <DropdownMenuItem asChild>
@@ -88,7 +88,7 @@ function ZoneActionsDropdown({ zone, currentUser }: ZoneActionsDropdownProps) {
             </Link>
           </DropdownMenuItem>
         </ClientRoleGuard>
-        
+
         {/* Action Voir sur carte */}
         <DropdownMenuItem asChild>
           <Link href={`/zones/${zone.id}/map`} className="cursor-pointer">
@@ -96,14 +96,11 @@ function ZoneActionsDropdown({ zone, currentUser }: ZoneActionsDropdownProps) {
             Voir sur carte
           </Link>
         </DropdownMenuItem>
-        
+
         {/* Action Suppression - Protégée pour directeurs seulement */}
         <ClientRoleGuard allowedRoles={[UserRole.DIRECTEUR]} user={currentUser}>
           <DropdownMenuItem asChild>
-            <DeleteZoneForm 
-              zoneId={zone.id} 
-              className="w-full"
-            />
+            <DeleteZoneForm zoneId={zone.id} className="w-full" />
           </DropdownMenuItem>
         </ClientRoleGuard>
       </DropdownMenuContent>
@@ -111,12 +108,12 @@ function ZoneActionsDropdown({ zone, currentUser }: ZoneActionsDropdownProps) {
   );
 }
 
-export default function ZonesDataTable({ 
-  zones, 
-  query, 
-  page = 1, 
+export default function ZonesDataTable({
+  zones,
+  query,
+  page = 1,
   per_page = 5,
-  currentUser
+  currentUser,
 }: ZonesTableProps) {
   const filteredZones = filterZones(zones, query);
   const { start, end } = getRange(page, per_page);
@@ -125,7 +122,7 @@ export default function ZonesDataTable({
 
   const searchParams = useSearchParams();
   useEffect(() => {
-    if (searchParams.get('deleted') === 'true') {
+    if (searchParams.get("deleted") === "true") {
       toast.success("Zone supprimée avec succès !");
     }
   }, [searchParams]);
@@ -136,7 +133,7 @@ export default function ZonesDataTable({
         <TableCaption>
           <p className="m-4">Liste des zones géographiques configurées.</p>
         </TableCaption>
-        
+
         {/* EN-TÊTE DU TABLEAU */}
         <TableHeader>
           <TableRow>
@@ -152,10 +149,10 @@ export default function ZonesDataTable({
         <TableBody>
           {paginatedZones.length > 0 ? (
             paginatedZones.map((zone: Zone) => (
-              <TableRow 
+              <TableRow
                 key={zone.id}
                 className="hover:bg-muted/50 transition-colors cursor-pointer"
-                onClick={() => window.location.href = `/zones/${zone.id}`}
+                onClick={() => (window.location.href = `/zones/${zone.id}`)}
               >
                 <TableCell className="font-medium">{zone.id}</TableCell>
                 <TableCell className="font-medium">
@@ -166,10 +163,10 @@ export default function ZonesDataTable({
                 <TableCell>
                   <div className="space-y-1 text-sm">
                     <div className="font-mono text-xs">
-                      {formatCoordinate(zone.latitude_centrale, 'lat')}
+                      {formatCoordinate(zone.latitude_centrale, "lat")}
                     </div>
                     <div className="font-mono text-xs">
-                      {formatCoordinate(zone.longitude_centrale, 'lng')}
+                      {formatCoordinate(zone.longitude_centrale, "lng")}
                     </div>
                   </div>
                 </TableCell>
@@ -178,7 +175,10 @@ export default function ZonesDataTable({
                     {formatRadius(zone.rayon_tolerance_metres)}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                <TableCell
+                  className="text-right"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <ZoneActionsDropdown zone={zone} currentUser={currentUser} />
                 </TableCell>
               </TableRow>
@@ -186,10 +186,9 @@ export default function ZonesDataTable({
           ) : (
             <TableRow>
               <TableCell colSpan={5} className="h-24 text-center">
-                {query 
-                  ? `Aucune zone trouvée pour "${query}".` 
-                  : "Aucune zone configurée."
-                }
+                {query
+                  ? `Aucune zone trouvée pour "${query}".`
+                  : "Aucune zone configurée."}
               </TableCell>
             </TableRow>
           )}

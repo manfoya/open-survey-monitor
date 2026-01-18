@@ -12,12 +12,12 @@ interface PageHeaderProps {
   actions?: ReactNode;
 }
 
-export default function PageHeader({ 
-  title, 
-  description, 
-  backHref, 
+export default function PageHeader({
+  title,
+  description,
+  backHref,
   backLabel = "Retour",
-  actions 
+  actions,
 }: PageHeaderProps) {
   return (
     <div className="flex flex-col items-start gap-4 mb-8">
@@ -29,7 +29,7 @@ export default function PageHeader({
           </Link>
         </Button>
       )}
-      
+
       <div className="flex items-start justify-between w-full">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{title}</h1>

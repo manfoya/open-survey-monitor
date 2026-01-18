@@ -96,7 +96,9 @@ export default function CreateZoneForm() {
 
       {/* Rayon de tolérance */}
       <div className="space-y-2">
-        <Label htmlFor="rayon_tolerance_metres">Rayon de tolérance (mètres)</Label>
+        <Label htmlFor="rayon_tolerance_metres">
+          Rayon de tolérance (mètres)
+        </Label>
         <Input
           id="rayon_tolerance_metres"
           name="rayon_tolerance_metres"
@@ -109,16 +111,13 @@ export default function CreateZoneForm() {
           aria-invalid={!!state.errors?.rayon_tolerance_metres}
         />
         <div className="text-xs text-muted-foreground">
-          Définit la zone de tolérance autour du point central (1m - 50km). Par défaut : 500m
+          Définit la zone de tolérance autour du point central (1m - 50km). Par
+          défaut : 500m
         </div>
         {errorDiv(state.errors?.rayon_tolerance_metres)}
       </div>
 
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isPending}
-      >
+      <Button type="submit" className="w-full" disabled={isPending}>
         {isPending ? "Création en cours..." : "Créer la zone"}
       </Button>
     </form>

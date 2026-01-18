@@ -1,48 +1,73 @@
-'use client';
+"use client";
 
-import { useState, useActionState, useEffect } from 'react';
-import { updateSettingsAction } from '@/features/app-settings/actions';
-import { GlobalSettings } from '@/features/app-settings/types';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle, Clock, MapPin, Timer, Zap, MessageCircle, AlertCircle, Calendar } from 'lucide-react';
-import { toast } from 'sonner';
-import { errorDiv } from '@/features/app-shell/components/utils';
+import { useState, useActionState, useEffect } from "react";
+import { updateSettingsAction } from "@/features/app-settings/actions";
+import { GlobalSettings } from "@/features/app-settings/types";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  CheckCircle,
+  Clock,
+  MapPin,
+  Timer,
+  Zap,
+  MessageCircle,
+  AlertCircle,
+  Calendar,
+} from "lucide-react";
+import { toast } from "sonner";
+import { errorDiv } from "@/features/app-shell/components/utils";
 
 interface GlobalSettingsFormProps {
   initialSettings: GlobalSettings;
 }
 
 const JOURS_SEMAINE = [
-  'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'
+  "Lundi",
+  "Mardi",
+  "Mercredi",
+  "Jeudi",
+  "Vendredi",
+  "Samedi",
+  "Dimanche",
 ];
 
-export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFormProps) {
+export default function GlobalSettingsForm({
+  initialSettings,
+}: GlobalSettingsFormProps) {
   const [state, formAction, isPending] = useActionState(updateSettingsAction, {
     success: false,
   });
-  
+
   // État pour les jours interdits (conversion string -> array)
   const [joursInterdits, setJoursInterdits] = useState<string[]>(
-    initialSettings.jours_interdits ? initialSettings.jours_interdits : ['Dimanche']
+    initialSettings.jours_interdits
+      ? initialSettings.jours_interdits
+      : ["Dimanche"],
   );
 
   const handleJourChange = (jour: string, checked: boolean) => {
     if (checked) {
-      setJoursInterdits(prev => [...prev, jour]);
+      setJoursInterdits((prev) => [...prev, jour]);
     } else {
-      setJoursInterdits(prev => prev.filter(j => j !== jour));
+      setJoursInterdits((prev) => prev.filter((j) => j !== jour));
     }
   };
 
   const handleSubmit = (formData: FormData) => {
     // Ajouter les jours interdits au formData
-    formData.set('jours_interdits', joursInterdits.join(','));
+    formData.set("jours_interdits", joursInterdits.join(","));
     formAction(formData);
   };
 
@@ -55,7 +80,6 @@ export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFo
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      
       {/* Message d'alerte global */}
       {state.message && !state.success && (
         <Alert variant="destructive">
@@ -74,7 +98,6 @@ export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFo
       )}
 
       <form action={handleSubmit} className="space-y-6">
-        
         {/* 1. RÈGLES DE TEMPS */}
         <Card>
           <CardHeader>
@@ -93,11 +116,14 @@ export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFo
                 name="check_heure"
                 defaultChecked={initialSettings.check_heure}
               />
-              <Label htmlFor="check_heure" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <Label
+                htmlFor="check_heure"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
                 Activer la vérification des horaires
               </Label>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="heure_debut_travail">Heure de début</Label>
@@ -145,23 +171,30 @@ export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFo
                 name="check_jours"
                 defaultChecked={initialSettings.check_jours}
               />
-              <Label htmlFor="check_jours" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <Label
+                htmlFor="check_jours"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
                 Activer l&apos;interdiction de certains jours
               </Label>
             </div>
-            
+
             <div className="space-y-3">
               <Label className="text-sm font-medium">Jours interdits</Label>
               <div className="grid grid-cols-4 gap-3">
-                {JOURS_SEMAINE.map(jour => (
+                {JOURS_SEMAINE.map((jour) => (
                   <div key={jour} className="flex items-center space-x-2">
                     <Checkbox
                       id={jour}
                       checked={joursInterdits.includes(jour)}
-                      onCheckedChange={(checked) => handleJourChange(jour, checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        handleJourChange(jour, checked as boolean)
+                      }
                       disabled={isPending}
                     />
-                    <Label htmlFor={jour} className="text-sm">{jour}</Label>
+                    <Label htmlFor={jour} className="text-sm">
+                      {jour}
+                    </Label>
                   </div>
                 ))}
               </div>
@@ -187,13 +220,18 @@ export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFo
                 name="check_gps"
                 defaultChecked={initialSettings.check_gps}
               />
-              <Label htmlFor="check_gps" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <Label
+                htmlFor="check_gps"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
                 Activer la vérification GPS
               </Label>
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="tolerance_gps_metres">Tolérance GPS (mètres)</Label>
+              <Label htmlFor="tolerance_gps_metres">
+                Tolérance GPS (mètres)
+              </Label>
               <Input
                 type="number"
                 id="tolerance_gps_metres"
@@ -231,13 +269,18 @@ export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFo
                 name="check_duree"
                 defaultChecked={initialSettings.check_duree}
               />
-              <Label htmlFor="check_duree" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <Label
+                htmlFor="check_duree"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
                 Vérifier la durée minimale
               </Label>
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="min_duree_minutes">Durée minimale (minutes)</Label>
+              <Label htmlFor="min_duree_minutes">
+                Durée minimale (minutes)
+              </Label>
               <Input
                 type="number"
                 id="min_duree_minutes"
@@ -275,13 +318,18 @@ export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFo
                 name="check_vitesse"
                 defaultChecked={initialSettings.check_vitesse}
               />
-              <Label htmlFor="check_vitesse" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <Label
+                htmlFor="check_vitesse"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
                 Vérifier la vitesse de remplissage
               </Label>
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="max_enquetes_par_jour">Maximum d&apos;enquêtes par jour</Label>
+              <Label htmlFor="max_enquetes_par_jour">
+                Maximum d&apos;enquêtes par jour
+              </Label>
               <Input
                 type="number"
                 id="max_enquetes_par_jour"
@@ -318,14 +366,15 @@ export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFo
               <textarea
                 id="message_du_jour"
                 name="message_du_jour"
-                defaultValue={initialSettings.message_du_jour || ''}
+                defaultValue={initialSettings.message_du_jour || ""}
                 rows={4}
                 disabled={isPending}
                 className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 placeholder="Entrez un message à afficher sur le tableau de bord..."
               />
               <div className="text-xs text-muted-foreground">
-                Ce message sera affiché sur la page d&apos;accueil de tous les utilisateurs
+                Ce message sera affiché sur la page d&apos;accueil de tous les
+                utilisateurs
               </div>
             </div>
           </CardContent>
@@ -336,7 +385,7 @@ export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFo
         {/* Bouton de soumission */}
         <div className="flex justify-end">
           <Button type="submit" disabled={isPending} size="lg">
-            {isPending ? 'Mise à jour...' : 'Sauvegarder les paramètres'}
+            {isPending ? "Mise à jour..." : "Sauvegarder les paramètres"}
           </Button>
         </div>
       </form>

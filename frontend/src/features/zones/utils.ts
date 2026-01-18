@@ -8,10 +8,9 @@
  * @param type - Type de coordonnée ('lat' pour latitude, 'lng' pour longitude)
  * @returns Coordonnée formatée avec direction (ex: "48.856600° N")
  */
-export function formatCoordinate(value: number, type: 'lat' | 'lng'): string {
-  const direction = type === 'lat' 
-    ? (value >= 0 ? 'N' : 'S') 
-    : (value >= 0 ? 'E' : 'W');
+export function formatCoordinate(value: number, type: "lat" | "lng"): string {
+  const direction =
+    type === "lat" ? (value >= 0 ? "N" : "S") : value >= 0 ? "E" : "W";
   return `${Math.abs(value).toFixed(6)}° ${direction}`;
 }
 

@@ -29,7 +29,7 @@ export default async function EditZonePage({ params }: EditZonePageProps) {
   }
 
   return (
-    <RoleGuard 
+    <RoleGuard
       allowedRoles={[UserRole.DIRECTEUR]}
       fallback={
         <div className="container mx-auto py-6 max-w-2xl">
@@ -43,7 +43,7 @@ export default async function EditZonePage({ params }: EditZonePageProps) {
       }
     >
       <div className="container mx-auto py-6 max-w-2xl">
-        <PageHeader 
+        <PageHeader
           title={`Modifier la Zone #${zoneId}`}
           description="Modifiez les paramètres de cette zone géographique."
           backHref="/zones"
@@ -60,19 +60,20 @@ export default async function EditZonePage({ params }: EditZonePageProps) {
 
 async function EditZoneFormAsync({ zoneId }: { zoneId: number }) {
   let zone;
-  
+
   try {
     zone = await getZoneById(zoneId);
   } catch (error) {
     console.error("Erreur lors du chargement de la zone:", error);
     return (
-      <ErrorState 
+      <ErrorState
         title="Erreur de chargement"
         message={`Impossible de charger la zone #${zoneId}. Elle a peut-être été supprimée.`}
         primaryAction={{ label: "Retour aux zones", href: "/zones" }}
-      />);
+      />
+    );
   }
-  
+
   if (!zone) {
     notFound();
   }
@@ -85,7 +86,8 @@ async function EditZoneFormAsync({ zoneId }: { zoneId: number }) {
           {zone.nom_zone}
         </CardTitle>
         <CardDescription>
-          Modifiez les coordonnées géographiques et le rayon de tolérance de cette zone.
+          Modifiez les coordonnées géographiques et le rayon de tolérance de
+          cette zone.
         </CardDescription>
       </CardHeader>
       <CardContent>

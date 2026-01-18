@@ -18,38 +18,57 @@ export type UpdateSettingsState = {
 
 export async function updateSettingsAction(
   prevState: UpdateSettingsState,
-  formData: FormData
+  formData: FormData,
 ): Promise<UpdateSettingsState> {
   try {
     // Extraction et conversion des données du formulaire
     const settingsData = {
       check_heure: formData.get("check_heure") === "on",
-      heure_debut_travail: formData.get("heure_debut_travail") as string || undefined,
-      heure_fin_travail: formData.get("heure_fin_travail") as string || undefined,
+      heure_debut_travail:
+        (formData.get("heure_debut_travail") as string) || undefined,
+      heure_fin_travail:
+        (formData.get("heure_fin_travail") as string) || undefined,
       check_jours: formData.get("check_jours") === "on",
-      jours_interdits: formData.get("jours_interdits")?.toString().split(",") || [],
+      jours_interdits:
+        formData.get("jours_interdits")?.toString().split(",") || [],
       check_gps: formData.get("check_gps") === "on",
       tolerance_gps_metres: Number(formData.get("tolerance_gps_metres")) || 500,
       check_duree: formData.get("check_duree") === "on",
       min_duree_minutes: Number(formData.get("min_duree_minutes")) || 10,
       check_vitesse: formData.get("check_vitesse") === "on",
-      max_enquetes_par_jour: Number(formData.get("max_enquetes_par_jour")) || 20,
-      message_du_jour: formData.get("message_du_jour") as string || undefined,
+      max_enquetes_par_jour:
+        Number(formData.get("max_enquetes_par_jour")) || 20,
+      message_du_jour: (formData.get("message_du_jour") as string) || undefined,
     };
 
     // Validation basique
-    const errors: UpdateSettingsState['errors'] = {};
-    
-    if (settingsData.tolerance_gps_metres < 0 || settingsData.tolerance_gps_metres > 50000) {
-      errors.tolerance_gps_metres = ["La tolérance GPS doit être entre 0 et 50000 mètres"];
+    const errors: UpdateSettingsState["errors"] = {};
+
+    if (
+      settingsData.tolerance_gps_metres < 0 ||
+      settingsData.tolerance_gps_metres > 50000
+    ) {
+      errors.tolerance_gps_metres = [
+        "La tolérance GPS doit être entre 0 et 50000 mètres",
+      ];
     }
-    
-    if (settingsData.min_duree_minutes < 1 || settingsData.min_duree_minutes > 1440) {
-      errors.min_duree_minutes = ["La durée minimale doit être entre 1 et 1440 minutes"];
+
+    if (
+      settingsData.min_duree_minutes < 1 ||
+      settingsData.min_duree_minutes > 1440
+    ) {
+      errors.min_duree_minutes = [
+        "La durée minimale doit être entre 1 et 1440 minutes",
+      ];
     }
-    
-    if (settingsData.max_enquetes_par_jour < 1 || settingsData.max_enquetes_par_jour > 200) {
-      errors.max_enquetes_par_jour = ["Le maximum d'enquêtes par jour doit être entre 1 et 200"];
+
+    if (
+      settingsData.max_enquetes_par_jour < 1 ||
+      settingsData.max_enquetes_par_jour > 200
+    ) {
+      errors.max_enquetes_par_jour = [
+        "Le maximum d'enquêtes par jour doit être entre 1 et 200",
+      ];
     }
 
     // Validation des heures si activée
@@ -66,29 +85,29 @@ export async function updateSettingsAction(
       return {
         success: false,
         errors,
-        message: "Veuillez corriger les erreurs dans le formulaire."
+        message: "Veuillez corriger les erreurs dans le formulaire.",
       };
     }
 
     // Appel au service pour mettre à jour les paramètres
     await updateGlobalSettings(settingsData);
-    
+
     // Invalider le cache de la page
     revalidatePath("/app-settings");
-    
+
     return {
       success: true,
-      message: "Paramètres mis à jour avec succès !"
+      message: "Paramètres mis à jour avec succès !",
     };
-
   } catch (error) {
     console.error("Erreur lors de la mise à jour des paramètres:", error);
-    
+
     return {
       success: false,
-      message: error instanceof ApiError 
-        ? error.message 
-        : "Une erreur est survenue lors de la mise à jour des paramètres."
+      message:
+        error instanceof ApiError
+          ? error.message
+          : "Une erreur est survenue lors de la mise à jour des paramètres.",
     };
   }
 }

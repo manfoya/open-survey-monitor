@@ -27,10 +27,14 @@ import DeleteUserForm from "@/features/users/components/delete-user-form";
 // Petit helper pour les couleurs (optionnel)
 const getRoleBadge = (role: UserRole) => {
   const styles = {
-    directeur: "border-purple-500/20 text-purple-700 dark:text-purple-300 hover:border-purple-500/30",
-    superviseur: "border-blue-500/20 text-blue-700 dark:text-blue-300 hover:border-blue-500/30",
-    controleur: "border-orange-500/20 text-orange-700 dark:text-orange-300 hover:border-orange-500/30",
-    agent: "border-slate-500/20 text-slate-700 dark:text-slate-300 hover:border-slate-500/30",
+    directeur:
+      "border-purple-500/20 text-purple-700 dark:text-purple-300 hover:border-purple-500/30",
+    superviseur:
+      "border-blue-500/20 text-blue-700 dark:text-blue-300 hover:border-blue-500/30",
+    controleur:
+      "border-orange-500/20 text-orange-700 dark:text-orange-300 hover:border-orange-500/30",
+    agent:
+      "border-slate-500/20 text-slate-700 dark:text-slate-300 hover:border-slate-500/30",
   };
   return styles[role] || "border-gray-500/20 text-gray-700 dark:text-gray-300";
 };
@@ -50,7 +54,7 @@ function filterUsers(users: UserProfile[], query: string) {
       user.username.toLowerCase().includes(lowerQuery) ||
       user.cspro_code?.toLowerCase().includes(lowerQuery) ||
       user.role.toLowerCase().includes(lowerQuery) ||
-      user.id.toString().includes(lowerQuery)
+      user.id.toString().includes(lowerQuery),
   );
 }
 
@@ -67,7 +71,7 @@ interface UserActionsDropdownProps {
 
 function UserActionsDropdown({ user, currentUser }: UserActionsDropdownProps) {
   // Logique de permission pour l'affichage du bouton supprimer
-  const canDelete = 
+  const canDelete =
     currentUser.role === UserRole.DIRECTEUR && // Seul le directeur peut supprimer
     user.role !== UserRole.DIRECTEUR; // Ne peut pas supprimer un autre directeur
 
@@ -87,7 +91,7 @@ function UserActionsDropdown({ user, currentUser }: UserActionsDropdownProps) {
             Détails
           </Link>
         </DropdownMenuItem>
-        
+
         {/* Action Édition */}
         <DropdownMenuItem asChild>
           <Link href={`/users/${user.id}/edit`} className="cursor-pointer">
@@ -95,14 +99,11 @@ function UserActionsDropdown({ user, currentUser }: UserActionsDropdownProps) {
             Modifier
           </Link>
         </DropdownMenuItem>
-        
+
         {/* Action Suppression - Conditionnelle avec composant réutilisable */}
         {canDelete && (
           <DropdownMenuItem asChild>
-            <DeleteUserForm 
-              userId={user.id}
-              className="w-full"
-            />
+            <DeleteUserForm userId={user.id} className="w-full" />
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>
@@ -110,13 +111,13 @@ function UserActionsDropdown({ user, currentUser }: UserActionsDropdownProps) {
   );
 }
 
-export default function UsersTable({ 
-  users, 
-  query, 
-  page = 1, 
+export default function UsersTable({
+  users,
+  query,
+  page = 1,
   per_page = 5,
-  currentUser
-}: UsersTableProps & { 
+  currentUser,
+}: UsersTableProps & {
   currentUser: UserProfile;
 }) {
   const filteredUsers = filterUsers(users, query);
@@ -127,8 +128,10 @@ export default function UsersTable({
   return (
     <div className="rounded-md border">
       <Table>
-        <TableCaption><p className="m-4">Liste des membres de l&apos;équipe.</p></TableCaption>
-        
+        <TableCaption>
+          <p className="m-4">Liste des membres de l&apos;équipe.</p>
+        </TableCaption>
+
         {/* EN-TÊTE DU TABLEAU */}
         <TableHeader>
           <TableRow>
@@ -144,10 +147,10 @@ export default function UsersTable({
         <TableBody>
           {paginatedUsers.length > 0 ? (
             paginatedUsers.map((user: UserProfile) => (
-              <TableRow 
+              <TableRow
                 key={user.id}
                 className="hover:bg-muted/50 transition-colors cursor-pointer"
-                onClick={() => window.location.href = `/users/${user.id}`}
+                onClick={() => (window.location.href = `/users/${user.id}`)}
               >
                 <TableCell className="font-medium">{user.id}</TableCell>
                 <TableCell className="font-medium">
@@ -156,10 +159,7 @@ export default function UsersTable({
                   </Link>
                 </TableCell>
                 <TableCell>
-                  <Badge 
-                    variant="outline" 
-                    className={getRoleBadge(user.role)}
-                  >
+                  <Badge variant="outline" className={getRoleBadge(user.role)}>
                     {user.role}
                   </Badge>
                 </TableCell>
@@ -168,7 +168,10 @@ export default function UsersTable({
                     {user.cspro_code || "N/A"}
                   </span>
                 </TableCell>
-                <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                <TableCell
+                  className="text-right"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <UserActionsDropdown user={user} currentUser={currentUser} />
                 </TableCell>
               </TableRow>
@@ -176,10 +179,9 @@ export default function UsersTable({
           ) : (
             <TableRow>
               <TableCell colSpan={5} className="h-24 text-center">
-                {query 
-                  ? `Aucun utilisateur trouvé pour "${query}".` 
-                  : "Aucun utilisateur sous votre responsabilité."
-                }
+                {query
+                  ? `Aucun utilisateur trouvé pour "${query}".`
+                  : "Aucun utilisateur sous votre responsabilité."}
               </TableCell>
             </TableRow>
           )}

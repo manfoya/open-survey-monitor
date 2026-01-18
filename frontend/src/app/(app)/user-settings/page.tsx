@@ -1,6 +1,12 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ThemeSelector } from "@/features/app-shell/components/theme-selector";
@@ -29,7 +35,8 @@ export default function SettingsPage() {
               Apparence
             </CardTitle>
             <CardDescription>
-              Personnalisez l&apos;apparence de l&apos;application selon vos préférences.
+              Personnalisez l&apos;apparence de l&apos;application selon vos
+              préférences.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -42,9 +49,9 @@ export default function SettingsPage() {
               </div>
               <ThemeToggle />
             </div>
-            
+
             <Separator />
-            
+
             <ThemeSelector />
           </CardContent>
         </Card>

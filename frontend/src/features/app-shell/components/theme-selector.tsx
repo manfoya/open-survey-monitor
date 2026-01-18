@@ -46,11 +46,11 @@ export function ThemeSelector() {
             <div className="h-2 bg-slate-100 rounded w-1/2"></div>
           </div>
         </div>
-      )
+      ),
     },
     {
       id: "dark",
-      label: "SOMBRE", 
+      label: "SOMBRE",
       description: "Thème sombre",
       preview: (
         <div className="aspect-video rounded-md border-2 border-muted bg-slate-950 p-2">
@@ -60,7 +60,7 @@ export function ThemeSelector() {
             <div className="h-2 bg-slate-800 rounded w-1/2"></div>
           </div>
         </div>
-      )
+      ),
     },
     {
       id: "system",
@@ -74,8 +74,8 @@ export function ThemeSelector() {
             <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded w-1/2"></div>
           </div>
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -94,11 +94,13 @@ export function ThemeSelector() {
               onChange={() => setTheme(themeOption.id)}
               className="sr-only"
             />
-            <div className={`relative transition-all duration-200 ${
-              theme === themeOption.id 
-                ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' 
-                : 'hover:ring-1 hover:ring-muted-foreground/50 hover:ring-offset-1'
-            }`}>
+            <div
+              className={`relative transition-all duration-200 ${
+                theme === themeOption.id
+                  ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
+                  : "hover:ring-1 hover:ring-muted-foreground/50 hover:ring-offset-1"
+              }`}
+            >
               {themeOption.preview}
               {/* Indicateur de sélection */}
               {theme === themeOption.id && (

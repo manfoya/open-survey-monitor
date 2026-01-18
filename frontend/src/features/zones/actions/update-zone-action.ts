@@ -52,14 +52,22 @@ export async function updateZoneAction(
 ): Promise<UpdateZoneState> {
   const rawData = {
     nom_zone: values.get("nom_zone") as string | undefined,
-    latitude_centrale: values.get("latitude_centrale") ? Number(values.get("latitude_centrale")) : undefined,
-    longitude_centrale: values.get("longitude_centrale") ? Number(values.get("longitude_centrale")) : undefined,
-    rayon_tolerance_metres: values.get("rayon_tolerance_metres") ? Number(values.get("rayon_tolerance_metres")) : undefined,
+    latitude_centrale: values.get("latitude_centrale")
+      ? Number(values.get("latitude_centrale"))
+      : undefined,
+    longitude_centrale: values.get("longitude_centrale")
+      ? Number(values.get("longitude_centrale"))
+      : undefined,
+    rayon_tolerance_metres: values.get("rayon_tolerance_metres")
+      ? Number(values.get("rayon_tolerance_metres"))
+      : undefined,
   };
 
   // Filtrer les valeurs undefined pour ne mettre à jour que les champs modifiés
   const filteredData = Object.fromEntries(
-    Object.entries(rawData).filter(([, value]) => value !== undefined && value !== "")
+    Object.entries(rawData).filter(
+      ([, value]) => value !== undefined && value !== "",
+    ),
   );
 
   const parsedData = updateZoneSchema.safeParse(filteredData);
