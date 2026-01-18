@@ -23,6 +23,9 @@ import Link from "next/link";
 import Pagination from "@/components/pagination";
 import { Separator } from "@radix-ui/react-separator";
 import DeleteUserForm from "@/features/users/components/delete-user-form";
+import ColumnSelector from "@/features/users/components/column-selector";
+import { availableColumns, defaultUserColumnVisibility } from "@/features/users/types/table-columns";
+import { useTableColumnVisibility } from "@/hooks/use-table-column-visibility";
 
 // Petit helper pour les couleurs (optionnel)
 const getRoleBadge = (role: UserRole) => {
@@ -120,75 +123,129 @@ export default function UsersTable({
 }: UsersTableProps & {
   currentUser: UserProfile;
 }) {
+  const { 
+    columnVisibility, 
+    updateColumnVisibility, 
+    isLoaded 
+  } = useTableColumnVisibility({
+    storageKey: "users-table-column-visibility",
+    defaultVisibility: defaultUserColumnVisibility,
+  });
+  
   const filteredUsers = filterUsers(users, query);
   const { start, end } = getRange(page, per_page);
   const paginatedUsers = filteredUsers.slice(start - 1, end);
   const totalPages = Math.ceil(filteredUsers.length / per_page);
 
+  // Filtrer les colonnes visibles
+  const visibleColumns = availableColumns.filter(col => columnVisibility[col.key]);
+
+  // Fonction pour obtenir la valeur d'une cellule selon la colonne
+  const getCellValue = (user: UserProfile, columnKey: string) => {
+    switch (columnKey) {
+      case 'id':
+        return <span className="font-medium">{user.id}</span>;
+      case 'username':
+        return (
+          <Link href={`/users/${user.id}`} className="hover:underline font-medium">
+            {user.username}
+          </Link>
+        );
+      case 'role':
+        return (
+          <Badge variant="outline" className={getRoleBadge(user.role)}>
+            {user.role}
+          </Badge>
+        );
+      case 'cspro_code':
+        return (
+          <span className="font-mono text-sm">
+            {user.cspro_code || "N/A"}
+          </span>
+        );
+      case 'chef_id':
+        return (
+          <span className="text-sm">
+            {user.chef_id ? `#${user.chef_id}` : "Aucun"}
+          </span>
+        );
+      case 'actions':
+        return <UserActionsDropdown user={user} currentUser={currentUser} />;
+      default:
+        return null;
+    }
+  };
+
+  // Ne pas rendre le tableau tant que les préférences ne sont pas chargées
+  if (!isLoaded) {
+    return <div className="rounded-md border p-4">Chargement...</div>;
+  }
+
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableCaption>
-          <p className="m-4">Liste des membres de l&apos;équipe.</p>
-        </TableCaption>
+    <div className="space-y-4">
+      {/* Barre d'outils avec sélecteur de colonnes */}
+      <div className="flex justify-end">
+        <ColumnSelector 
+          columnVisibility={columnVisibility}
+          onColumnVisibilityChange={updateColumnVisibility}
+        />
+      </div>
 
-        {/* EN-TÊTE DU TABLEAU */}
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">ID</TableHead>
-            <TableHead>Utilisateur</TableHead>
-            <TableHead>Rôle</TableHead>
-            <TableHead>Code CSPro</TableHead>
-            <TableHead className="text-right">Action</TableHead>
-          </TableRow>
-        </TableHeader>
+      {/* Tableau personnalisable */}
+      <div className="rounded-md border">
+        <Table>
+          <TableCaption>
+            <p className="m-4">Liste des membres de l&apos;équipe.</p>
+          </TableCaption>
 
-        {/* CORPS DU TABLEAU */}
-        <TableBody>
-          {paginatedUsers.length > 0 ? (
-            paginatedUsers.map((user: UserProfile) => (
-              <TableRow
-                key={user.id}
-                className="hover:bg-muted/50 transition-colors cursor-pointer"
-                onClick={() => (window.location.href = `/users/${user.id}`)}
-              >
-                <TableCell className="font-medium">{user.id}</TableCell>
-                <TableCell className="font-medium">
-                  <Link href={`/users/${user.id}`} className="hover:underline">
-                    {user.username}
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={getRoleBadge(user.role)}>
-                    {user.role}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <span className="font-mono text-sm">
-                    {user.cspro_code || "N/A"}
-                  </span>
-                </TableCell>
-                <TableCell
-                  className="text-right"
-                  onClick={(e) => e.stopPropagation()}
+          {/* EN-TÊTE DYNAMIQUE */}
+          <TableHeader>
+            <TableRow>
+              {visibleColumns.map((column) => (
+                <TableHead 
+                  key={column.key} 
+                  className={column.width || ""}
                 >
-                  <UserActionsDropdown user={user} currentUser={currentUser} />
+                  {column.label}
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+
+          {/* CORPS DYNAMIQUE */}
+          <TableBody>
+            {paginatedUsers.length > 0 ? (
+              paginatedUsers.map((user: UserProfile) => (
+                <TableRow
+                  key={user.id}
+                  className="hover:bg-muted/50 transition-colors cursor-pointer"
+                  onClick={() => (window.location.href = `/users/${user.id}`)}
+                >
+                  {visibleColumns.map((column) => (
+                    <TableCell
+                      key={column.key}
+                      className={column.key === 'actions' ? 'text-right' : ''}
+                      onClick={column.key === 'actions' ? (e) => e.stopPropagation() : undefined}
+                    >
+                      {getCellValue(user, column.key)}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={visibleColumns.length} className="h-24 text-center">
+                  {query
+                    ? `Aucun utilisateur trouvé pour "${query}".`
+                    : "Aucun utilisateur sous votre responsabilité."}
                 </TableCell>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={5} className="h-24 text-center">
-                {query
-                  ? `Aucun utilisateur trouvé pour "${query}".`
-                  : "Aucun utilisateur sous votre responsabilité."}
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <Separator className="my-2" />
-      <Pagination totalPages={totalPages} />
+            )}
+          </TableBody>
+        </Table>
+        <Separator className="my-2" />
+        <Pagination totalPages={totalPages} />
+      </div>
     </div>
   );
 }
