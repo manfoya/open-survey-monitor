@@ -17,9 +17,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logoutAction } from "@/features/auth/actions";
 import { navGroups } from "@/features/app-shell/nav-data";
+import { UserRole } from "@/features/auth/types";
+import { useCurrentUser } from "@/features/auth/contexts/user-context";
 
 export default function AppSideBar() {
   const pathname = usePathname();
+  const currentUser = useCurrentUser();
+
+  // Fonction pour vérifier si un utilisateur a accès à un élément
+  const hasAccess = (itemRoles?: UserRole[]) => {
+    if (!itemRoles || itemRoles.length === 0) return true; // Pas de restriction
+    if (!currentUser) return false; // Pas d'utilisateur connecté
+    return itemRoles.includes(currentUser.role);
+  };
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
@@ -38,27 +48,35 @@ export default function AppSideBar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {navGroups.map((group) => (
-          <SidebarGroup key={group.label}>
-            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
-            <SidebarMenu>
-              {group.items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip={item.title}
-                    isActive={pathname === item.url}
-                  >
-                    <Link href={item.url}>
-                      <item.icon className="size-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroup>
-        ))}
+        {navGroups.map((group) => {
+          // Filtrer les éléments du groupe selon les permissions
+          const accessibleItems = group.items.filter((item) => hasAccess(item.roles));
+          
+          // Ne pas afficher le groupe s'il n'y a aucun élément accessible
+          if (accessibleItems.length === 0) return null;
+
+          return (
+            <SidebarGroup key={group.label}>
+              <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+              <SidebarMenu>
+                {accessibleItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={item.title}
+                      isActive={pathname === item.url}
+                    >
+                      <Link href={item.url}>
+                        <item.icon className="size-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroup>
+          );
+        })}
       </SidebarContent>
 
       <SidebarFooter className="border-t p-4">

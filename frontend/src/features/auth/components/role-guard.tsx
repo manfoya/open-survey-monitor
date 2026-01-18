@@ -1,5 +1,6 @@
 import { getMe } from "@/features/auth/services/auth";
 import { UserRole, UserProfile } from "@/features/auth/types";
+import { useCurrentUser } from "@/features/auth/contexts/user-context";
 
 interface RoleGuardProps {
   children: React.ReactNode;
@@ -45,4 +46,29 @@ export function ClientRoleGuard({
   }
 
   return <>{children}</>;
+}
+
+// Hook personnalisé pour simplifier l'utilisation avec le Context
+export function useRoleGuard() {
+  const currentUser = useCurrentUser();
+  
+  const hasRole = (allowedRoles: UserRole | UserRole[]): boolean => {
+    if (!currentUser) return false;
+    const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+    return roles.includes(currentUser.role);
+  };
+
+  const RoleGuard = ({ 
+    children, 
+    allowedRoles, 
+    fallback = null 
+  }: {
+    children: React.ReactNode;
+    allowedRoles: UserRole | UserRole[];
+    fallback?: React.ReactNode;
+  }) => {
+    return hasRole(allowedRoles) ? <>{children}</> : <>{fallback}</>;
+  };
+
+  return { hasRole, RoleGuard, currentUser };
 }

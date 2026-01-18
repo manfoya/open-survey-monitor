@@ -27,15 +27,14 @@ import DeleteZoneForm from "@/features/zones/components/delete-zone-form";
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { ClientRoleGuard } from "@/features/auth/components/role-guard";
-import { UserRole, UserProfile } from "@/features/auth/types";
+import { useRoleGuard } from "@/features/auth/components/role-guard";
+import { UserRole } from "@/features/auth/types";
 
 interface ZonesTableProps {
   zones: Zone[];
   query: string;
   page: number;
   per_page: number;
-  currentUser: UserProfile | null; // Ajouter l'utilisateur actuel
 }
 
 function filterZones(zones: Zone[], query: string) {
@@ -58,10 +57,11 @@ function getRange(page: number, per_page: number) {
 
 interface ZoneActionsDropdownProps {
   zone: Zone;
-  currentUser: UserProfile | null; // Ajouter l'utilisateur actuel
 }
 
-function ZoneActionsDropdown({ zone, currentUser }: ZoneActionsDropdownProps) {
+function ZoneActionsDropdown({ zone }: ZoneActionsDropdownProps) {
+  const { RoleGuard } = useRoleGuard();
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -80,14 +80,14 @@ function ZoneActionsDropdown({ zone, currentUser }: ZoneActionsDropdownProps) {
         </DropdownMenuItem>
 
         {/* Action Édition - Protégée pour directeurs seulement */}
-        <ClientRoleGuard allowedRoles={[UserRole.DIRECTEUR]} user={currentUser}>
+        <RoleGuard allowedRoles={[UserRole.DIRECTEUR]}>
           <DropdownMenuItem asChild>
             <Link href={`/zones/${zone.id}/edit`} className="cursor-pointer">
               <Edit className="mr-2 h-4 w-4" />
               Modifier
             </Link>
           </DropdownMenuItem>
-        </ClientRoleGuard>
+        </RoleGuard>
 
         {/* Action Voir sur carte */}
         <DropdownMenuItem asChild>
@@ -98,11 +98,11 @@ function ZoneActionsDropdown({ zone, currentUser }: ZoneActionsDropdownProps) {
         </DropdownMenuItem>
 
         {/* Action Suppression - Protégée pour directeurs seulement */}
-        <ClientRoleGuard allowedRoles={[UserRole.DIRECTEUR]} user={currentUser}>
+        <RoleGuard allowedRoles={[UserRole.DIRECTEUR]}>
           <DropdownMenuItem asChild>
             <DeleteZoneForm zoneId={zone.id} className="w-full" />
           </DropdownMenuItem>
-        </ClientRoleGuard>
+        </RoleGuard>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -113,7 +113,6 @@ export default function ZonesDataTable({
   query,
   page = 1,
   per_page = 5,
-  currentUser,
 }: ZonesTableProps) {
   const filteredZones = filterZones(zones, query);
   const { start, end } = getRange(page, per_page);
@@ -179,7 +178,7 @@ export default function ZonesDataTable({
                   className="text-right"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <ZoneActionsDropdown zone={zone} currentUser={currentUser} />
+                  <ZoneActionsDropdown zone={zone} />
                 </TableCell>
               </TableRow>
             ))

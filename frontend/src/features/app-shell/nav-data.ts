@@ -6,8 +6,21 @@ import {
   Settings2,
   MapPin,
 } from "lucide-react";
+import { UserRole } from "../auth/types";
 
-export const navGroups = [
+export interface NavItem {
+  title: string;
+  url: string;
+  icon: React.ComponentType<{ className?: string }>;
+  roles?: UserRole[]; // Rôles requis pour accéder à cet élément
+}
+
+export interface NavGroup {
+  label: string;
+  items: NavItem[];
+}
+
+export const navGroups: NavGroup[] = [
   {
     label: "Opérations",
     items: [
@@ -19,7 +32,7 @@ export const navGroups = [
   {
     label: "Données",
     items: [
-      { title: "Users", url: "/users", icon: Users },
+      { title: "Users", url: "/users", icon: Users, roles: [UserRole.DIRECTEUR, UserRole.SUPERVISEUR, UserRole.CONTROLEUR] }, // Tout sauf AGENT
       // { title: "Dictionnaires", url: "/dictionaries", icon: BookA },
     ],
   },
@@ -27,8 +40,11 @@ export const navGroups = [
     label: "Configuration",
     items: [
       { title: "Paramètres", url: "/user-settings", icon: Settings },
-      { title: "Paramètres du site", url: "app-settings", icon: Settings2 },
+      { title: "Paramètres du site", url: "/app-settings", icon: Settings2, roles: [UserRole.DIRECTEUR] },
       { title: "Mon Profil", url: "/users/me", icon: UserCircle },
     ],
   },
 ];
+
+export type NavGroupType = typeof navGroups[0];
+export type NavItemType = typeof navGroups[0]["items"][0];

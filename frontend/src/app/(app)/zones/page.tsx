@@ -94,7 +94,6 @@ async function ZonesTableAsync({
       page={page}
       query={query}
       per_page={per_page}
-      currentUser={currentUser}
     />
   );
 }
