@@ -100,8 +100,7 @@ function UserActionsDropdown({ user, currentUser }: UserActionsDropdownProps) {
         {canDelete && (
           <DropdownMenuItem asChild>
             <DeleteUserForm 
-              userId={user.id} 
-              userName={user.username}
+              userId={user.id}
               className="w-full"
             />
           </DropdownMenuItem>
@@ -145,29 +144,42 @@ export default function UsersTable({
         <TableBody>
           {paginatedUsers.length > 0 ? (
             paginatedUsers.map((user: UserProfile) => (
-              <TableRow key={user.id}>
+              <TableRow 
+                key={user.id}
+                className="hover:bg-muted/50 transition-colors cursor-pointer"
+                onClick={() => window.location.href = `/users/${user.id}`}
+              >
                 <TableCell className="font-medium">{user.id}</TableCell>
-                <TableCell>{user.username}</TableCell>
+                <TableCell className="font-medium">
+                  <Link href={`/users/${user.id}`} className="hover:underline">
+                    {user.username}
+                  </Link>
+                </TableCell>
                 <TableCell>
-                  <Badge className={getRoleBadge(user.role)} variant="outline">
+                  <Badge 
+                    variant="outline" 
+                    className={getRoleBadge(user.role)}
+                  >
                     {user.role}
                   </Badge>
                 </TableCell>
-                <TableCell className="font-mono text-xs">
-                  {user.cspro_code}
+                <TableCell>
+                  <span className="font-mono text-sm">
+                    {user.cspro_code || "N/A"}
+                  </span>
                 </TableCell>
-                <TableCell className="text-right">
-                  <UserActionsDropdown 
-                    user={user} 
-                    currentUser={currentUser}
-                  />
+                <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                  <UserActionsDropdown user={user} currentUser={currentUser} />
                 </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
               <TableCell colSpan={5} className="h-24 text-center">
-                Aucun utilisateur trouvé.
+                {query 
+                  ? `Aucun utilisateur trouvé pour "${query}".` 
+                  : "Aucun utilisateur sous votre responsabilité."
+                }
               </TableCell>
             </TableRow>
           )}

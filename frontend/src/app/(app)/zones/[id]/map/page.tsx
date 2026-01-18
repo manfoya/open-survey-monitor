@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getZoneById } from "@/features/zones/services";
 import ZoneMap from "@/features/zones/components/zone-map";
+import ErrorState from "@/components/error-state";
 
 interface ZoneMapPageProps {
   params: Promise<{ id: string }>;
@@ -34,7 +35,27 @@ async function ZoneMapAsync({ zoneId }: { zoneId: number }) {
     zone = await getZoneById(zoneId);
   } catch (error) {
     console.error("Erreur lors du chargement de la zone:", error);
-    return <MapErrorState zoneId={zoneId} />;
+    return (
+      <div className="h-screen flex flex-col">
+        <div className="bg-background border-b px-4 py-3">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/zones" className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Retour aux zones
+            </Link>
+          </Button>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="max-w-md">
+            <ErrorState
+              title="Erreur de chargement"
+              message={`Impossible de charger la zone #${zoneId}.`}
+              primaryAction={{ label: "Retour aux zones", href: "/zones" }}
+            />
+          </div>
+        </div>
+      </div>
+    );
   }
   
   if (!zone) {
@@ -43,7 +64,7 @@ async function ZoneMapAsync({ zoneId }: { zoneId: number }) {
 
   return (
     <>
-      {/* Header compact */}
+      {/* Header de navigation */}
       <div className="bg-background border-b px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild>
@@ -67,7 +88,7 @@ async function ZoneMapAsync({ zoneId }: { zoneId: number }) {
         </div>
       </div>
 
-      {/* Carte plein écran */}
+      {/* Carte pleine hauteur */}
       <div className="flex-1">
         <ZoneMap 
           zone={zone} 
@@ -91,38 +112,6 @@ function MapPageSkeleton() {
       </div>
       <div className="flex-1 bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
         <div className="text-sm text-muted-foreground">Chargement de la carte...</div>
-      </div>
-    </div>
-  );
-}
-
-function MapErrorState({ zoneId }: { zoneId: number }) {
-  return (
-    <div className="h-screen flex flex-col">
-      <div className="bg-background border-b px-4 py-3">
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/zones" className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Retour aux zones
-          </Link>
-        </Button>
-      </div>
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-destructive mb-4">⚠️</div>
-          <h3 className="text-lg font-semibold mb-2">Erreur de chargement</h3>
-          <p className="text-muted-foreground mb-4">
-            Impossible de charger la zone #{zoneId}.
-          </p>
-          <div className="flex gap-2 justify-center">
-            <Button variant="outline" onClick={() => window.location.reload()}>
-              Réessayer
-            </Button>
-            <Button asChild>
-              <Link href="/zones">Retour aux zones</Link>
-            </Button>
-          </div>
-        </div>
       </div>
     </div>
   );

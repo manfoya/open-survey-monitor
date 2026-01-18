@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import {
   Card,
   CardHeader,
@@ -6,117 +7,99 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { notFound } from "next/navigation";
 import { getMe } from "@/features/auth/services/auth";
 import { UserRole } from "@/features/auth/types";
 import { getSubordinates, getUserById } from "@/features/users/services";
-import { User, ShieldCheck, Hash, Fingerprint, Edit, ArrowLeft } from "lucide-react";
+import { User, ShieldCheck, Hash, Fingerprint, Edit } from "lucide-react";
 import Link from "next/link";
 import DeleteUserForm from "@/features/users/components/delete-user-form";
+import PageHeader from "@/components/page-header";
+import ErrorState from "@/components/error-state";
+import { RoleGuard } from "@/features/auth/components/role-guard";
 
 export default async function UserDetailsPage(props: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await props.params;
+  const userId = Number(id);
 
-  // Valider le paramètre id
-  const userId = Number(id) || null;
-  if (!userId) {
-    return <div>Identifiant non valide</div>;
+  if (isNaN(userId)) {
+    notFound();
   }
 
-  // Obtenir les informations de l'utilisateur
-  const user = await getUserById(userId);
-  if (!user) {
+  return (
+    <div className="container mx-auto py-6 max-w-2xl">
+      <PageHeader 
+        title={`Utilisateur #${userId}`}
+        description="Informations détaillées et paramètres du compte."
+        backHref="/users"
+        backLabel="Retour aux utilisateurs"
+      />
+
+      <Suspense fallback={<UserDetailsSkeleton />}>
+        <UserDetailsAsync userId={userId} />
+      </Suspense>
+    </div>
+  );
+}
+
+async function UserDetailsAsync({ userId }: { userId: number }) {
+  let user;
+  let currentUser;
+  let subordinates;
+
+  try {
+    [user, currentUser, subordinates] = await Promise.all([
+      getUserById(userId),
+      getMe(),
+      getSubordinates()
+    ]);
+  } catch (error) {
+    console.error("Erreur lors du chargement de l'utilisateur:", error);
     return (
-      <div>
-        L&apos;utilisateur n&apos;existe pas ou ne fait peut-être pas partie de
-        votre équipe
-      </div>
+      <ErrorState
+        title="Erreur de chargement"
+        message={`Impossible de charger l'utilisateur #${userId}.`}
+        primaryAction={{ label: "Retour aux utilisateurs", href: "/users" }}
+      />
     );
   }
 
-  // Obtenir les infos de l'utilisateur actuel (connecté)
-  const me = await getMe();
-  if (!me) {
-    return (
-      <div>Vous n&apos;êtes pas connecté. Déconnectez et reconnectez-vous.</div>
-    );
+  if (!user || !currentUser) {
+    notFound();
   }
 
-  // Pour la page de détails, on est plus permissif que pour l'édition
-  // On permet la consultation si c'est dans l'équipe ou si c'est un directeur
-  const subordinates = await getSubordinates();
+  // Vérifier les permissions
   const subordinateIds = subordinates.map((u) => u.id);
-  
   const canView = 
-    me.role === UserRole.DIRECTEUR || 
+    currentUser.role === UserRole.DIRECTEUR || 
     subordinateIds.includes(user.id) ||
-    user.id === me.id; // Permet de voir son propre profil
+    user.id === currentUser.id;
 
   if (!canView) {
     return (
-      <div>
-        Accès refusé: Vous n&apos;êtes pas autorisé à consulter ce profil.
-      </div>
+      <ErrorState
+        title="Accès refusé"
+        message="Vous n'êtes pas autorisé à consulter ce profil."
+        primaryAction={{ label: "Retour aux utilisateurs", href: "/users" }}
+        showRefresh={false}
+      />
     );
   }
 
-  // Déterminer si on peut éditer (même logique que la page edit mais pour le bouton)
-  const canEdit = me.role === UserRole.DIRECTEUR || subordinateIds.includes(user.id);
-
-  // Déterminer si on peut supprimer (seuls les directeurs, et pas un autre directeur)
+  const canEdit = currentUser.role === UserRole.DIRECTEUR || subordinateIds.includes(user.id);
   const canDelete = 
-    me.role === UserRole.DIRECTEUR && 
+    currentUser.role === UserRole.DIRECTEUR && 
     user.role !== UserRole.DIRECTEUR &&
-    user.id !== me.id; // Ne peut pas se supprimer soi-même
+    user.id !== currentUser.id;
 
-  // Trouver le nom du chef
+  // Trouver le chef
   const chef = user.chef_id ? subordinates.find(u => u.id === user.chef_id) : null;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      {/* En-tête avec navigation */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/users">
-              <ArrowLeft className="h-4 w-4 mr-1" />
-              Retour
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">
-              Profil utilisateur
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Consultez les informations de l&apos;utilisateur.
-            </p>
-          </div>
-        </div>
-
-        {/* Boutons d'actions */}
-        <div className="flex items-center gap-2">
-          {canEdit && (
-            <Button asChild variant="outline" size="sm">
-              <Link href={`/users/${user.id}/edit`}>
-                <Edit className="h-4 w-4 mr-2" />
-                Modifier
-              </Link>
-            </Button>
-          )}
-          
-          {canDelete && (
-            <DeleteUserForm
-              userId={user.id}
-              userName={user.username}
-              buttonClassName="flex items-center text-destructive bg-destructive/10 hover:bg-destructive/20 px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
-              buttonText="Supprimer"
-              redirectOnSuccess={true}
-            />
-          )}
-        </div>
-      </div>
-
+    <div className="space-y-6">
       {/* Carte principale avec informations */}
       <Card className="overflow-hidden">
         <CardHeader className="bg-muted/30 border-b">
@@ -131,6 +114,31 @@ export default async function UserDetailsPage(props: {
                   {user.role}
                 </Badge>
               </div>
+            </div>
+            
+            {/* Boutons d'actions - Protégés par RoleGuard */}
+            <div className="flex items-center gap-2">
+              <RoleGuard 
+                allowedRoles={canEdit ? [UserRole.DIRECTEUR, UserRole.SUPERVISEUR, UserRole.CONTROLEUR] : []}
+              >
+                <Button asChild variant="outline" size="sm">
+                  <Link href={`/users/${user.id}/edit`}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Modifier
+                  </Link>
+                </Button>
+              </RoleGuard>
+              
+              <RoleGuard allowedRoles={[UserRole.DIRECTEUR]}>
+                {canDelete && (
+                  <DeleteUserForm
+                    userId={user.id}
+                    buttonClassName="flex items-center text-destructive bg-destructive/10 hover:bg-destructive/20 px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
+                    buttonText="Supprimer"
+                    redirectOnSuccess={true}
+                  />
+                )}
+              </RoleGuard>
             </div>
           </div>
         </CardHeader>
@@ -189,6 +197,48 @@ export default async function UserDetailsPage(props: {
           Le <strong>Code CSPro</strong> est requis pour la synchronisation
           des données terrain. Il doit être unique dans le système.
         </p>
+      </div>
+    </div>
+  );
+}
+
+function UserDetailsSkeleton() {
+  return (
+    <div className="space-y-6">
+      <Card className="overflow-hidden">
+        <CardHeader className="bg-muted/30 border-b">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-12 w-12 rounded-full" />
+              <div>
+                <Skeleton className="h-6 w-32" />
+                <Skeleton className="h-4 w-16 mt-1" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-8 w-20" />
+              <Skeleton className="h-8 w-20" />
+            </div>
+          </div>
+        </CardHeader>
+        
+        <CardContent className="p-0">
+          <div className="divide-y">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex items-center justify-between p-4">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-4 w-4" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+                <Skeleton className="h-4 w-20" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+      
+      <div className="p-4 rounded-lg border">
+        <Skeleton className="h-16 w-full" />
       </div>
     </div>
   );

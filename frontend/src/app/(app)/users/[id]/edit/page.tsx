@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import {
   Card,
   CardHeader,
@@ -5,89 +6,134 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { notFound } from "next/navigation";
 import { getMe } from "@/features/auth/services/auth";
 import { UserRole } from "@/features/auth/types";
 import UpdateUserForm from "@/features/users/components/update-user-form";
 import { getSubordinates, getUserById } from "@/features/users/services";
+import { User } from "lucide-react";
+import PageHeader from "@/components/page-header";
+import ErrorState from "@/components/error-state";
 
-export default async function UpdateUserPage(props: {
+interface UpdateUserPageProps {
   params: Promise<{ id: string }>;
-}) {
-  const { id } = await props.params;
+}
 
-  // Valider le paramètre id (revoir la logique si le type d'ID change)
-  const userId = Number(id) || null;
-  if (!userId) {
-    return <div>Identifiant non valide</div>;
+export default async function UpdateUserPage({ params }: UpdateUserPageProps) {
+  const { id } = await params;
+  const userId = Number(id);
+
+  if (isNaN(userId)) {
+    notFound();
   }
-  // Obtenir les informations de l'utilisateur via une fonction serveur
-  const user = await getUserById(userId);
-  if (!user) {
+
+  return (
+    <div className="container mx-auto py-6 max-w-2xl">
+      <PageHeader
+        title={`Modifier l'utilisateur #${userId}`}
+        description="Modifiez les informations du compte et ses rattachements."
+        backHref="/users"
+        backLabel="Retour aux utilisateurs"
+      />
+
+      <Suspense fallback={<UpdateUserFormSkeleton />}>
+        <UpdateUserFormAsync userId={userId} />
+      </Suspense>
+    </div>
+  );
+}
+
+async function UpdateUserFormAsync({ userId }: { userId: number }) {
+  let user;
+  let currentUser;
+  let subordinates;
+
+  try {
+    [user, currentUser, subordinates] = await Promise.all([
+      getUserById(userId),
+      getMe(),
+      getSubordinates()
+    ]);
+  } catch (error) {
+    console.error("Erreur lors du chargement de l'utilisateur:", error);
     return (
-      <div>
-        L&apos;utilisateur n&apos;existe pas ou ne fait peut-être pas partie de
-        votre équipe
-      </div>
+      <ErrorState
+        title="Erreur de chargement"
+        message={`Impossible de charger l'utilisateur #${userId}.`}
+        primaryAction={{ label: "Retour aux utilisateurs", href: "/users" }}
+      />
     );
   }
 
-  // Obtenir les infos de l'utilisateur actuel (connecté)
-  const me = await getMe();
-  if (!me) {
-    return (
-      <div>Vous n&apos;êtes pas connecté. Déconnectez et reconnectez-vous.</div>
-    );
+  if (!user || !currentUser) {
+    notFound();
   }
 
-  // Vérifier les autorisations
-  // Le directeur peut modifier tout le monde
-  // Les autres peuvent modifier uniquement les utilisateurs sous leur responsabilité
-  // Finalement, un user ne peut modifier son propre profil sauf le directeur
-  const subordinates = await getSubordinates();
+  // Vérifier les autorisations - Protection au niveau serveur
   const subordinateIds = subordinates.map((u) => u.id);
-
-  const canEdit =
-    me.role === UserRole.DIRECTEUR || subordinateIds.includes(user.id);
-  // Comme un utilsateur n'est pas dans sa propre liste de subordonnés,
-  // on n'a pas besoin de vérifier explicitement qu'il ne peut pas modifier son propre profil
+  const canEdit = currentUser.role === UserRole.DIRECTEUR || subordinateIds.includes(user.id);
 
   if (!canEdit) {
     return (
-      <div>
-        Accès refusé: Vous n&apos;êtes pas autorisé à modifier ce profil.
-      </div>
+      <ErrorState
+        title="Accès refusé"
+        message="Vous n'êtes pas autorisé à modifier ce profil."
+        primaryAction={{ label: "Retour aux utilisateurs", href: "/users" }}
+        showRefresh={false}
+      />
     );
   }
 
   // Déterminer si l'utilisateur peut changer le chef
-  // Le directeur peut toujours changer le chef
-  // Je ne peux pas changer le chef d'un utilisateur dont je suis déjà le chef direct
-  const canChangeChef =
-    me.role === UserRole.DIRECTEUR || user.chef_id !== me.id;
+  const canChangeChef = currentUser.role === UserRole.DIRECTEUR || user.chef_id !== currentUser.id;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          Modifier un utilisateur
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Modifier les informations de l&apos;utilisateur et ses rattachements.
-        </p>
-      </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <User className="h-5 w-5" />
+          {user.username}
+        </CardTitle>
+        <CardDescription>
+          Modifiez uniquement les informations nécessaires. Les champs non modifiés conserveront leurs valeurs actuelles.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <UpdateUserForm user={user} canChangeChef={canChangeChef} />
+      </CardContent>
+    </Card>
+  );
+}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Informations de compte</CardTitle>
-          <CardDescription>
-            Modifiez uniquement les informations nécessaires. Les champs non
-            modifiés conserveront leurs valeurs actuelles.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <UpdateUserForm user={user} canChangeChef={canChangeChef} />
-        </CardContent>
-      </Card>
-    </div>
+function UpdateUserFormSkeleton() {
+  return (
+    <Card>
+      <CardHeader>
+        <Skeleton className="h-6 w-48" />
+        <Skeleton className="h-4 w-full" />
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+        <Skeleton className="h-10 w-full" />
+      </CardContent>
+    </Card>
   );
 }

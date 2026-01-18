@@ -18,17 +18,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Zone } from "@/features/zones/types";
+import { formatCoordinate, formatRadius } from "@/features/zones/utils";
 import { Edit, MoreVertical, Eye, MapPin } from "lucide-react";
 import Link from "next/link";
 import Pagination from "@/components/pagination";
 import { Separator } from "@radix-ui/react-separator";
 import DeleteZoneForm from "@/features/zones/components/delete-zone-form";
+import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import { ClientRoleGuard } from "@/features/auth/components/role-guard";
+import { UserRole, UserProfile } from "@/features/auth/types";
 
 interface ZonesTableProps {
   zones: Zone[];
   query: string;
   page: number;
   per_page: number;
+  currentUser: UserProfile | null; // Ajouter l'utilisateur actuel
 }
 
 function filterZones(zones: Zone[], query: string) {
@@ -49,25 +56,12 @@ function getRange(page: number, per_page: number) {
   return { start, end };
 }
 
-function formatCoordinate(value: number, type: 'lat' | 'lng'): string {
-  const direction = type === 'lat' 
-    ? (value >= 0 ? 'N' : 'S') 
-    : (value >= 0 ? 'E' : 'W');
-  return `${Math.abs(value).toFixed(6)}° ${direction}`;
-}
-
-function formatRadius(radius: number): string {
-  if (radius >= 1000) {
-    return `${(radius / 1000).toFixed(1)} km`;
-  }
-  return `${radius} m`;
-}
-
 interface ZoneActionsDropdownProps {
   zone: Zone;
+  currentUser: UserProfile | null; // Ajouter l'utilisateur actuel
 }
 
-function ZoneActionsDropdown({ zone }: ZoneActionsDropdownProps) {
+function ZoneActionsDropdown({ zone, currentUser }: ZoneActionsDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -85,13 +79,15 @@ function ZoneActionsDropdown({ zone }: ZoneActionsDropdownProps) {
           </Link>
         </DropdownMenuItem>
         
-        {/* Action Édition */}
-        <DropdownMenuItem asChild>
-          <Link href={`/zones/${zone.id}/edit`} className="cursor-pointer">
-            <Edit className="mr-2 h-4 w-4" />
-            Modifier
-          </Link>
-        </DropdownMenuItem>
+        {/* Action Édition - Protégée pour directeurs seulement */}
+        <ClientRoleGuard allowedRoles={[UserRole.DIRECTEUR]} user={currentUser}>
+          <DropdownMenuItem asChild>
+            <Link href={`/zones/${zone.id}/edit`} className="cursor-pointer">
+              <Edit className="mr-2 h-4 w-4" />
+              Modifier
+            </Link>
+          </DropdownMenuItem>
+        </ClientRoleGuard>
         
         {/* Action Voir sur carte */}
         <DropdownMenuItem asChild>
@@ -101,14 +97,15 @@ function ZoneActionsDropdown({ zone }: ZoneActionsDropdownProps) {
           </Link>
         </DropdownMenuItem>
         
-        {/* Action Suppression avec composant réutilisable */}
-        <DropdownMenuItem asChild>
-          <DeleteZoneForm 
-            zoneId={zone.id} 
-            zoneName={zone.nom_zone}
-            className="w-full"
-          />
-        </DropdownMenuItem>
+        {/* Action Suppression - Protégée pour directeurs seulement */}
+        <ClientRoleGuard allowedRoles={[UserRole.DIRECTEUR]} user={currentUser}>
+          <DropdownMenuItem asChild>
+            <DeleteZoneForm 
+              zoneId={zone.id} 
+              className="w-full"
+            />
+          </DropdownMenuItem>
+        </ClientRoleGuard>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -118,12 +115,20 @@ export default function ZonesDataTable({
   zones, 
   query, 
   page = 1, 
-  per_page = 5
+  per_page = 5,
+  currentUser
 }: ZonesTableProps) {
   const filteredZones = filterZones(zones, query);
   const { start, end } = getRange(page, per_page);
   const paginatedZones = filteredZones.slice(start - 1, end);
   const totalPages = Math.ceil(filteredZones.length / per_page);
+
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    if (searchParams.get('deleted') === 'true') {
+      toast.success("Zone supprimée avec succès !");
+    }
+  }, [searchParams]);
 
   return (
     <div className="rounded-md border">
@@ -149,11 +154,15 @@ export default function ZonesDataTable({
             paginatedZones.map((zone: Zone) => (
               <TableRow 
                 key={zone.id}
-                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                className="hover:bg-muted/50 transition-colors cursor-pointer"
                 onClick={() => window.location.href = `/zones/${zone.id}`}
               >
                 <TableCell className="font-medium">{zone.id}</TableCell>
-                <TableCell className="font-medium">{zone.nom_zone}</TableCell>
+                <TableCell className="font-medium">
+                  <Link href={`/zones/${zone.id}`} className="hover:underline">
+                    {zone.nom_zone}
+                  </Link>
+                </TableCell>
                 <TableCell>
                   <div className="space-y-1 text-sm">
                     <div className="font-mono text-xs">
@@ -169,8 +178,8 @@ export default function ZonesDataTable({
                     {formatRadius(zone.rayon_tolerance_metres)}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right">
-                  <ZoneActionsDropdown zone={zone} />
+                <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                  <ZoneActionsDropdown zone={zone} currentUser={currentUser} />
                 </TableCell>
               </TableRow>
             ))

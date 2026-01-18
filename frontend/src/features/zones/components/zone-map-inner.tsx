@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { MapContainer, TileLayer, Circle, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import { Zone } from "@/features/zones/types";
+import { getOptimalZoomLevel } from "@/features/zones/utils";
 
 // On importe le CSS ici ou dans le layout global
 import "leaflet/dist/leaflet.css";
@@ -30,18 +31,11 @@ export default function ZoneMapInner({ zone, height, showPopup }: ZoneMapInnerPr
 
   const center: [number, number] = [zone.latitude_centrale, zone.longitude_centrale];
 
-  const getZoomLevel = (radius: number) => {
-    if (radius <= 100) return 17;
-    if (radius <= 500) return 15;
-    if (radius <= 5000) return 12;
-    return 10;
-  };
-
   return (
     <div style={{ height }} className="rounded-lg overflow-hidden border w-full">
       <MapContainer
         center={center}
-        zoom={getZoomLevel(zone.rayon_tolerance_metres)}
+        zoom={getOptimalZoomLevel(zone.rayon_tolerance_metres)}
         scrollWheelZoom={false}
         className="h-full w-full z-0"
       >

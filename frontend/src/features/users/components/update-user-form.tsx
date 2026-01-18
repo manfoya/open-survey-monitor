@@ -42,6 +42,7 @@ import {
   filterEligibleChefs,
   getRequiredChefRoleLabel,
 } from "./create-user-form";
+import { errorDiv } from "@/features/app-shell/components/utils";
 
 interface UpdateUserFormProps {
   user: UserProfile;
@@ -152,9 +153,7 @@ export default function UpdateUserForm({
             defaultValue={state.data?.username || user.username}
             className={state.errors?.username ? "border-red-500" : ""}
           />
-          {state.errors?.username && (
-            <p className="text-xs text-red-600">{state.errors.username[0]}</p>
-          )}
+          {errorDiv(state.errors?.username)}
         </div>
 
         {/* SECTION CHEF (Conditionnelle) */}
@@ -270,9 +269,7 @@ export default function UpdateUserForm({
             </div>
           )}
 
-          {state.errors?.chef_id && (
-            <p className="text-xs text-red-600">{state.errors.chef_id[0]}</p>
-          )}
+          {errorDiv(state.errors?.chef_id)}
         </div>
 
         {/* PASSWORD (Optionnel) */}
@@ -286,9 +283,7 @@ export default function UpdateUserForm({
             disabled={isPending}
             className={state.errors?.password ? "border-red-500" : ""}
           />
-          {state.errors?.password && (
-            <p className="text-xs text-red-600">{state.errors.password[0]}</p>
-          )}
+          {errorDiv(state.errors?.password)}
         </div>
       </div>
 

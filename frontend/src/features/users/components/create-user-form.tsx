@@ -47,6 +47,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { errorDiv } from "@/features/app-shell/components/utils";
 
 // Mapping des poids pour la hiérarchie stricte
 export const ROLE_WEIGHTS: Record<string, number> = {
@@ -63,10 +64,7 @@ export const ASSIGNABLE_ROLES = [
   { value: "superviseur", label: "Superviseur" },
 ] as const;
 
-export function errorDiv(messages: string[] | undefined) {
-  if (!messages || messages.length === 0) return null;
-  return <div className="mt-1 text-sm text-red-600">{messages[0]}</div>;
-}
+
 
 export function getRequiredChefRoleLabel(targetRole: string): string {
   switch (targetRole) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useActionState, useEffect } from 'react';
 import { updateSettingsAction } from '@/features/app-settings/actions';
 import { GlobalSettings } from '@/features/app-settings/types';
 import { Button } from '@/components/ui/button';
@@ -9,8 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CheckCircle, XCircle, Clock, MapPin, Timer, Zap, MessageCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { CheckCircle, Clock, MapPin, Timer, Zap, MessageCircle, AlertCircle, Calendar } from 'lucide-react';
+import { toast } from 'sonner';
+import { errorDiv } from '@/features/app-shell/components/utils';
 
 interface GlobalSettingsFormProps {
   initialSettings: GlobalSettings;
@@ -21,12 +23,13 @@ const JOURS_SEMAINE = [
 ];
 
 export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFormProps) {
-  const [isPending, startTransition] = useTransition();
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [state, formAction, isPending] = useActionState(updateSettingsAction, {
+    success: false,
+  });
   
   // État pour les jours interdits (conversion string -> array)
   const [joursInterdits, setJoursInterdits] = useState<string[]>(
-    initialSettings.jours_interdits ? initialSettings.jours_interdits.split(',') : ['Dimanche']
+    initialSettings.jours_interdits ? initialSettings.jours_interdits : ['Dimanche']
   );
 
   const handleJourChange = (jour: string, checked: boolean) => {
@@ -40,29 +43,33 @@ export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFo
   const handleSubmit = (formData: FormData) => {
     // Ajouter les jours interdits au formData
     formData.set('jours_interdits', joursInterdits.join(','));
-    
-    startTransition(async () => {
-      const result = await updateSettingsAction(formData);
-      setMessage({
-        type: result.success ? 'success' : 'error',
-        text: result.message
-      });
-    });
+    formAction(formData);
   };
+
+  // Affichage du toast pour les succès
+  useEffect(() => {
+    if (state.success && state.message) {
+      toast.success(state.message);
+    }
+  }, [state.success, state.message]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Paramètres de l&apos;Application</h1>
-        <p className="text-muted-foreground">
-          Configurez les règles de validation et de contrôle qualité pour les enquêtes.
-        </p>
-      </div>
       
-      {message && (
-        <Alert variant={message.type === 'success' ? 'default' : 'destructive'}>
-          {message.type === 'success' ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
-          <AlertDescription>{message.text}</AlertDescription>
+      {/* Message d'alerte global */}
+      {state.message && !state.success && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Erreur</AlertTitle>
+          <AlertDescription>{state.message}</AlertDescription>
+        </Alert>
+      )}
+
+      {state.success && (
+        <Alert className="border-green-600/50 text-green-600 dark:border-green-500 dark:text-green-500 [&>svg]:text-green-600">
+          <CheckCircle className="h-4 w-4" />
+          <AlertTitle>Succès</AlertTitle>
+          <AlertDescription>{state.message}</AlertDescription>
         </Alert>
       )}
 
@@ -99,7 +106,10 @@ export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFo
                   id="heure_debut_travail"
                   name="heure_debut_travail"
                   defaultValue={initialSettings.heure_debut_travail}
+                  disabled={isPending}
+                  aria-invalid={!!state.errors?.heure_debut_travail}
                 />
+                {errorDiv(state.errors?.heure_debut_travail)}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="heure_fin_travail">Heure de fin</Label>
@@ -108,7 +118,10 @@ export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFo
                   id="heure_fin_travail"
                   name="heure_fin_travail"
                   defaultValue={initialSettings.heure_fin_travail}
+                  disabled={isPending}
+                  aria-invalid={!!state.errors?.heure_fin_travail}
                 />
+                {errorDiv(state.errors?.heure_fin_travail)}
               </div>
             </div>
           </CardContent>
@@ -118,7 +131,7 @@ export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFo
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-green-500" />
+              <Calendar className="h-5 w-5 text-green-500" />
               Règles de Jours
             </CardTitle>
             <CardDescription>
@@ -146,6 +159,7 @@ export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFo
                       id={jour}
                       checked={joursInterdits.includes(jour)}
                       onCheckedChange={(checked) => handleJourChange(jour, checked as boolean)}
+                      disabled={isPending}
                     />
                     <Label htmlFor={jour} className="text-sm">{jour}</Label>
                   </div>
@@ -186,8 +200,15 @@ export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFo
                 name="tolerance_gps_metres"
                 defaultValue={initialSettings.tolerance_gps_metres}
                 min="0"
+                max="50000"
                 className="max-w-xs"
+                disabled={isPending}
+                aria-invalid={!!state.errors?.tolerance_gps_metres}
               />
+              <div className="text-xs text-muted-foreground">
+                Valeur entre 0 et 50000 mètres (50km)
+              </div>
+              {errorDiv(state.errors?.tolerance_gps_metres)}
             </div>
           </CardContent>
         </Card>
@@ -223,8 +244,15 @@ export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFo
                 name="min_duree_minutes"
                 defaultValue={initialSettings.min_duree_minutes}
                 min="1"
+                max="1440"
                 className="max-w-xs"
+                disabled={isPending}
+                aria-invalid={!!state.errors?.min_duree_minutes}
               />
+              <div className="text-xs text-muted-foreground">
+                Valeur entre 1 et 1440 minutes (24h)
+              </div>
+              {errorDiv(state.errors?.min_duree_minutes)}
             </div>
           </CardContent>
         </Card>
@@ -260,8 +288,15 @@ export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFo
                 name="max_enquetes_par_jour"
                 defaultValue={initialSettings.max_enquetes_par_jour}
                 min="1"
+                max="200"
                 className="max-w-xs"
+                disabled={isPending}
+                aria-invalid={!!state.errors?.max_enquetes_par_jour}
               />
+              <div className="text-xs text-muted-foreground">
+                Valeur entre 1 et 200 enquêtes par jour
+              </div>
+              {errorDiv(state.errors?.max_enquetes_par_jour)}
             </div>
           </CardContent>
         </Card>
@@ -285,9 +320,13 @@ export default function GlobalSettingsForm({ initialSettings }: GlobalSettingsFo
                 name="message_du_jour"
                 defaultValue={initialSettings.message_du_jour || ''}
                 rows={4}
+                disabled={isPending}
                 className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 placeholder="Entrez un message à afficher sur le tableau de bord..."
               />
+              <div className="text-xs text-muted-foreground">
+                Ce message sera affiché sur la page d&apos;accueil de tous les utilisateurs
+              </div>
             </div>
           </CardContent>
         </Card>

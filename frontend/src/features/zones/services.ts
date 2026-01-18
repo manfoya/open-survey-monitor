@@ -3,13 +3,14 @@
 import { apiClient } from "@/lib/api-client";
 import { getAccessToken } from "@/features/auth/services/auth";
 import { Zone, CreateZoneData, UpdateZoneData } from "./types";
+import { API_ENDPOINTS } from "@/lib/api-endpoints";
 
 export const getZones = async (skip: number = 0, limit: number = 100): Promise<Zone[]> => {
   const token = await getAccessToken();
   if (!token) return [];
 
   try {
-    const url = `/maps/zones/?skip=${skip}&limit=${limit}`;
+    const url = `${API_ENDPOINTS.ZONES.BASE}?skip=${skip}&limit=${limit}`;
     return await apiClient<Zone[]>(url, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -24,7 +25,7 @@ export const getZoneById = async (id: number): Promise<Zone | null> => {
   if (!token) return null;
 
   try {
-    return await apiClient<Zone>(`/maps/zones/${id}`, {
+    return await apiClient<Zone>(API_ENDPOINTS.ZONES.BY_ID(id), {
       headers: { Authorization: `Bearer ${token}` },
     });
   } catch (error) {
@@ -42,7 +43,7 @@ export const postZone = async (
   const token = await getAccessToken();
   if (!token) return null;
 
-  return await apiClient<Zone>("/maps/zones/", {
+  return await apiClient<Zone>(API_ENDPOINTS.ZONES.BASE, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: JSON.stringify(zoneData),
@@ -56,7 +57,7 @@ export const updateZone = async (
   const token = await getAccessToken();
   if (!token) return null;
 
-  return await apiClient<Zone>(`/maps/zones/${id}`, {
+  return await apiClient<Zone>(API_ENDPOINTS.ZONES.BY_ID(id), {
     method: "PUT",
     headers: { Authorization: `Bearer ${token}` },
     body: JSON.stringify(zoneData),
@@ -67,7 +68,7 @@ export const deleteZone = async (id: number): Promise<Zone | null> => {
   const token = await getAccessToken();
   if (!token) return null;
 
-  return await apiClient<Zone>(`/maps/zones/${id}`, {
+  return await apiClient<Zone>(API_ENDPOINTS.ZONES.BY_ID(id), {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });

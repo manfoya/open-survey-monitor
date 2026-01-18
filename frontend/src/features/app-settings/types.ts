@@ -4,7 +4,7 @@ export interface GlobalSettings {
   heure_debut_travail?: string;
   heure_fin_travail?: string;
   check_jours: boolean;
-  jours_interdits: string;
+  jours_interdits: string[];
   check_gps: boolean;
   tolerance_gps_metres: number;
   check_duree: boolean;
