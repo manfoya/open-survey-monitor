@@ -9,6 +9,13 @@ from app.core.database import get_db
 from app.core.security import get_password_hash
 from app.models.users import User, RoleEnum
 from app.schemas.users import UserCreate, UserOut, UserUpdate
+from app.api.v1.pagination import (
+    PaginatedResponse, 
+    PaginationParams, 
+    create_pagination_params,
+    paginate_sqlalchemy_query
+)
+from app.api.v1.pagination import paginate_list
 
 router = APIRouter()
 
@@ -29,25 +36,38 @@ def get_all_subordinates_recursive(user: User) -> List[User]:
 def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
 
-# Route pour voir mes mes subordonnés (ma team)
-@router.get("/", response_model=List[UserOut])
+# Route pour voir mes subordonnés avec pagination
+@router.get("/", response_model=PaginatedResponse[UserOut])
 def read_my_team(
+    pagination: PaginationParams = Depends(create_pagination_params),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """
-    Retourne la liste des utilisateurs visibles.
-    - Directeur : voit tout le monde.
+    Retourne la liste paginée des utilisateurs visibles.
+    - Directeur : voit tout le monde avec pagination, tri et recherche.
     - Autres : Voient uniquement leurs subordonnés (directs et indirects).
+    
+    Paramètres de pagination disponibles :
+    - page: numéro de page (défaut: 1)
+    - size: taille de page (défaut: 50, max: 1000)
+    - sort_by: champ de tri (username, role, cspro_code)
+    - sort_order: ordre de tri (asc/desc)
+    - search: recherche textuelle dans username et cspro_code
     """
     if current_user.role == RoleEnum.directeur:
-        # Le boss voit tout la base
-        return db.query(User).all()
+        # Le directeur peut paginer sur toute la base
+        query = db.query(User)
+        return paginate_sqlalchemy_query(
+            query,
+            pagination,
+            allowed_sort_fields=["username", "role", "cspro_code", "id"],
+            search_fields=["username", "cspro_code"]
+        )
     
-    # Pour les autres, on lance la recherche dans leur descendance
+    # Pour les autres, on récupère d'abord la descendance puis on pagine
     my_team = get_all_subordinates_recursive(current_user)
-    return my_team
-##
+    return paginate_list(my_team, pagination)
 
 ## Route pour chercher par code
 @router.get("/code/{cspro_code}", response_model=UserOut)
@@ -283,5 +303,3 @@ def delete_user(
     db.delete(user_db)
     db.commit()
     return None # 204 No Content
-
-

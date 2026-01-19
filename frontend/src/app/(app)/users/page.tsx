@@ -10,18 +10,23 @@ import { RoleGuard } from "@/features/auth/components/role-guard";
 import { UserRole } from "@/features/auth/types";
 import Search from "@/components/search";
 import PageHeader from "@/components/page-header";
+import { PaginationQuery } from "@/lib/api-types";
 
 export default async function UsersPage(props: {
   searchParams?: Promise<{
     query?: string;
     page?: string;
-    per_page?: string;
+    size?: string;
+    sort_by?: string;
+    sort_order?: 'asc' | 'desc';
   }>;
 }) {
   const searchParams = await props.searchParams;
   const query = searchParams?.query || "";
-  const page = Number(searchParams?.page) || 1;
-  const per_page = Number(searchParams?.per_page) || 10;
+  const page = searchParams?.page || "1";
+  const size = searchParams?.size || "10";
+  const sort_by = searchParams?.sort_by || 'id';
+  const sort_order = searchParams?.sort_order || 'asc';
 
   return (
     <div className="container mx-auto py-6">
@@ -45,7 +50,13 @@ export default async function UsersPage(props: {
       </div>
 
       <Suspense fallback={<UsersTableSkeleton />}>
-        <UsersTableAsync query={query} page={page} per_page={per_page} />
+        <UsersTableAsync 
+          query={query} 
+          page={page} 
+          size={size}
+          sort_by={sort_by}
+          sort_order={sort_order}
+        />
       </Suspense>
     </div>
   );
@@ -54,11 +65,15 @@ export default async function UsersPage(props: {
 async function UsersTableAsync({
   query,
   page,
-  per_page,
+  size,
+  sort_by,
+  sort_order,
 }: {
   query: string;
-  page: number;
-  per_page: number;
+  page: string;
+  size: string;
+  sort_by?: string;
+  sort_order: 'asc' | 'desc';
 }) {
   const currentUser = await getMe();
 
@@ -66,37 +81,54 @@ async function UsersTableAsync({
     return <div>Erreur lors du chargement du profil utilisateur.</div>;
   }
 
-  const users = await getSubordinates();
+  // Construire les paramètres pour l'API
+  const paginationParams: PaginationQuery = {
+    page,
+    size,
+    sort_by,
+    sort_order,
+  };
 
-  if (users.length === 0) {
+  // Ajouter la recherche seulement si elle n'est pas vide
+  if (query.trim()) {
+    paginationParams.search = query;
+  }
+
+  // Utiliser la nouvelle API avec pagination côté serveur
+  const paginatedUsers = await getSubordinates(paginationParams);
+
+  if (paginatedUsers.meta.total_items === 0) {
     return (
       <div className="text-center py-12">
         <UserPlus className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
         <h3 className="text-lg font-semibold mb-2">
-          Aucun utilisateur sous votre responsabilité
+          {query 
+            ? `Aucun utilisateur trouvé pour "${query}"`
+            : "Aucun utilisateur sous votre responsabilité"
+          }
         </h3>
         <p className="text-muted-foreground mb-4">
-          Vous n&apos;avez aucun utilisateur dans votre équipe pour le moment.
+          {query 
+            ? "Essayez de modifier votre recherche."
+            : "Vous n'avez aucun utilisateur dans votre équipe pour le moment."
+          }
         </p>
-        <RoleGuard allowedRoles={[UserRole.DIRECTEUR]}>
-          <Button asChild>
-            <Link href="/users/create">
-              <UserPlus className="mr-2 h-4 w-4" />
-              Créer un compte
-            </Link>
-          </Button>
-        </RoleGuard>
+          <RoleGuard allowedRoles={[UserRole.DIRECTEUR]}>
+            <Button asChild>
+              <Link href="/users/create">
+                <UserPlus className="mr-2 h-4 w-4" />
+                Créer un compte
+              </Link>
+            </Button>
+          </RoleGuard>
       </div>
     );
   }
 
   return (
     <UsersDataTable
-      users={users}
-      page={page}
+      paginatedUsers={paginatedUsers}
       query={query}
-      per_page={per_page}
-      currentUser={currentUser}
     />
   );
 }

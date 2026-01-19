@@ -36,7 +36,7 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 // Assure-toi que les chemins d'import correspondent à ton projet
 import { UserProfile } from "@/features/auth/types";
-import { getSubordinates } from "@/features/users/services";
+import { getUsers } from "@/features/users/services";
 import { updateUserAction } from "@/features/users/actions/update-user-action";
 import {
   filterEligibleChefs,
@@ -75,7 +75,7 @@ export default function UpdateUserForm({
   const loadUsers = useCallback(async () => {
     try {
       setIsLoadingUsers(true);
-      const fetchedUsers = await getSubordinates();
+      const fetchedUsers = await getUsers();
       setUsers(fetchedUsers);
     } catch (error) {
       console.error("Erreur chargement users:", error);

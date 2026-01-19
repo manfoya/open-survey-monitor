@@ -7,6 +7,12 @@ from app.core.database import get_db
 from app.models.users import User, RoleEnum
 from app.models.zones import Zone, Affectation
 from app.schemas.maps import ZoneCreate, ZoneOut, ZoneUpdate, AffectationCreate, AffectationOut, AffectationUpdate
+from app.api.v1.pagination import (
+    PaginatedResponse, 
+    PaginationParams, 
+    create_pagination_params,
+    paginate_sqlalchemy_query
+)
 
 router = APIRouter()
 
@@ -27,14 +33,28 @@ def create_zone(
     db.refresh(zone)
     return zone
 
-@router.get("/zones/", response_model=List[ZoneOut])
+@router.get("/zones/", response_model=PaginatedResponse[ZoneOut])
 def read_zones(
-    skip: int = 0, limit: int = 100, 
+    pagination: PaginationParams = Depends(create_pagination_params),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Lister toutes les zones."""
-    return db.query(Zone).offset(skip).limit(limit).all()
+    """
+    Lister toutes les zones avec pagination, tri et recherche.
+    
+    Fonctionnalités :
+    - Pagination complète (page/size ou skip/limit)
+    - Tri par nom_zone, latitude_centrale, longitude_centrale
+    - Recherche textuelle dans nom_zone
+    """
+    query = db.query(Zone)
+    
+    return paginate_sqlalchemy_query(
+        query,
+        pagination,
+        allowed_sort_fields=["nom_zone", "latitude_centrale", "longitude_centrale", "rayon_tolerance_metres", "id"],
+        search_fields=["nom_zone"]
+    )
 
 @router.get("/zones/{zone_id}", response_model=ZoneOut)
 def read_zone(

@@ -33,7 +33,7 @@ import {
 import { cn } from "@/lib/utils";
 
 import { UserProfile } from "@/features/auth/types";
-import { getSubordinates } from "@/features/users/services";
+import { getUsers } from "@/features/users/services";
 import {
   createUserAction,
   CreateUserState,
@@ -101,7 +101,7 @@ export default function CreateUserForm() {
     try {
       setIsLoadingUsers(true);
       setUsersError(null);
-      const fetchedUsers = await getSubordinates();
+      const fetchedUsers = await getUsers();
       setUsers(fetchedUsers);
     } catch (error) {
       setUsersError("Erreur lors du chargement des utilisateurs");

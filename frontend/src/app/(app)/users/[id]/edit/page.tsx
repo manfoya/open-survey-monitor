@@ -11,7 +11,7 @@ import { notFound } from "next/navigation";
 import { getMe } from "@/features/auth/services/auth";
 import { UserRole } from "@/features/auth/types";
 import UpdateUserForm from "@/features/users/components/update-user-form";
-import { getSubordinates, getUserById } from "@/features/users/services";
+import { getUserById, getUsers } from "@/features/users/services";
 import { User } from "lucide-react";
 import PageHeader from "@/components/page-header";
 import ErrorState from "@/components/error-state";
@@ -53,7 +53,7 @@ async function UpdateUserFormAsync({ userId }: { userId: number }) {
     [user, currentUser, subordinates] = await Promise.all([
       getUserById(userId),
       getMe(),
-      getSubordinates(),
+      getUsers(),
     ]);
   } catch (error) {
     console.error("Erreur lors du chargement de l'utilisateur:", error);

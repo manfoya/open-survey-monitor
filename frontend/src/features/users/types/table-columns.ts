@@ -4,6 +4,8 @@ export interface TableColumn {
   label: string;
   width?: string;
   required?: boolean; // Colonnes qui ne peuvent pas être cachées
+  sortable?: boolean; // Colonnes qui peuvent être triées
+  sortKey?: string; // Clé de tri pour l'API (si différente de key)
 }
 
 export interface ColumnVisibility {
@@ -12,12 +14,12 @@ export interface ColumnVisibility {
 
 // Configuration des colonnes disponibles
 export const availableColumns: TableColumn[] = [
-  { key: 'id', label: 'ID', width: 'w-[100px]', required: true },
-  { key: 'username', label: 'Utilisateur', required: true },
-  { key: 'role', label: 'Rôle' },
-  { key: 'cspro_code', label: 'Code CSPro' },
-  { key: 'chef_id', label: 'Chef' },
-  { key: 'actions', label: 'Actions', width: 'text-right', required: true },
+  { key: 'id', label: 'ID', width: 'w-[100px]', required: true, sortable: true, sortKey: 'id' },
+  { key: 'username', label: 'Utilisateur', required: true, sortable: true, sortKey: 'username' },
+  { key: 'role', label: 'Rôle', sortable: true, sortKey: 'role' },
+  { key: 'cspro_code', label: 'Code CSPro', sortable: true, sortKey: 'cspro_code' },
+  { key: 'chef_id', label: 'Chef', sortable: false },
+  { key: 'actions', label: 'Actions', width: 'text-right', required: true, sortable: false },
 ];
 
 // Configuration par défaut des colonnes visibles

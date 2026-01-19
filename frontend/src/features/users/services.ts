@@ -4,19 +4,54 @@ import { apiClient } from "@/lib/api-client";
 import { getAccessToken } from "@/features/auth/services/auth";
 import { API_ENDPOINTS } from "@/lib/api-endpoints";
 import { UserProfile } from "@/features/auth/types";
+import { PaginatedResponse, PaginationQuery } from "@/lib/api-types";
 
-export const getSubordinates = async (): Promise<UserProfile[]> => {
+export const getSubordinates = async (params: PaginationQuery = {}): Promise<PaginatedResponse<UserProfile>> => {
   const token = await getAccessToken();
-  if (!token) return [];
+  if (!token) {
+    return {
+      items: [],
+      meta: {
+        current_page: 1,
+        page_size: 50,
+        total_items: 0,
+        total_pages: 0,
+      }
+    };
+  }
+
+  // Construire les paramètres de requête
+  const searchParams = new URLSearchParams();
+  if (params.page) searchParams.set('page', params.page);
+  if (params.size) searchParams.set('size', params.size);
+  if (params.sort_by) searchParams.set('sort_by', params.sort_by);
+  if (params.sort_order) searchParams.set('sort_order', params.sort_order);
+  if (params.search) searchParams.set('search', params.search);
+
+  const url = `${API_ENDPOINTS.USERS.BASE}?${searchParams.toString()}`;
 
   try {
-    return await apiClient<UserProfile[]>(API_ENDPOINTS.USERS.BASE, {
+    return await apiClient<PaginatedResponse<UserProfile>>(url, {
       headers: { Authorization: `Bearer ${token}` },
     });
   } catch (error) {
     console.error("Erreur lors de la récupération des utilisateurs:\n", error);
-    return [];
+    return {
+      items: [],
+      meta: {
+        current_page: Number(params.page) || 1,
+        page_size: Number(params.size) || 50,
+        total_items: 0,
+        total_pages: 0,
+      }
+    };
   }
+};
+
+// Fonction de compatibilité pour l'ancien code qui attend un tableau simple
+export const getUsers = async (): Promise<UserProfile[]> => {
+  const response = await getSubordinates();
+  return response.items;
 };
 
 export const getUserById = async (id: number): Promise<UserProfile | null> => {
