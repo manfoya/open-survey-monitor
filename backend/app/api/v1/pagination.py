@@ -58,7 +58,8 @@ def paginate_query(
     query: Query,
     params: PaginationParams,
     allowed_sort_fields: Optional[List[str]] = None,
-    search_fields: Optional[List[str]] = None
+    search_fields: Optional[List[str]] = None,
+    text_sort_fields: Optional[List[str]] = None
 ) -> tuple[Query, int]:
     """
     Applique la pagination, le tri et la recherche à une requête SQLAlchemy.
@@ -68,6 +69,7 @@ def paginate_query(
         params: Paramètres de pagination
         allowed_sort_fields: Liste des champs autorisés pour le tri
         search_fields: Liste des champs où effectuer la recherche
+        text_sort_fields: Liste des champs texte nécessitant un tri insensible à la casse
         
     Returns:
         tuple: (requête paginée, nombre total d'éléments)
@@ -106,8 +108,14 @@ def paginate_query(
                     detail=f"Tri non autorisé sur le champ '{params.sort_by}'. Champs autorisés: {allowed_sort_fields}"
                 )
             
-            # Construire l'ordre de tri de manière sécurisée
-            order_clause = f"{params.sort_by} {params.sort_order.upper()}"
+            # Déterminer le type de tri selon la configuration fournie
+            if text_sort_fields and params.sort_by in text_sort_fields:
+                # Tri insensible à la casse pour les champs texte spécifiés
+                order_clause = f"LOWER({params.sort_by}) {params.sort_order.upper()}"
+            else:
+                # Tri normal pour tous les autres champs
+                order_clause = f"{params.sort_by} {params.sort_order.upper()}"
+            
             query = query.order_by(text(order_clause))
         
         # Calculer l'offset
@@ -155,17 +163,18 @@ def paginate_sqlalchemy_query(
     query: Query,
     params: PaginationParams,
     allowed_sort_fields: Optional[List[str]] = None,
-    search_fields: Optional[List[str]] = None
+    search_fields: Optional[List[str]] = None,
+    text_sort_fields: Optional[List[str]] = None
 ) -> PaginatedResponse[Any]:
     """
     Fonction complète pour paginer une requête SQLAlchemy.
-    Combine paginate_query et paginate_response.
     
     Args:
         query: Requête SQLAlchemy
         params: Paramètres de pagination
         allowed_sort_fields: Champs autorisés pour le tri
         search_fields: Champs pour la recherche textuelle
+        text_sort_fields: Champs texte nécessitant un tri insensible à la casse
         
     Returns:
         PaginatedResponse complète
@@ -173,7 +182,7 @@ def paginate_sqlalchemy_query(
     try:
         # Appliquer pagination et récupérer le total
         paginated_query, total_count = paginate_query(
-            query, params, allowed_sort_fields, search_fields
+            query, params, allowed_sort_fields, search_fields, text_sort_fields
         )
         
         # Exécuter la requête

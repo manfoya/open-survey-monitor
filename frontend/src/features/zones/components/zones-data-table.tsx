@@ -22,38 +22,29 @@ import { formatCoordinate, formatRadius } from "@/features/zones/utils";
 import { Edit, MoreVertical, Eye, MapPin } from "lucide-react";
 import Link from "next/link";
 import Pagination from "@/components/pagination";
-import { Separator } from "@radix-ui/react-separator";
 import DeleteZoneForm from "@/features/zones/components/delete-zone-form";
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useRoleGuard } from "@/features/auth/components/role-guard";
 import { UserRole } from "@/features/auth/types";
+import { PaginatedResponse } from "@/lib/api-types";
+import { PageSizeSelector } from "@/components/page-size-selector";
+import { SortableTableHead } from "@/components/sortable-table-head";
 
 interface ZonesTableProps {
-  zones: Zone[];
-  query: string;
-  page: number;
-  per_page: number;
+  paginatedZones: PaginatedResponse<Zone>;
+  query?: string;
 }
 
-function filterZones(zones: Zone[], query: string) {
-  if (!query) return zones;
-  const lowerQuery = query.toLowerCase().trim();
-  return zones.filter(
-    (zone) =>
-      zone.nom_zone.toLowerCase().includes(lowerQuery) ||
-      zone.id.toString().includes(lowerQuery) ||
-      zone.latitude_centrale.toString().includes(lowerQuery) ||
-      zone.longitude_centrale.toString().includes(lowerQuery),
-  );
-}
-
-function getRange(page: number, per_page: number) {
-  const start = (page - 1) * per_page + 1;
-  const end = page * per_page;
-  return { start, end };
-}
+// Configuration des colonnes avec support du tri
+const zoneColumns = [
+  { key: 'id', label: 'ID', sortKey: 'id', className: 'w-[80px]', sortable: true },
+  { key: 'nom_zone', label: 'Nom de la zone', sortKey: 'nom_zone', sortable: true },
+  { key: 'coordinates', label: 'Coordonnées', sortable: false },
+  { key: 'rayon_tolerance_metres', label: 'Rayon', sortKey: 'rayon_tolerance_metres', sortable: true },
+  { key: 'actions', label: 'Action', className: 'text-right', sortable: false }
+];
 
 interface ZoneActionsDropdownProps {
   zone: Zone;
@@ -108,18 +99,52 @@ function ZoneActionsDropdown({ zone }: ZoneActionsDropdownProps) {
   );
 }
 
-export default function ZonesDataTable({
-  zones,
-  query,
-  page = 1,
-  per_page = 5,
-}: ZonesTableProps) {
-  const filteredZones = filterZones(zones, query);
-  const { start, end } = getRange(page, per_page);
-  const paginatedZones = filteredZones.slice(start - 1, end);
-  const totalPages = Math.ceil(filteredZones.length / per_page);
+// Fonction pour obtenir la valeur d'une cellule selon la colonne
+function getCellValue(zone: Zone, columnKey: string) {
+  switch (columnKey) {
+    case 'id':
+      return <span className="font-medium">{zone.id}</span>;
+    case 'nom_zone':
+      return (
+        <Link href={`/zones/${zone.id}`} className="hover:underline font-medium">
+          {zone.nom_zone}
+        </Link>
+      );
+    case 'coordinates':
+      return (
+        <div className="space-y-1 text-sm">
+          <div className="font-mono text-xs">
+            {formatCoordinate(zone.latitude_centrale, "lat")}
+          </div>
+          <div className="font-mono text-xs">
+            {formatCoordinate(zone.longitude_centrale, "lng")}
+          </div>
+        </div>
+      );
+    case 'rayon_tolerance_metres':
+      return (
+        <Badge variant="secondary" className="font-mono text-xs">
+          {formatRadius(zone.rayon_tolerance_metres)}
+        </Badge>
+      );
+    case 'actions':
+      return <ZoneActionsDropdown zone={zone} />;
+    default:
+      return null;
+  }
+}
 
+export default function ZonesDataTable({
+  paginatedZones,
+  query = ""
+}: ZonesTableProps) {
   const searchParams = useSearchParams();
+  const { items: zones, meta: paginationMeta } = paginatedZones;
+
+  // Récupérer les paramètres de tri actuels depuis l'URL
+  const currentSort = searchParams.get("sort_by") || 'id';
+  const currentOrder = (searchParams.get("sort_order") as 'asc' | 'desc') || 'asc';
+
   useEffect(() => {
     if (searchParams.get("deleted") === "true") {
       toast.success("Zone supprimée avec succès !");
@@ -127,74 +152,95 @@ export default function ZonesDataTable({
   }, [searchParams]);
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableCaption>
-          <p className="m-4">Liste des zones géographiques configurées.</p>
-        </TableCaption>
+    <div className="space-y-4">
+      {/* Barre d'outils avec info pagination et sélecteur de taille */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-4">
+          <div className="text-sm text-muted-foreground">
+            {paginationMeta.total_items} zone{paginationMeta.total_items > 1 ? 's' : ''} • 
+            Page {paginationMeta.current_page} sur {paginationMeta.total_pages}
+            {currentSort && (
+              <span className="ml-2 text-xs">
+                • Trié par {zoneColumns.find(col => col.sortKey === currentSort)?.label} 
+                ({currentOrder === 'asc' ? 'croissant' : 'décroissant'})
+              </span>
+            )}
+          </div>
+          <PageSizeSelector currentPageSize={paginationMeta.page_size} />
+        </div>
+      </div>
 
-        {/* EN-TÊTE DU TABLEAU */}
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[80px]">ID</TableHead>
-            <TableHead>Nom de la zone</TableHead>
-            <TableHead>Coordonnées</TableHead>
-            <TableHead>Rayon</TableHead>
-            <TableHead className="text-right">Action</TableHead>
-          </TableRow>
-        </TableHeader>
+      {/* Tableau avec tri */}
+      <div className="rounded-md border">
+        <Table>
+          <TableCaption>
+            <p className="m-4">Liste des zones géographiques configurées.</p>
+          </TableCaption>
 
-        {/* CORPS DU TABLEAU */}
-        <TableBody>
-          {paginatedZones.length > 0 ? (
-            paginatedZones.map((zone: Zone) => (
-              <TableRow
-                key={zone.id}
-                className="hover:bg-muted/50 transition-colors cursor-pointer"
-                onClick={() => (window.location.href = `/zones/${zone.id}`)}
-              >
-                <TableCell className="font-medium">{zone.id}</TableCell>
-                <TableCell className="font-medium">
-                  <Link href={`/zones/${zone.id}`} className="hover:underline">
-                    {zone.nom_zone}
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  <div className="space-y-1 text-sm">
-                    <div className="font-mono text-xs">
-                      {formatCoordinate(zone.latitude_centrale, "lat")}
-                    </div>
-                    <div className="font-mono text-xs">
-                      {formatCoordinate(zone.longitude_centrale, "lng")}
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="secondary" className="font-mono text-xs">
-                    {formatRadius(zone.rayon_tolerance_metres)}
-                  </Badge>
-                </TableCell>
-                <TableCell
-                  className="text-right"
-                  onClick={(e) => e.stopPropagation()}
+          {/* EN-TÊTE DYNAMIQUE AVEC TRI */}
+          <TableHeader>
+            <TableRow>
+              {zoneColumns.map((column) => (
+                column.sortKey ? (
+                  <SortableTableHead
+                    key={column.key}
+                    column={column}
+                    currentSort={currentSort}
+                    currentOrder={currentOrder}
+                  />
+                ) : (
+                  <TableHead key={column.key} className={column.className}>
+                    {column.label}
+                  </TableHead>
+                )
+              ))}
+            </TableRow>
+          </TableHeader>
+
+          {/* CORPS DU TABLEAU */}
+          <TableBody>
+            {zones.length > 0 ? (
+              zones.map((zone: Zone) => (
+                <TableRow
+                  key={zone.id}
+                  className="hover:bg-muted/50 transition-colors cursor-pointer"
+                  onClick={() => (window.location.href = `/zones/${zone.id}`)}
                 >
-                  <ZoneActionsDropdown zone={zone} />
+                  {zoneColumns.map((column) => (
+                    <TableCell
+                      key={column.key}
+                      className={column.key === 'actions' ? 'text-right' : ''}
+                      onClick={column.key === 'actions' ? (e) => e.stopPropagation() : undefined}
+                    >
+                      {getCellValue(zone, column.key)}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={zoneColumns.length} className="h-24 text-center">
+                  {query
+                    ? `Aucune zone trouvée pour "${query}".`
+                    : "Aucune zone configurée."}
                 </TableCell>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={5} className="h-24 text-center">
-                {query
-                  ? `Aucune zone trouvée pour "${query}".`
-                  : "Aucune zone configurée."}
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <Separator className="my-2" />
-      <Pagination totalPages={totalPages} />
+            )}
+          </TableBody>
+        </Table>
+        
+        {/* Pagination en bas du tableau */}
+        <div className="border-t">
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="text-sm text-muted-foreground">
+              Affichage de {((paginationMeta.current_page - 1) * paginationMeta.page_size) + 1} à{" "}
+              {Math.min(paginationMeta.current_page * paginationMeta.page_size, paginationMeta.total_items)} sur{" "}
+              {paginationMeta.total_items} zones
+            </div>
+            <Pagination totalPages={paginationMeta.total_pages} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

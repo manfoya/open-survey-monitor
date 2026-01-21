@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { notFound } from "next/navigation";
 import { getMe } from "@/features/auth/services/auth";
 import { UserRole } from "@/features/auth/types";
-import { getUserById, getUsers } from "@/features/users/services";
+import { getUserById, getAllSubordinates } from "@/features/users/services";
 import { User, ShieldCheck, Hash, Fingerprint, Edit } from "lucide-react";
 import Link from "next/link";
 import DeleteUserForm from "@/features/users/components/delete-user-form";
@@ -49,7 +49,7 @@ async function UserDetailsAsync({ userId }: { userId: number }) {
     [user, currentUser, subordinates] = await Promise.all([
       getUserById(userId),
       getMe(),
-      getUsers(),
+      getAllSubordinates(),
     ]);
   } catch (error) {
     console.error("Erreur lors du chargement de l'utilisateur:", error);

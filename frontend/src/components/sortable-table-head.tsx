@@ -62,7 +62,8 @@ export function SortableTableHead({ column, currentSort, currentOrder }: Sortabl
         size="sm"
         className={cn(
           "h-8 p-2 -ml-2 hover:bg-muted/50 font-medium",
-          isCurrentSort && "bg-muted/30"
+          isCurrentSort && "bg-muted/30",
+          "cursor-pointer"
         )}
         onClick={handleSort}
       >

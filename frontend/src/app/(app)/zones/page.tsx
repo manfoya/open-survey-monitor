@@ -10,18 +10,23 @@ import { RoleGuard } from "@/features/auth/components/role-guard";
 import { UserRole } from "@/features/auth/types";
 import Search from "@/components/search";
 import PageHeader from "@/components/page-header";
+import { PaginationQuery } from "@/lib/api-types";
 
 export default async function ZonesPage(props: {
   searchParams?: Promise<{
     query?: string;
     page?: string;
-    per_page?: string;
+    size?: string;
+    sort_by?: string;
+    sort_order?: 'asc' | 'desc';
   }>;
 }) {
   const searchParams = await props.searchParams;
   const query = searchParams?.query || "";
-  const page = Number(searchParams?.page) || 1;
-  const per_page = Number(searchParams?.per_page) || 5;
+  const page = searchParams?.page || "1";
+  const size = searchParams?.size || "10";
+  const sort_by = searchParams?.sort_by || 'id';
+  const sort_order = searchParams?.sort_order || 'asc';
 
   return (
     <div className="container mx-auto py-6">
@@ -45,7 +50,13 @@ export default async function ZonesPage(props: {
       </div>
 
       <Suspense fallback={<ZonesTableSkeleton />}>
-        <ZonesTableAsync query={query} page={page} per_page={per_page} />
+        <ZonesTableAsync 
+          query={query} 
+          page={page} 
+          size={size}
+          sort_by={sort_by}
+          sort_order={sort_order}
+        />
       </Suspense>
     </div>
   );
@@ -54,11 +65,15 @@ export default async function ZonesPage(props: {
 async function ZonesTableAsync({
   query,
   page,
-  per_page,
+  size,
+  sort_by,
+  sort_order,
 }: {
   query: string;
-  page: number;
-  per_page: number;
+  page: string;
+  size: string;
+  sort_by?: string;
+  sort_order: 'asc' | 'desc';
 }) {
   const currentUser = await getMe();
 
@@ -66,15 +81,37 @@ async function ZonesTableAsync({
     return <div>Erreur lors du chargement du profil utilisateur.</div>;
   }
 
-  const zones = await getZones();
+  // Construire les paramètres pour l'API
+  const paginationParams: PaginationQuery = {
+    page,
+    size,
+    sort_by,
+    sort_order,
+  };
 
-  if (zones.length === 0) {
+  // Ajouter la recherche seulement si elle n'est pas vide
+  if (query.trim()) {
+    paginationParams.search = query;
+  }
+
+  // Utiliser la nouvelle API avec pagination côté serveur
+  const paginatedZones = await getZones(paginationParams);
+
+  if (paginatedZones.meta.total_items === 0) {
     return (
       <div className="text-center py-12">
         <MapPin className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-semibold mb-2">Aucune zone configurée</h3>
+        <h3 className="text-lg font-semibold mb-2">
+          {query 
+            ? `Aucune zone trouvée pour "${query}"`
+            : "Aucune zone configurée"
+          }
+        </h3>
         <p className="text-muted-foreground mb-4">
-          Commencez par créer votre première zone géographique.
+          {query 
+            ? "Essayez de modifier votre recherche."
+            : "Commencez par créer votre première zone géographique."
+          }
         </p>
         <RoleGuard allowedRoles={[UserRole.DIRECTEUR]}>
           <Button asChild>
@@ -90,10 +127,8 @@ async function ZonesTableAsync({
 
   return (
     <ZonesDataTable
-      zones={zones}
-      page={page}
+      paginatedZones={paginatedZones}
       query={query}
-      per_page={per_page}
     />
   );
 }

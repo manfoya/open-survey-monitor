@@ -36,6 +36,25 @@ def get_all_subordinates_recursive(user: User) -> List[User]:
 def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
 
+@router.get("/all", response_model=List[UserOut])
+def read_all_users(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Retourne la liste complète des subordonnés (directs et indirects) de l'utilisateur courant.
+    - Directeur : voit tout le monde.
+    - Autres : voient uniquement leurs subordonnés (directs et indirects).
+    NB: Cette route n'est pas paginée et doit être utilisé avec précaution.
+    """
+    if current_user.role == RoleEnum.directeur:
+        # Le directeur voit tout le monde
+        return db.query(User).all()
+    
+    # Pour les autres, on récupère toute la descendance
+    my_team = get_all_subordinates_recursive(current_user)
+    return my_team
+
 # Route pour voir mes subordonnés avec pagination
 @router.get("/", response_model=PaginatedResponse[UserOut])
 def read_my_team(
@@ -62,10 +81,12 @@ def read_my_team(
             query,
             pagination,
             allowed_sort_fields=["username", "role", "cspro_code", "id"],
-            search_fields=["username", "cspro_code"]
+            search_fields=["username", "cspro_code"],
+            text_sort_fields=["username", "cspro_code"]  # Tri insensible à la casse
         )
     
     # Pour les autres, on récupère d'abord la descendance puis on pagine
+    from app.api.v1.pagination import paginate_list
     my_team = get_all_subordinates_recursive(current_user)
     return paginate_list(my_team, pagination)
 

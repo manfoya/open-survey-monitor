@@ -17,7 +17,7 @@ export function PageSizeSelector({
 
   const handlePageSizeChange = (newPageSize: string) => {
     const params = new URLSearchParams(searchParams);
-    params.set("page_size", newPageSize);
+    params.set("size", newPageSize);
     params.set("page", "1"); // Retourner à la première page
     router.push(`?${params.toString()}`);
   };

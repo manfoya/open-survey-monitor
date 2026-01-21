@@ -33,6 +33,16 @@ def create_zone(
     db.refresh(zone)
     return zone
 
+# Endpoint simple pour usage courant (dropdowns, cartes)
+@router.get("/zones/all", response_model=List[ZoneOut])
+def get_all_zones(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Récupérer toutes les zones (pour dropdowns, cartes, etc.)"""
+    zones = db.query(Zone).order_by(Zone.nom_zone).all()
+    return zones
+
 @router.get("/zones/", response_model=PaginatedResponse[ZoneOut])
 def read_zones(
     pagination: PaginationParams = Depends(create_pagination_params),
@@ -53,7 +63,8 @@ def read_zones(
         query,
         pagination,
         allowed_sort_fields=["nom_zone", "latitude_centrale", "longitude_centrale", "rayon_tolerance_metres", "id"],
-        search_fields=["nom_zone"]
+        search_fields=["nom_zone"],
+        text_sort_fields=["nom_zone"]  # Tri insensible à la casse pour les noms de zones
     )
 
 @router.get("/zones/{zone_id}", response_model=ZoneOut)

@@ -1,14 +1,18 @@
+import { ALL } from "dns";
+
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: "/auth/login",
     ME: "/users/me",
   },
   USERS: {
-    BASE: "/users",
+    BASE: "/users/",
+    ALL: "/users/all",
     BY_ID: (id: number) => `/users/${id}`,
   },
   ZONES: {
     BASE: "/maps/zones/",
+    ALL: "/maps/zones/all",
     BY_ID: (id: number) => `/maps/zones/${id}`,
   },
   SETTINGS: {

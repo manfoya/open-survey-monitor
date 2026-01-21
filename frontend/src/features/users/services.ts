@@ -48,10 +48,18 @@ export const getSubordinates = async (params: PaginationQuery = {}): Promise<Pag
   }
 };
 
-// Fonction de compatibilité pour l'ancien code qui attend un tableau simple
-export const getUsers = async (): Promise<UserProfile[]> => {
-  const response = await getSubordinates();
-  return response.items;
+export const getAllSubordinates = async (): Promise<UserProfile[]> => {
+  const token = await getAccessToken();
+  if (!token) return [];
+
+  try {
+    return await apiClient<UserProfile[]>(API_ENDPOINTS.USERS.ALL, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch (error) {
+    console.error("Erreur lors de la récupération de tous les utilisateurs:\n", error);
+    return [];
+  }
 };
 
 export const getUserById = async (id: number): Promise<UserProfile | null> => {
