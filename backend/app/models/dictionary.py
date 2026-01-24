@@ -1,49 +1,63 @@
-# backend/app/models/dictionary.py
-
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, JSON, Text
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 import enum
 
-class VariableType(str, enum.Enum):
+class VariableDataType(str, enum.Enum):
     """
-    Les types de questions possibles dans CSPro
+    Type de donnée technique (utilisé pour le casting côté Backend)
     """
-    choix_unique = "SelectOne"   # Radio button (ex: Sexe)
-    choix_multiple = "SelectMany" # Checkbox (ex: Sources de revenus)
-    entier = "Integer"           # Nombre (ex: Age)
-    texte = "Text"               # Champ libre (ex: Nom)
+    NUMBER = "number"   # Entiers ou décimaux (Age, Revenu)
+    TEXT = "text"       # Champ libre (Nom, Commentaire)
+    DATE = "date"       # Date (Date de naissance)
+    BOOLEAN = "boolean" # Vrai/Faux (Est en zone rurale ?)
+    LIST = "list"       # Choix unique ou multiple (Sexe, Région)
 
 class Variable(Base):
     """
-    Dictionnaire des variables de l'enquête.
-    Exemple : ID=1, Nom="Q01_SEXE", Libellé="Sexe du Chef de ménage"
+    Source de vérité pour le Query Builder.
+    Définit quelles variables sont disponibles et comment les afficher.
     """
     __tablename__ = "variables"
 
     id = Column(Integer, primary_key=True, index=True)
     
-    # Le "Name" dans CSPro (C'est la clé de liaison !)
-    name = Column(String, unique=True, index=True, nullable=False) 
+    # L'identifiant technique unique (ex: "age", "q01_sexe")
+    # C'est ce champ qui sera utilisé dans le JSON du Query Builder ("field": "age")
+    slug = Column(String, unique=True, index=True, nullable=False)
     
-    # Le libellé affiché à l'écran pour l'Admin
+    # Le label humain (ex: "Âge du répondant")
     label = Column(String, nullable=False)
     
-    # Le type de question (utile pour savoir si on affiche un camembert ou une moyenne)
-    type = Column(Enum(VariableType), default=VariableType.choix_unique)
+    # Le type de donnée pour le moteur de règles
+    data_type = Column(String, nullable=False, default=VariableDataType.TEXT)
     
+    # Configuration JSON pour l'interface Frontend (Flexibilité totale)
+    # Exemples :
+    # Pour Age : { "inputType": "number", "min": 18, "max": 99, "step": 1 }
+    # Pour Date : { "inputType": "date", "format": "YYYY-MM-DD" }
+    ui_config = Column(JSON, nullable=True, default=dict)
+
+    # Liste des opérateurs exclus (optionnel)
+    # Ex: Pour une ville, on ne veut pas "plus grand que".
+    # Stocké en JSON : ["<", ">", "<=", ">="]
+    excluded_operators = Column(JSON, nullable=True, default=list)
+
     # Est-ce une variable utilisable pour les Quotas ?
-    # (Ex: Sexe=Oui, Age=Oui, mais "Commentaire"=Non)
-    est_quota = Column(Boolean, default=False)
+    is_quota = Column(Boolean, default=False, index=True)
 
     # Relations
+    # Uniquement pertinent si data_type == 'list'
     modalites = relationship("Modalite", back_populates="variable", cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f"<Variable {self.slug} ({self.data_type})>"
 
 
 class Modalite(Base):
     """
-    Les options de réponses possibles pour les questions à choix (Single/Multiple).
-    Exemple : Variable="Q01_SEXE", Code="1", Label="Masculin"
+    Les options prédéfinies pour les variables de type LIST.
+    Sert à alimenter les dropdowns du Query Builder.
     """
     __tablename__ = "modalites"
 
@@ -51,11 +65,17 @@ class Modalite(Base):
     
     variable_id = Column(Integer, ForeignKey("variables.id"), nullable=False)
     
-    # Le code envoyé par CSPro (Attention, c'est souvent du String "01", "A"...)
-    code = Column(String, nullable=False)
+    # La valeur technique stockée (ex: "1", "M", "DAK")
+    value = Column(String, nullable=False)
     
-    # Ce qu'on affiche à l'écran
+    # Le label affiché dans le dropdown (ex: "Masculin", "Dakar")
     label = Column(String, nullable=False)
+    
+    # Ordre d'affichage optionnel
+    order = Column(Integer, default=0)
 
     # Relation
     variable = relationship("Variable", back_populates="modalites")
+    
+    def __repr__(self):
+        return f"<Modalite {self.label}={self.value}>"

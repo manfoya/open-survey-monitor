@@ -31,9 +31,12 @@ class UserLogin(BaseModel):
 # Pour ne pas renvoyer de mot de passe, on utilise 
 # UserOut comme "response_model" dans FastAPI, le champ 'password'
 # (qui est dans UserCreate) sera automatiquement exclu.
+class UserOutMinimal(UserBase):
+    id: int
+    
 class UserOut(UserBase):
     id: int
-    chef_id: Optional[int] = None
+    chef: Optional['UserOutMinimal'] = None
 
     class Config:
         # Permet à Pydantic de lire les objets SQLAlchemy

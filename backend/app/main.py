@@ -2,8 +2,7 @@
 
 from fastapi import FastAPI
 from app.api.v1 import auth
-from app.models import users, zones, survey, settings
-from app.api.v1 import auth, users, maps, settings, dictionary
+from app.api.v1 import auth, users, maps, settings, variables, quotas
 
 
 app = FastAPI(
@@ -17,7 +16,8 @@ app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentification"]
 app.include_router(users.router, prefix="/api/v1/users", tags=["Utilisateurs"])
 app.include_router(maps.router, prefix="/api/v1/maps", tags=["Maps & Quotas"])
 app.include_router(settings.router, prefix="/api/v1/settings", tags=["Global Settings"])
-app.include_router(dictionary.router, prefix="/api/v1/dictionary", tags=["Dictionary"]) 
+app.include_router(variables.router, prefix="/api/v1/variables", tags=["Variables"]) 
+app.include_router(quotas.router, prefix="/api/v1/quotas", tags=["Quotas"]) 
 
 
 @app.get("/")

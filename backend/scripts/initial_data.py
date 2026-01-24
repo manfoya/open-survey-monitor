@@ -58,6 +58,7 @@ def main():
     db = SessionLocal()
     try:
         init_db(db)
+        init_global_settings(db)
     finally:
         # Le bloc 'finally' garantit que la connexion est fermée proprement
         # même si le script plante au milieu (ex: erreur réseau).

@@ -46,4 +46,4 @@ class User(Base):
     affectations = relationship("Affectation", back_populates="controleur")
     
     # Relation avec les quotas assignés à cet utilisateur
-    # user_quotas = relationship("UserQuota", back_populates="user")
+    user_quotas = relationship("UserQuota", back_populates="user")

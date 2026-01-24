@@ -12,6 +12,7 @@ from alembic import context
 from app.core.database import Base
 from app.models import users, zones, survey, settings
 from app.models import dictionary
+from app.models import quotas
 
 
 # this is the Alembic Config object, which provides

@@ -1,40 +1,43 @@
-# backend/app/schemas/dictionary.py
+from pydantic import BaseModel, Field, field_validator
+from typing import List, Optional, Dict, Any
+from app.models.dictionary import VariableDataType
 
-from pydantic import BaseModel
-from typing import List, Optional
-from app.models.dictionary import VariableType
-
-# MODALITÉS
-
+# --- Schemas pour les Modalités ---
 class ModaliteBase(BaseModel):
-    code: str   # Ex: "1"
-    label: str  # Ex: "Masculin"
+    value: str # ex: "1"
+    label: str # ex: "Masculin"
+    order: Optional[int] = 0
 
 class ModaliteCreate(ModaliteBase):
     pass
 
 class ModaliteOut(ModaliteBase):
     id: int
-    variable_id: int
     class Config:
         from_attributes = True
 
-# VARIABLES
-
+# --- Schemas pour les Variables ---
 class VariableBase(BaseModel):
-    name: str    # Ex: "Q01_SEXE"
-    label: str   # Ex: "Sexe du chef de ménage"
-    type: VariableType = VariableType.choix_unique
-    est_quota: bool = False
+    slug: str       # ex: "age"
+    label: str      # ex: "Âge"
+    data_type: VariableDataType # "number", "list", etc.
+    is_quota: bool = False
+    
+    # Champs JSON optionnels
+    ui_config: Optional[Dict[str, Any]] = {} 
+    excluded_operators: Optional[List[str]] = []
 
 class VariableCreate(VariableBase):
-    # L'astuce ici : on permet de créer les modalités directement avec la variable
-    modalites: List[ModaliteCreate] = []
+    # Liste des modalités (uniquement si data_type="list")
+    modalites: Optional[List[ModaliteCreate]] = []
+
+    @field_validator('slug')
+    def slug_must_be_lowercase(cls, v):
+        return v.lower().strip().replace(" ", "_")
 
 class VariableOut(VariableBase):
     id: int
-    # On renvoie aussi la liste des modalités quand on lit la variable
     modalites: List[ModaliteOut] = []
-    
+
     class Config:
         from_attributes = True
