@@ -28,6 +28,6 @@ export const defaultUserColumnVisibility: ColumnVisibility = {
   username: true,
   role: true,
   cspro_code: true,
-  chef_id: false, // Masquée par défaut
+  chef: false, // Masquée par défaut
   actions: true,
 };
