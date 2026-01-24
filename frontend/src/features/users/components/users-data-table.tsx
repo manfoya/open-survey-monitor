@@ -186,10 +186,10 @@ function getCellValue (user: UserProfile, columnKey: string, currentUser: UserPr
           {user.cspro_code || "N/A"}
         </span>
       );
-    case 'chef_id':
+    case 'chef':
       return (
         <span className="text-sm">
-          {user.chef_id ? `#${user.chef_id}` : "Aucun"}
+          {user.chef?.username ? `${user.chef?.username}` : "Aucun"}
         </span>
       );
     case 'actions':

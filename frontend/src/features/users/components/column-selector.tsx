@@ -31,6 +31,7 @@ export default function ColumnSelector({
       [columnKey]: visible,
     });
   };
+  console.log('columnVisibility', columnVisibility)
 
   const visibleCount = Object.values(columnVisibility).filter(Boolean).length;
 

@@ -92,8 +92,8 @@ async function UserDetailsAsync({ userId }: { userId: number }) {
     user.id !== currentUser.id;
 
   // Trouver le chef
-  const chef = user.chef_id
-    ? subordinates.find((u) => u.id === user.chef_id)
+  const chef = user.chef?.id
+    ? subordinates.find((u) => u.id === user.chef?.id)
     : null;
 
   return (

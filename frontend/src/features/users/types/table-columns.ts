@@ -18,8 +18,8 @@ export const availableColumns: TableColumn[] = [
   { key: 'username', label: 'Utilisateur', required: true, sortable: true, sortKey: 'username' },
   { key: 'role', label: 'Rôle', sortable: true, sortKey: 'role' },
   { key: 'cspro_code', label: 'Code CSPro', sortable: true, sortKey: 'cspro_code' },
-  { key: 'chef_id', label: 'Chef', sortable: false },
-  { key: 'actions', label: 'Actions', width: 'text-right', required: true, sortable: false },
+  { key: 'chef', label: 'Chef', sortable: true, sortKey: 'id'},
+  { key: 'actions', label: 'Actions', width: 'text-right', required: true },
 ];
 
 // Configuration par défaut des colonnes visibles

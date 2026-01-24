@@ -3,7 +3,7 @@
 import { apiClient } from "@/lib/api-client";
 import { getAccessToken } from "@/features/auth/services/auth";
 import { API_ENDPOINTS } from "@/lib/api-endpoints";
-import { UserProfile } from "@/features/auth/types";
+import { UserCreatePayload, UserProfile } from "@/features/auth/types";
 import { PaginatedResponse, PaginationQuery } from "@/lib/api-types";
 
 export const getSubordinates = async (params: PaginationQuery = {}): Promise<PaginatedResponse<UserProfile>> => {
@@ -80,7 +80,7 @@ export const getUserById = async (id: number): Promise<UserProfile | null> => {
 };
 
 export const postUser = async (
-  userData: Omit<UserProfile, "id">,
+  userData: UserCreatePayload,
 ): Promise<UserProfile | null> => {
   const token = await getAccessToken();
   if (!token) return null;

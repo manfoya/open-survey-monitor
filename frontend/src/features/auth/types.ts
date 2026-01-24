@@ -15,5 +15,16 @@ export interface UserProfile {
   username: string;
   role: UserRole;
   cspro_code: string | null;
-  chef_id: number | null;
+  chef: {
+    id: number;
+    username: string;
+  } | null;
+};
+
+export interface UserCreatePayload {
+  username: string;
+  password: string;
+  role: UserRole;
+  cspro_code?: string | null;
+  chef_id?: number | null;
 }

@@ -88,7 +88,7 @@ async function UpdateUserFormAsync({ userId }: { userId: number }) {
 
   // Déterminer si l'utilisateur peut changer le chef
   const canChangeChef =
-    currentUser.role === UserRole.DIRECTEUR || user.chef_id !== currentUser.id;
+    currentUser.role === UserRole.DIRECTEUR || user.chef?.id !== currentUser.id;
 
   return (
     <Card>

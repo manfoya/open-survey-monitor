@@ -58,7 +58,7 @@ export default function UpdateUserForm({
   // Initialisation des états
   // On convertit en string pour la gestion des inputs/selects
   const [selectedChef, setSelectedChef] = useState<string>(
-    user.chef_id ? user.chef_id.toString() : "",
+    user.chef?.id ? user.chef?.id.toString() : "",
   );
   const [openCombobox, setOpenCombobox] = useState(false);
   const [users, setUsers] = useState<UserProfile[]>([]); // subordonnés
