@@ -1,0 +1,132 @@
+### Configuration des variables
+@baseUrl = http://localhost:8000/api/v1
+@authToken = {{login.response.body.access_token}}
+
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/x-www-form-urlencoded
+
+username=admin&password=admin123
+
+###
+
+# =================================================================
+# UTILISATEURS
+# =================================================================
+
+### Récupérer mon profil
+GET {{baseUrl}}/users/me
+Authorization: Bearer {{authToken}}
+
+### Lire tous les utilisateurs
+GET {{baseUrl}}/users/all
+Authorization: Bearer {{authToken}}
+
+### Lire mon équipe
+GET {{baseUrl}}/users/
+Authorization: Bearer {{authToken}}
+
+### Créer un utilisateur (Shell)
+POST {{baseUrl}}/users/
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+    "username": "enqueteur_01",
+    "cspro_code": "C001",
+    "role": "enqueteur"
+}
+
+### Lire un utilisateur par son code CSPro
+GET {{baseUrl}}/users/code/C001
+Authorization: Bearer {{authToken}}
+
+### Lire un utilisateur par ID
+@userId = 1
+GET {{baseUrl}}/users/{{userId}}
+Authorization: Bearer {{authToken}}
+
+### Mettre à jour l'affectation d'un utilisateur
+PUT {{baseUrl}}/users/{{userId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+    "assignment": "Nouvelle Zone"
+}
+
+### Supprimer un utilisateur
+DELETE {{baseUrl}}/users/{{userId}}
+Authorization: Bearer {{authToken}}
+
+# =================================================================
+# MAPS & ZONES
+# =================================================================
+
+### Créer une zone
+POST {{baseUrl}}/maps/zones/
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+    "name": "Zone Nord",
+    "geometry": {}
+}
+
+### Lire les zones (paginé)
+GET {{baseUrl}}/maps/zones/
+Authorization: Bearer {{authToken}}
+
+### Récupérer toutes les zones
+GET {{baseUrl}}/maps/zones/all
+Authorization: Bearer {{authToken}}
+
+### Lire les affectations
+GET {{baseUrl}}/maps/affectations/
+Authorization: Bearer {{authToken}}
+
+# =================================================================
+# VARIABLES & QUOTAS
+# =================================================================
+
+### Config du Query Builder
+GET {{baseUrl}}/variables/builder-config
+Authorization: Bearer {{authToken}}
+
+### Lire toutes les variables
+GET {{baseUrl}}/variables/
+Authorization: Bearer {{authToken}}
+
+### Créer un Quota
+POST {{baseUrl}}/quotas/
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+    "name": "Quota Hommes 18-25",
+    "target": 100
+}
+
+### Voir mes quotas (Enquêteur)
+GET {{baseUrl}}/quotas/my-quotas
+Authorization: Bearer {{authToken}}
+
+# =================================================================
+# PARAMÈTRES GLOBAUX
+# =================================================================
+
+### Lire les paramètres
+GET {{baseUrl}}/settings/
+Authorization: Bearer {{authToken}}
+
+### Modifier les paramètres
+PUT {{baseUrl}}/settings/
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+    "survey_status": "active"
+}
+
+### Root (Test de connexion serveur)
+GET http://localhost:8000/

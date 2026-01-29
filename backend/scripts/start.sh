@@ -6,7 +6,7 @@ set -e
 echo "🚀 Démarrage du serveur Open Survey Monitor"
 echo "=========================================="
 
-# Vérification environnement virtuel
+"""# Vérification environnement virtuel
 if [ ! -d "venv" ]; then
     echo "❌ Environnement virtuel non trouvé. Lancez d'abord './scripts/setup.sh'"
     exit 1
@@ -25,10 +25,10 @@ if [ ! -f ".env" ]; then
         exit 1
     fi
 fi
-
+"""
 # Activation de l'environnement
 echo "📦 Activation de l'environnement virtuel..."
-source venv/bin/activate
+# source venv/bin/activate
 
 # Mode de développement par défaut
 MODE=${1:-dev}
