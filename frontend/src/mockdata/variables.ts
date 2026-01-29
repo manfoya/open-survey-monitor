@@ -1,0 +1,88 @@
+import { DataType, VariableDataType } from "@/features/variables/types";
+
+export const MOCK_VARIABLES: VariableDataType[] = [
+  {
+    id: 1,
+    label: "Âge du chef de ménage",
+    slug: "age_chef_menage",
+    data_type: DataType.NUMBER,
+    is_quota: true,
+    ui_config: {
+      min: 18,
+      max: 120,
+      step: 1,
+      unit: "ans",
+      placeholder: "Ex: 45"
+    },
+    excluded_operators: [],
+    modalites: []
+  },
+  {
+    id: 2,
+    label: "Sexe",
+    slug: "sexe",
+    data_type: DataType.LIST,
+    is_quota: true,
+    ui_config: {},
+    excluded_operators: [],
+    modalites: [
+      { value: "M", label: "Masculin", order: 1 },
+      { value: "F", label: "Féminin", order: 2 }
+    ]
+  },
+  {
+    id: 3,
+    label: "Niveau d'instruction",
+    slug: "niveau_instruction",
+    data_type: DataType.LIST,
+    is_quota: false,
+    ui_config: {},
+    excluded_operators: [],
+    modalites: [
+      { value: "AUCUN", label: "Aucun", order: 1 },
+      { value: "PRIMAIRE", label: "Primaire", order: 2 },
+      { value: "SECONDAIRE", label: "Secondaire", order: 3 },
+      { value: "SUPERIEUR", label: "Supérieur", order: 4 },
+      { value: "CORANIQUE", label: "Coranique", order: 5 }
+    ]
+  },
+  {
+    id: 4,
+    label: "Revenu mensuel",
+    slug: "revenu_mensuel",
+    data_type: DataType.NUMBER,
+    is_quota: false,
+    ui_config: {
+      min: 0,
+      unit: "FCFA",
+      step: 5000
+    },
+    excluded_operators: [],
+    modalites: []
+  },
+  {
+    id: 5,
+    label: "Commentaires enquêteur",
+    slug: "commentaires",
+    data_type: DataType.TEXT,
+    is_quota: false,
+    ui_config: {
+      placeholder: "Observations particulières sur le ménage..."
+    },
+    excluded_operators: [],
+    modalites: []
+  },
+  {
+    id: 6,
+    label: "Date de l'entretien",
+    slug: "date_entretien",
+    data_type: DataType.DATE,
+    is_quota: false,
+    ui_config: {
+       minDate: "2024-01-01",
+       maxDate: "2024-12-31"
+    },
+    excluded_operators: [],
+    modalites: []
+  }
+];

@@ -12,6 +12,12 @@ export interface GlobalSettings {
   check_vitesse: boolean;
   max_enquetes_par_jour: number;
   message_du_jour?: string;
+  variable_duree_start?: string;
+  variable_duree_end?: string;
+  variable_gps_lat?: string;
+  variable_gps_lon?: string;
+  variable_date_enquete?: string;
+  variable_heure_enquete?: string;
 }
 
 export interface GlobalSettingsFormData {
@@ -27,4 +33,10 @@ export interface GlobalSettingsFormData {
   check_vitesse: boolean;
   max_enquetes_par_jour: number;
   message_du_jour?: string;
+  variable_duree_start?: string;
+  variable_duree_end?: string;
+  variable_gps_lat?: string;
+  variable_gps_lon?: string;
+  variable_date_enquete?: string;
+  variable_heure_enquete?: string;
 }

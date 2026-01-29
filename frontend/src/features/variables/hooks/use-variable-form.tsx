@@ -1,4 +1,4 @@
-import { createVariableAction } from "@/features/variables/actions/create-variable-action";
+
 import {
   DataType,
   UIConfig,
@@ -10,16 +10,30 @@ import {
 import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 
-export default function useVariableForm() {
+import { VariableDataType } from "@/features/variables/types";
+
+export default function useVariableForm(initialValues?: VariableDataType) {
   const defaultDataType = DataType.NUMBER
-  const [label, setLabel] = useState("");
-  const [slug, setSlug] = useState("");
-  const [dataType, setDataType] = useState<DataType>(defaultDataType);
-  const [isQuota, setIsQuota] = useState(true);
-  const [uiConfig, setUiConfig] = useState<UIConfig>({});
-  const [modalites, setModalites] = useState<Modalite[]>([]);
+  
+  const [label, setLabel] = useState(initialValues?.label || "");
+  const [slug, setSlug] = useState(initialValues?.slug || "");
+  const [dataType, setDataType] = useState<DataType>(initialValues?.data_type || defaultDataType);
+  const [isQuota, setIsQuota] = useState(initialValues?.is_quota ?? true);
+  
+  // Initialisation de la config UI
+  const [uiConfig, setUiConfig] = useState<UIConfig>(initialValues?.ui_config || {});
+
+  // Initialisation des modalités : on ajoute des ID temporaires si besoin (pour React keys)
+  const [modalites, setModalites] = useState<Modalite[]>(
+    initialValues?.modalites?.map((m, index) => ({
+      ...m,
+      order: m.order ?? index + 1, // Fallback si pas d'ordre
+      id: crypto.randomUUID(), // ID temporaire pour le drag & drop / listes React
+    })) || []
+  );
+
   const [excludedOperators, setExcludedOperators] = useState<Set<OperatorType>>(
-    new Set<OperatorType>()
+    new Set<OperatorType>(initialValues?.excluded_operators || [])
   );
   const [isPending, startTransition] = useTransition();
 
@@ -122,28 +136,7 @@ export default function useVariableForm() {
     [label, slug, dataType, isQuota, modalites, excludedOperators, uiConfig]
   );
 
-  // Dans le hook
-  const submitData = async () => {
-    startTransition(async () => {
-      try {
-        const result = await createVariableAction(null, formData);
-        if (result.success) {
-          toast.success("Variable créée avec succès !");
-          resetForm();
-        } else {
-          toast.error(result.message || "Erreur lors de la création de la variable.");
-        }
-      } catch (err) {
-        console.error("Erreur lors de la création de la variable", err);
-        toast.error("Erreur lors de la création de la variable.");
-      }
-    });
-  };
 
-  const onFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    submitData();
-  };
 
   return {
     state: {
@@ -168,7 +161,6 @@ export default function useVariableForm() {
       removeModalite,
       toggleOperator,
       resetForm,
-      onFormSubmit,
     },
   };
 }

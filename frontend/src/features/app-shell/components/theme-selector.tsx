@@ -11,7 +11,7 @@ interface ThemeOption {
 }
 
 export function ThemeSelector() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   React.useEffect(() => {
@@ -67,11 +67,21 @@ export function ThemeSelector() {
       label: "SYSTÈME",
       description: "Suit les préférences système",
       preview: (
-        <div className="aspect-video rounded-md border-2 border-muted bg-gradient-to-br from-background to-slate-100 dark:to-slate-900 p-2">
+        <div 
+          className={`aspect-video rounded-md border-2 border-muted p-2 ${
+            systemTheme === 'dark' ? 'bg-slate-950' : 'bg-white'
+          }`}
+        >
           <div className="space-y-2">
-            <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded"></div>
-            <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded w-3/4"></div>
-            <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded w-1/2"></div>
+            <div className={`h-2 rounded ${
+              systemTheme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'
+            }`} />
+            <div className={`h-2 rounded w-3/4 ${
+              systemTheme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'
+            }`} />
+            <div className={`h-2 rounded w-1/2 ${
+              systemTheme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'
+            }`} />
           </div>
         </div>
       ),

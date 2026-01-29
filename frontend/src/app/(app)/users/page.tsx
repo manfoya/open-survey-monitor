@@ -5,12 +5,13 @@ import { getMe } from "@/features/auth/services/auth";
 import { Button } from "@/components/ui/button";
 import { UserPlus } from "lucide-react";
 import Link from "next/link";
-import { Skeleton } from "@/components/ui/skeleton";
 import { RoleGuard } from "@/features/auth/components/role-guard";
 import { UserRole } from "@/features/auth/types";
 import Search from "@/components/search";
 import PageHeader from "@/components/page-header";
 import { PaginationQuery } from "@/lib/api-types";
+import { UsersTableSkeleton } from "@/features/users/components/users-table-skeleton";
+import { UsersEmptyState } from "@/features/users/components/users-empty-state";
 
 export default async function UsersPage(props: {
   searchParams?: Promise<{
@@ -98,31 +99,7 @@ async function UsersTableAsync({
   const paginatedUsers = await getSubordinates(paginationParams);
 
   if (paginatedUsers.meta.total_items === 0) {
-    return (
-      <div className="text-center py-12">
-        <UserPlus className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-semibold mb-2">
-          {query 
-            ? `Aucun utilisateur trouvé pour "${query}"`
-            : "Aucun utilisateur sous votre responsabilité"
-          }
-        </h3>
-        <p className="text-muted-foreground mb-4">
-          {query 
-            ? "Essayez de modifier votre recherche."
-            : "Vous n'avez aucun utilisateur dans votre équipe pour le moment."
-          }
-        </p>
-          <RoleGuard allowedRoles={[UserRole.DIRECTEUR]}>
-            <Button asChild>
-              <Link href="/users/create">
-                <UserPlus className="mr-2 h-4 w-4" />
-                Créer un compte
-              </Link>
-            </Button>
-          </RoleGuard>
-      </div>
-    );
+    return <UsersEmptyState query={query} />;
   }
 
   return (
@@ -130,38 +107,5 @@ async function UsersTableAsync({
       paginatedUsers={paginatedUsers}
       query={query}
     />
-  );
-}
-
-function UsersTableSkeleton() {
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-8 w-24" />
-      </div>
-      <div className="border rounded-md">
-        <div className="border-b px-4 py-3">
-          <div className="flex space-x-4">
-            <Skeleton className="h-4 w-8" />
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-20" />
-            <Skeleton className="h-4 w-16" />
-          </div>
-        </div>
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="border-b px-4 py-3">
-            <div className="flex space-x-4">
-              <Skeleton className="h-4 w-8" />
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-4 w-16" />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }

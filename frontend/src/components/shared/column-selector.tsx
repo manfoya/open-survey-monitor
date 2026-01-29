@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -12,16 +11,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Settings2 } from "lucide-react";
-import { availableColumns, ColumnVisibility } from "@/features/users/types/table-columns";
+import { TableColumn, ColumnVisibility } from "@/types/table";
+import { useState } from "react";
 
 interface ColumnSelectorProps {
+  columns: TableColumn[];
   columnVisibility: ColumnVisibility;
   onColumnVisibilityChange: (columnVisibility: ColumnVisibility) => void;
 }
 
-export default function ColumnSelector({ 
-  columnVisibility, 
-  onColumnVisibilityChange 
+export default function ColumnSelector({
+  columns,
+  columnVisibility,
+  onColumnVisibilityChange,
 }: ColumnSelectorProps) {
   const [open, setOpen] = useState(false);
 
@@ -31,7 +33,6 @@ export default function ColumnSelector({
       [columnKey]: visible,
     });
   };
-  console.log('columnVisibility', columnVisibility)
 
   const visibleCount = Object.values(columnVisibility).filter(Boolean).length;
 
@@ -47,14 +48,14 @@ export default function ColumnSelector({
         <DropdownMenuLabel>Affichage des colonnes</DropdownMenuLabel>
         <DropdownMenuSeparator />
         
-        {availableColumns.map((column) => (
+        {columns.map((column) => (
           <DropdownMenuItem
             key={column.key}
             className="flex items-center space-x-2 cursor-pointer"
             onSelect={(e) => e.preventDefault()}
           >
             <Checkbox
-              id={column.key}
+              id={`column-${column.key}`}
               checked={columnVisibility[column.key] || false}
               onCheckedChange={(checked) => 
                 handleColumnToggle(column.key, checked as boolean)
@@ -62,13 +63,15 @@ export default function ColumnSelector({
               disabled={column.required}
             />
             <label 
-              htmlFor={column.key}
+              htmlFor={`column-${column.key}`}
               className={`text-sm cursor-pointer flex-1 ${
                 column.required ? 'text-muted-foreground' : ''
               }`}
             >
               {column.label}
-              {column.required && ' *'}
+              {column.required && (
+                <span className="text-xs ml-1">(requis)</span>
+              )}
             </label>
           </DropdownMenuItem>
         ))}

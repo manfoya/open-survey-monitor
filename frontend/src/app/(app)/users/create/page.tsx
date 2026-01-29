@@ -8,10 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { UserPlus } from "lucide-react";
 import CreateUserForm from "@/features/users/components/create-user-form";
 import PageHeader from "@/components/page-header";
+import { UserFormSkeleton } from "@/features/users/components/user-form-skeleton";
 
 export default function CreateUserPage() {
   return (
@@ -24,7 +24,7 @@ export default function CreateUserPage() {
           backLabel="Retour aux utilisateurs"
         />
 
-        <Suspense fallback={<CreateUserFormSkeleton />}>
+        <Suspense fallback={<UserFormSkeleton />}>
           <CreateUserFormAsync />
         </Suspense>
       </div>
@@ -47,38 +47,6 @@ async function CreateUserFormAsync() {
       </CardHeader>
       <CardContent>
         <CreateUserForm />
-      </CardContent>
-    </Card>
-  );
-}
-
-function CreateUserFormSkeleton() {
-  return (
-    <Card>
-      <CardHeader>
-        <Skeleton className="h-6 w-48" />
-        <Skeleton className="h-4 w-full" />
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-10 w-full" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-10 w-full" />
-        </div>
-        <Skeleton className="h-10 w-full" />
       </CardContent>
     </Card>
   );

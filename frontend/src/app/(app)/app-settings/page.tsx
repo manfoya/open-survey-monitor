@@ -3,11 +3,12 @@ import { getGlobalSettings } from "@/features/app-settings/services";
 import GlobalSettingsForm from "@/features/app-settings/components/global-settings-form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { RoleGuard } from "@/features/auth/components/role-guard";
 import { UserRole } from "@/features/auth/types";
 import ErrorState from "@/components/error-state";
 import PageHeader from "@/components/page-header";
+import { getAllVariables } from "@/features/variables/services";
+import { AppSettingsSkeleton } from "@/features/app-settings/components/skeleton";
 
 export default async function AppSettingsPage() {
   return (
@@ -30,7 +31,7 @@ export default async function AppSettingsPage() {
           description="Configurez les règles de validation et contrôles qualité pour toutes les enquêtes."
         />
 
-        <Suspense fallback={<AppSettingsFormSkeleton />}>
+        <Suspense fallback={<AppSettingsSkeleton />}>
           <AppSettingsFormAsync />
         </Suspense>
       </div>
@@ -40,16 +41,22 @@ export default async function AppSettingsPage() {
 
 async function AppSettingsFormAsync() {
   let settings;
+  let variables;
   let error = null;
 
   try {
-    settings = await getGlobalSettings();
+    const [fetchedSettings, fetchedVariables] = await Promise.all([
+      getGlobalSettings(),
+      getAllVariables(),
+    ]);
+    settings = fetchedSettings;
+    variables = fetchedVariables;
   } catch (err) {
     console.error("Erreur lors du chargement des paramètres:", err);
     error = err;
   }
 
-  if (error || !settings) {
+  if (error || !settings || !variables) {
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
@@ -61,26 +68,5 @@ async function AppSettingsFormAsync() {
     );
   }
 
-  return <GlobalSettingsForm initialSettings={settings} />;
-}
-
-function AppSettingsFormSkeleton() {
-  return (
-    <div className="space-y-6">
-      <div className="grid gap-6">
-        {/* Skeleton pour les cartes de paramètres */}
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="border rounded-lg p-6 space-y-4">
-            <Skeleton className="h-6 w-48" />
-            <Skeleton className="h-4 w-full" />
-            <div className="space-y-3">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          </div>
-        ))}
-        <Skeleton className="h-10 w-32" />
-      </div>
-    </div>
-  );
+  return <GlobalSettingsForm initialSettings={settings} variables={variables} />;
 }

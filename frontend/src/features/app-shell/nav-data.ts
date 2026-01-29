@@ -5,6 +5,7 @@ import {
   UserCircle,
   Settings2,
   MapPin,
+  Database,
 } from "lucide-react";
 import { UserRole } from "../auth/types";
 
@@ -25,15 +26,14 @@ export const navGroups: NavGroup[] = [
     label: "Opérations",
     items: [
       { title: "Overview", url: "/overview", icon: LayoutDashboard },
-      // { title: "Missions", url: "/missions", icon: ClipboardList },
-      { title: "Zones", url: "/zones", icon: MapPin },
     ],
   },
   {
     label: "Données",
     items: [
       { title: "Users", url: "/users", icon: Users, roles: [UserRole.DIRECTEUR, UserRole.SUPERVISEUR, UserRole.CONTROLEUR] }, // Tout sauf AGENT
-      // { title: "Dictionnaires", url: "/dictionaries", icon: BookA },
+      { title: "Zones", url: "/zones", icon: MapPin },
+      { title: "Variables", url: "/variables", icon: Database, roles: [UserRole.DIRECTEUR] },
     ],
   },
   {

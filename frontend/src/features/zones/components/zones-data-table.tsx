@@ -1,12 +1,7 @@
 "use client";
 
 import {
-  Table,
-  TableBody,
-  TableCaption,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +16,6 @@ import { Zone } from "@/features/zones/types";
 import { formatCoordinate, formatRadius } from "@/features/zones/utils";
 import { Edit, MoreVertical, Eye, MapPin } from "lucide-react";
 import Link from "next/link";
-import Pagination from "@/components/pagination";
 import DeleteZoneForm from "@/features/zones/components/delete-zone-form";
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
@@ -29,22 +23,14 @@ import { toast } from "sonner";
 import { useRoleGuard } from "@/features/auth/components/role-guard";
 import { UserRole } from "@/features/auth/types";
 import { PaginatedResponse } from "@/lib/api-types";
-import { PageSizeSelector } from "@/components/page-size-selector";
-import { SortableTableHead } from "@/components/sortable-table-head";
+import { availableColumns, defaultZoneColumnVisibility } from "@/features/zones/types/table-columns";
+import { useTableColumnVisibility } from "@/hooks/use-table-column-visibility";
+import { DataTable } from "@/components/shared/data-table";
 
 interface ZonesTableProps {
   paginatedZones: PaginatedResponse<Zone>;
   query?: string;
 }
-
-// Configuration des colonnes avec support du tri
-const zoneColumns = [
-  { key: 'id', label: 'ID', sortKey: 'id', className: 'w-[80px]', sortable: true },
-  { key: 'nom_zone', label: 'Nom de la zone', sortKey: 'nom_zone', sortable: true },
-  { key: 'coordinates', label: 'Coordonnées', sortable: false },
-  { key: 'rayon_tolerance_metres', label: 'Rayon', sortKey: 'rayon_tolerance_metres', sortable: true },
-  { key: 'actions', label: 'Action', className: 'text-right', sortable: false }
-];
 
 interface ZoneActionsDropdownProps {
   zone: Zone;
@@ -138,6 +124,15 @@ export default function ZonesDataTable({
   paginatedZones,
   query = ""
 }: ZonesTableProps) {
+  const { 
+    columnVisibility, 
+    updateColumnVisibility, 
+    isLoaded 
+  } = useTableColumnVisibility({
+    storageKey: "zones-table-column-visibility",
+    defaultVisibility: defaultZoneColumnVisibility,
+  });
+
   const searchParams = useSearchParams();
   const { items: zones, meta: paginationMeta } = paginatedZones;
 
@@ -152,95 +147,35 @@ export default function ZonesDataTable({
   }, [searchParams]);
 
   return (
-    <div className="space-y-4">
-      {/* Barre d'outils avec info pagination et sélecteur de taille */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center space-x-4">
-          <div className="text-sm text-muted-foreground">
-            {paginationMeta.total_items} zone{paginationMeta.total_items > 1 ? 's' : ''} • 
-            Page {paginationMeta.current_page} sur {paginationMeta.total_pages}
-            {currentSort && (
-              <span className="ml-2 text-xs">
-                • Trié par {zoneColumns.find(col => col.sortKey === currentSort)?.label} 
-                ({currentOrder === 'asc' ? 'croissant' : 'décroissant'})
-              </span>
-            )}
-          </div>
-          <PageSizeSelector currentPageSize={paginationMeta.page_size} />
-        </div>
-      </div>
-
-      {/* Tableau avec tri */}
-      <div className="rounded-md border">
-        <Table>
-          <TableCaption>
-            <p className="m-4">Liste des zones géographiques configurées.</p>
-          </TableCaption>
-
-          {/* EN-TÊTE DYNAMIQUE AVEC TRI */}
-          <TableHeader>
-            <TableRow>
-              {zoneColumns.map((column) => (
-                column.sortKey ? (
-                  <SortableTableHead
-                    key={column.key}
-                    column={column}
-                    currentSort={currentSort}
-                    currentOrder={currentOrder}
-                  />
-                ) : (
-                  <TableHead key={column.key} className={column.className}>
-                    {column.label}
-                  </TableHead>
-                )
-              ))}
-            </TableRow>
-          </TableHeader>
-
-          {/* CORPS DU TABLEAU */}
-          <TableBody>
-            {zones.length > 0 ? (
-              zones.map((zone: Zone) => (
-                <TableRow
-                  key={zone.id}
-                  className="hover:bg-muted/50 transition-colors cursor-pointer"
-                  onClick={() => (window.location.href = `/zones/${zone.id}`)}
-                >
-                  {zoneColumns.map((column) => (
-                    <TableCell
-                      key={column.key}
-                      className={column.key === 'actions' ? 'text-right' : ''}
-                      onClick={column.key === 'actions' ? (e) => e.stopPropagation() : undefined}
-                    >
-                      {getCellValue(zone, column.key)}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={zoneColumns.length} className="h-24 text-center">
-                  {query
-                    ? `Aucune zone trouvée pour "${query}".`
-                    : "Aucune zone configurée."}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        
-        {/* Pagination en bas du tableau */}
-        <div className="border-t">
-          <div className="flex items-center justify-between px-4 py-3">
-            <div className="text-sm text-muted-foreground">
-              Affichage de {((paginationMeta.current_page - 1) * paginationMeta.page_size) + 1} à{" "}
-              {Math.min(paginationMeta.current_page * paginationMeta.page_size, paginationMeta.total_items)} sur{" "}
-              {paginationMeta.total_items} zones
-            </div>
-            <Pagination totalPages={paginationMeta.total_pages} />
-          </div>
-        </div>
-      </div>
-    </div>
+    <DataTable
+      data={zones}
+      paginationMeta={paginationMeta}
+      columns={availableColumns}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={updateColumnVisibility}
+      currentSort={currentSort}
+      currentOrder={currentOrder}
+      entityLabel="zone"
+      query={query}
+      isLoaded={isLoaded}
+      caption="Liste des zones géographiques configurées."
+      renderRow={(zone, visibleColumns) => (
+        <TableRow
+          key={zone.id}
+          className="hover:bg-muted/50 transition-colors cursor-pointer"
+          onClick={() => (window.location.href = `/zones/${zone.id}`)}
+        >
+          {visibleColumns.map((column) => (
+            <TableCell
+              key={column.key}
+              className={column.key === 'actions' ? 'text-right' : ''}
+              onClick={column.key === 'actions' ? (e) => e.stopPropagation() : undefined}
+            >
+              {getCellValue(zone, column.key)}
+            </TableCell>
+          ))}
+        </TableRow>
+      )}
+    />
   );
 }

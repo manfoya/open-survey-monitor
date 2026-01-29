@@ -6,16 +6,10 @@ import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-export interface SortableColumn {
-  key: string;
-  label: string;
-  width?: string;
-  sortable?: boolean;
-  sortKey?: string;
-}
+import { TableColumn } from "@/types/table";
 
 interface SortableTableHeadProps {
-  column: SortableColumn;
+  column: TableColumn;
   currentSort?: string;
   currentOrder?: 'asc' | 'desc';
 }
@@ -49,14 +43,14 @@ export function SortableTableHead({ column, currentSort, currentOrder }: Sortabl
 
   if (!column.sortable) {
     return (
-      <TableHead className={column.width || ""}>
+      <TableHead className={column.className || ""}>
         {column.label}
       </TableHead>
     );
   }
 
   return (
-    <TableHead className={column.width || ""}>
+    <TableHead className={column.className || ""}>
       <Button
         variant="ghost"
         size="sm"

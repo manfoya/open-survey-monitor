@@ -1,4 +1,4 @@
-import { SortableColumn } from "@/components/sortable-table-head";
+import { TableColumn } from "@/types/table";
 
 // Types pour les variables selon vos spécifications
 export enum DataType {
@@ -141,7 +141,7 @@ export type CreateVariableDataType = {
 };
 
 export type VariableDataType = {
-  id: string;
+  id: number;
   label: string;
   slug: string;
   data_type: DataType;
@@ -151,7 +151,7 @@ export type VariableDataType = {
   excluded_operators: OperatorType[];
 };
 
-export const availableColumns: SortableColumn[] = [
+export const availableColumns: TableColumn[] = [
   {key: 'id', label: 'ID', sortable: true, sortKey: 'id' },
   {key: 'label', label: 'Libellé', sortable: true, sortKey: 'label' },
   {key: 'slug', label: 'Nom technique', sortable: true, sortKey: 'slug' },

@@ -55,24 +55,6 @@ export default function SettingsPage() {
             <ThemeSelector />
           </CardContent>
         </Card>
-
-        {/* Section Profil (placeholder pour future extension) */}
-        {/* <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Profil utilisateur
-            </CardTitle>
-            <CardDescription>
-              Gérez vos informations personnelles et préférences de compte.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-sm text-muted-foreground p-4 bg-muted/50 rounded-lg">
-              Cette section sera disponible prochainement pour gérer vos informations de profil.
-            </div>
-          </CardContent>
-        </Card> */}
       </div>
     </div>
   );

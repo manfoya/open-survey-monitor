@@ -21,6 +21,12 @@ export async function updateSettingsAction(
   formData: FormData,
 ): Promise<UpdateSettingsState> {
   try {
+    // Helper to clean variable inputs
+    const getVar = (key: string) => {
+      const val = formData.get(key) as string;
+      return val && val !== "__none__" ? val : undefined;
+    };
+
     // Extraction et conversion des données du formulaire
     const settingsData = {
       check_heure: formData.get("check_heure") === "on",
@@ -39,6 +45,12 @@ export async function updateSettingsAction(
       max_enquetes_par_jour:
         Number(formData.get("max_enquetes_par_jour")) || 20,
       message_du_jour: (formData.get("message_du_jour") as string) || undefined,
+      variable_duree_start: getVar("variable_duree_start"),
+      variable_duree_end: getVar("variable_duree_end"),
+      variable_gps_lat: getVar("variable_gps_lat"),
+      variable_gps_lon: getVar("variable_gps_lon"),
+      variable_date_enquete: getVar("variable_date_enquete"),
+      variable_heure_enquete: getVar("variable_heure_enquete"),
     };
 
     // Validation basique

@@ -8,7 +8,12 @@ import AdvancedSettingsSection from "./section-advanced";
 import JSONPreview from "./json-preview";
 import ValidationIndicator from "./validation-indicator";
 
+import { createVariableAction } from "@/features/variables/actions/create-variable-action";
+import { toast } from "sonner";
+import { useTransition } from "react";
+
 export default function CreateVariableForm() {
+  const [isPending, startTransition] = useTransition();
   const {
     state: {
       label,
@@ -19,7 +24,6 @@ export default function CreateVariableForm() {
       modalites,
       excludedOperators,
       formData,
-      isPending,
     },
     actions: {
       onLabelChange,
@@ -31,9 +35,27 @@ export default function CreateVariableForm() {
       updateModalite,
       removeModalite,
       toggleOperator,
-      onFormSubmit,
+      resetForm,
     },
   } = useVariableForm();
+
+  const onFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    startTransition(async () => {
+      try {
+        const result = await createVariableAction(null, formData);
+        if (result.success) {
+          toast.success("Variable créée avec succès !");
+          resetForm();
+        } else {
+          toast.error(result.message || "Erreur lors de la création de la variable.");
+        }
+      } catch (err) {
+        console.error("Erreur lors de la création de la variable", err);
+        toast.error("Erreur lors de la création de la variable.");
+      }
+    });
+  };
 
   return (
     <form className="space-y-8" onSubmit={onFormSubmit}>

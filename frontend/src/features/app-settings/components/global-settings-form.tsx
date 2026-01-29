@@ -25,12 +25,16 @@ import {
   MessageCircle,
   AlertCircle,
   Calendar,
+  Database,
 } from "lucide-react";
 import { toast } from "sonner";
 import { errorDiv } from "@/features/app-shell/components/utils";
+import { VariableSelector } from "./variable-selector";
+import { VariableDataType } from "@/features/variables/types";
 
 interface GlobalSettingsFormProps {
   initialSettings: GlobalSettings;
+  variables: VariableDataType[];
 }
 
 const JOURS_SEMAINE = [
@@ -45,6 +49,7 @@ const JOURS_SEMAINE = [
 
 export default function GlobalSettingsForm({
   initialSettings,
+  variables,
 }: GlobalSettingsFormProps) {
   const [state, formAction, isPending] = useActionState(updateSettingsAction, {
     success: false,
@@ -150,6 +155,29 @@ export default function GlobalSettingsForm({
                 {errorDiv(state.errors?.heure_fin_travail)}
               </div>
             </div>
+
+            <div className="space-y-4 pt-4 border-t">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Database className="h-4 w-4" />
+                Mapping des variables
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <VariableSelector
+                  name="variable_date_enquete"
+                  label="Variable Date Enquête"
+                  value={initialSettings.variable_date_enquete}
+                  variables={variables}
+                  disabled={isPending}
+                />
+                <VariableSelector
+                  name="variable_heure_enquete"
+                  label="Variable Heure Enquête"
+                  value={initialSettings.variable_heure_enquete}
+                  variables={variables}
+                  disabled={isPending}
+                />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -248,6 +276,31 @@ export default function GlobalSettingsForm({
               </div>
               {errorDiv(state.errors?.tolerance_gps_metres)}
             </div>
+
+            <div className="space-y-4 pt-4 border-t">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Database className="h-4 w-4" />
+                Mapping des variables GPS
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <VariableSelector
+                  name="variable_gps_lat"
+                  label="Latitude"
+                  value={initialSettings.variable_gps_lat}
+                  placeholder="Sélectionner la latitude"
+                  variables={variables}
+                  disabled={isPending}
+                />
+                <VariableSelector
+                  name="variable_gps_lon"
+                  label="Longitude"
+                  value={initialSettings.variable_gps_lon}
+                  placeholder="Sélectionner la longitude"
+                  variables={variables}
+                  disabled={isPending}
+                />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -296,6 +349,31 @@ export default function GlobalSettingsForm({
                 Valeur entre 1 et 1440 minutes (24h)
               </div>
               {errorDiv(state.errors?.min_duree_minutes)}
+            </div>
+
+            <div className="space-y-4 pt-4 border-t">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Database className="h-4 w-4" />
+                Mapping des variables de durée
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <VariableSelector
+                  name="variable_duree_start"
+                  label="Début de l'enquête"
+                  value={initialSettings.variable_duree_start}
+                  placeholder="Variable début"
+                  variables={variables}
+                  disabled={isPending}
+                />
+                <VariableSelector
+                  name="variable_duree_end"
+                  label="Fin de l'enquête"
+                  value={initialSettings.variable_duree_end}
+                  placeholder="Variable fin"
+                  variables={variables}
+                  disabled={isPending}
+                />
+              </div>
             </div>
           </CardContent>
         </Card>

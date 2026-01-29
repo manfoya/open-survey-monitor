@@ -6,7 +6,6 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { notFound } from "next/navigation";
 import { getMe } from "@/features/auth/services/auth";
 import { UserRole } from "@/features/auth/types";
@@ -15,6 +14,7 @@ import { getUserById, getAllSubordinates } from "@/features/users/services";
 import { User } from "lucide-react";
 import PageHeader from "@/components/page-header";
 import ErrorState from "@/components/error-state";
+import { UserFormSkeleton } from "@/features/users/components/user-form-skeleton";
 
 interface UpdateUserPageProps {
   params: Promise<{ id: string }>;
@@ -37,7 +37,7 @@ export default async function UpdateUserPage({ params }: UpdateUserPageProps) {
         backLabel="Retour aux utilisateurs"
       />
 
-      <Suspense fallback={<UpdateUserFormSkeleton />}>
+      <Suspense fallback={<UserFormSkeleton />}>
         <UpdateUserFormAsync userId={userId} />
       </Suspense>
     </div>
@@ -104,38 +104,6 @@ async function UpdateUserFormAsync({ userId }: { userId: number }) {
       </CardHeader>
       <CardContent>
         <UpdateUserForm user={user} canChangeChef={canChangeChef} />
-      </CardContent>
-    </Card>
-  );
-}
-
-function UpdateUserFormSkeleton() {
-  return (
-    <Card>
-      <CardHeader>
-        <Skeleton className="h-6 w-48" />
-        <Skeleton className="h-4 w-full" />
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-10 w-full" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-10 w-full" />
-        </div>
-        <Skeleton className="h-10 w-full" />
       </CardContent>
     </Card>
   );

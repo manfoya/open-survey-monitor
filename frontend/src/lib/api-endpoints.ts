@@ -21,4 +21,7 @@ export const API_ENDPOINTS = {
   SETTINGS: {
     GLOBAL: "/api/global-settings",
   },
+  STATS: {
+    DASHBOARD: "/stats/dashboard",
+  },
 } as const;

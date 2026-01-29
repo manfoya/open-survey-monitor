@@ -18,7 +18,7 @@ export default function ValidationIndicator({
   const isValid = useMemo(() => {
     if (!label.trim()) return false;
     if (!slug.trim()) return false;
-    if (dataType === "LIST" && modalites.length === 0) return false;
+    if (dataType === DataType.LIST && modalites.length === 0) return false;
     return true;
   }, [label, slug, dataType, modalites]);
 
@@ -27,7 +27,7 @@ export default function ValidationIndicator({
   const issues = [];
   if (!label.trim()) issues.push("Le libellé est requis");
   if (!slug.trim()) issues.push("L'identifiant technique est requis");
-  if (dataType === "LIST" && modalites.length === 0) {
+  if (dataType === DataType.LIST && modalites.length === 0) {
     issues.push("Au moins une modalité est requise pour une liste de choix");
   }
 

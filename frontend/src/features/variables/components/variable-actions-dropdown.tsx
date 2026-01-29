@@ -11,19 +11,12 @@ import { Edit, MoreVertical, Eye, Trash2, Settings } from "lucide-react";
 import Link from "next/link";
 import { ClientRoleGuard, useRoleGuard } from "@/features/auth/components/role-guard";
 import { UserRole } from "@/features/auth/types";
+import DeleteVariableForm from "./delete-variable-form";
 
-// Supposons qu'on aura un type Variable
-interface Variable {
-  id: number;
-  label: string;
-  slug: string;
-  data_type: string;
-  is_quota: boolean;
-  created_at?: string;
-}
+import { VariableDataType } from "../types";
 
 interface VariableActionsDropdownProps {
-  variable: Variable;
+  variable: VariableDataType;
 }
 
 export default function VariableActionsDropdown({ variable }: VariableActionsDropdownProps) {
@@ -55,22 +48,14 @@ export default function VariableActionsDropdown({ variable }: VariableActionsDro
           </DropdownMenuItem>
         </ClientRoleGuard>
 
-        {/* Action Édition - Protégée pour directeurs seulement */}
-        <ClientRoleGuard allowedRoles={[UserRole.DIRECTEUR]} user={user} >
-          <DropdownMenuItem asChild>
-            <Link href={`/variables/${variable.id}/`} className="cursor-pointer">
-              <Edit className="mr-2 h-4 w-4" />
-              Modifier
-            </Link>
-          </DropdownMenuItem>
-        </ClientRoleGuard>
-
         {/* Action Suppression - Protégée pour directeurs seulement */}
         <ClientRoleGuard allowedRoles={[UserRole.DIRECTEUR]} user={user} >
-          <DropdownMenuItem className="text-red-600 focus:text-red-600">
-            <Trash2 className="mr-2 h-4 w-4" />
-            Supprimer
-          </DropdownMenuItem>
+            <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+             <DeleteVariableForm 
+                variableId={variable.id} 
+                className="w-full" 
+             />
+            </DropdownMenuItem>
         </ClientRoleGuard>
       </DropdownMenuContent>
     </DropdownMenu>
