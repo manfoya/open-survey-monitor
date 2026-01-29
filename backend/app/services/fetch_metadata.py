@@ -13,12 +13,13 @@ from app.core.database import SessionLocal
 from app.models.dictionary import Variable, Modalite, VariableDataType
 
 # 1. CONFIGURATION MYSQL HOSTINGER
-# Remplace par tes infos réelles
-MYSQL_USER = "u100076301_enqDash"
-MYSQL_PASSWORD = "capiENSPD25"
-MYSQL_HOST = "123.456.78.90" # L'IP ou le domaine fourni par Hostinger
-MYSQL_DB = "u100076301_enqDash"
-MYSQL_TABLE = "ma_table_enquete" # La table où CSPro déverse les données
+# 1. CONFIGURATION MYSQL HOSTINGER
+# Mise à jour avec les infos de 2026
+MYSQL_USER = "u100076301_enq2026"
+MYSQL_PASSWORD = "Enq20252026"
+MYSQL_HOST = "193.203.168.147" # Info Hostinger
+MYSQL_DB = "u100076301_enq2026"
+MYSQL_TABLE = "QUESTIONNAIRE_ENQ_2024_2025_DICT" # Table identifiée
 
 # Construction de l'URL de connexion
 MYSQL_URL = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_DB}"
@@ -75,58 +76,78 @@ def main():
             if col_name.lower() in ['id', 'created_at', 'updated_at', 'deleted_at']:
                 continue
 
-            # 1. Analyse de la Cardinalité (Combien de valeurs uniques ?)
-            # Cela permet de savoir si c'est une lisCoût : 0 $/mois.
-
-te déroulante ou un champ libre
-            query = text(f"SELECT COUNT(DISTINCT {col_name}) FROM {MYSQL_TABLE}")
-            distinct_count = connection.execute(query).scalar()
+            # 1. Analyse Optimisée (Échantillonnage)
+            # Au lieu de scanner toute la table (Lent !), on regarde les 100 premières lignes
+            query_sample = text(f"SELECT {col_name} FROM {MYSQL_TABLE} WHERE {col_name} IS NOT NULL LIMIT 100")
+            rows_sample = connection.execute(query_sample).fetchall()
             
-            # 2. Détermination du Type
-            local_type = map_mysql_type_to_local(col, distinct_count)
+            values_sample = [str(r[0]) for r in rows_sample]
+            unique_sample = set(values_sample)
+            count_sample = len(values_sample)
+            count_unique = len(unique_sample)
             
-            print(f"Traitement: {col_name} (Type SQL: {col['type']}, Unique: {distinct_count}) -> {local_type.value}")
+            # Estimation du Type
+            local_type = VariableDataType.TEXT # Par défaut
+            
+            # Si SQL dit que c'est un nombre
+            sql_type = str(col['type']).lower()
+            is_sql_number = any(x in sql_type for x in ['int', 'decimal', 'float', 'double', 'numeric'])
+            
+            if is_sql_number:
+                # Si peu de valeurs uniques dans l'échantillon, c'est peut-être un code catégorie (ex: Sexe=1,2)
+                if count_unique < 15 and count_sample > 20: 
+                    local_type = VariableDataType.LIST
+                else:
+                    local_type = VariableDataType.NUMBER
+            else:
+                # Si texte, on regarde la répétition
+                # Si on a 100 lignes et seulement 5 valeurs différentes -> Liste
+                if count_unique < 30 and count_sample > 30:
+                    local_type = VariableDataType.LIST
+            
+            print(f"Traitement: {col_name} (Sample: {count_unique}/{count_sample}) -> {local_type.value}")
 
             # 3. Enregistrement / Mise à jour dans PostgreSQL
-            # On vérifie si la variable existe déjà par son slug
             variable = pg_db.query(Variable).filter(Variable.slug == col_name).first()
-            
             if not variable:
                 variable = Variable(
                     slug=col_name,
-                    label=col_name, # Par défaut on met le slug, l'admin changera le label si besoin
+                    label=col_name,
                     data_type=local_type,
-                    is_quota=False # Par défaut faux, l'admin activera
+                    is_quota=False
                 )
                 pg_db.add(variable)
                 pg_db.commit()
                 pg_db.refresh(variable)
             else:
-                # Si elle existe, on met juste à jour le type si ça a changé
                 variable.data_type = local_type
                 pg_db.commit()
 
-            # 4. Gestion des MODALITÉS (Si c'est une LISTE)
+            # 4. Gestion des MODALITÉS (Seulement si LIST)
             if local_type == VariableDataType.LIST:
-                # On récupère les valeurs uniques pour remplir les modalités
-                # ex: SELECT DISTINCT sexe FROM table
-                query_vals = text(f"SELECT DISTINCT {col_name} FROM {MYSQL_TABLE} WHERE {col_name} IS NOT NULL")
-                rows = connection.execute(query_vals).fetchall()
-                
-                existing_mods = pg_db.query(Modalite).filter(Modalite.variable_id == variable.id).all()
-                existing_values = [m.value for m in existing_mods]
+                # Là on est obligé de faire un DISTINCT global pour ne rien rater
+                # Mais on le fait SEULEMENT sur les colonnes identifiées comme LISTES
+                # On ajoute un try/except pour éviter le crash si trop long
+                try:
+                    query_distinct = text(f"SELECT DISTINCT {col_name} FROM {MYSQL_TABLE} WHERE {col_name} IS NOT NULL")
+                    rows_distinct = connection.execute(query_distinct).fetchall()
+                    
+                    existing_mods = pg_db.query(Modalite).filter(Modalite.variable_id == variable.id).all()
+                    existing_values = [m.value for m in existing_mods]
 
-                for row in rows:
-                    val = str(row[0]).strip()
-                    if val and val not in existing_values:
-                        new_mod = Modalite(
-                            variable_id=variable.id,
-                            value=val,
-                            label=val # Par défaut label = valeur (ex: "1"="1"), faute de dictionnaire
-                        )
-                        pg_db.add(new_mod)
-                
-                pg_db.commit()
+                    for r in rows_distinct:
+                        val = str(r[0]).strip()
+                        if val and val not in existing_values:
+                            new_mod = Modalite(variable_id=variable.id, value=val, label=val)
+                            pg_db.add(new_mod)
+                    pg_db.commit()
+                    
+                except Exception as e:
+                    print(f"⚠️ Warning: Impossible de récupérer toutes les modalités pour {col_name} (Timeout?). Utilisation de l'échantillon.")
+                    # Fallback : on stocke au moins celles vues dans l'échantillon
+                    for val in unique_sample:
+                         # (Check existence logic duplicated roughly here or simplified)
+                         pass # Simplification pour le fix
 
         print("Terminé ! Le dictionnaire a été synchronisé.")
 

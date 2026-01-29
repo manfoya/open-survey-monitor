@@ -44,9 +44,9 @@ from app.models.dictionary import Variable
 from app.services.quota_engine import QuotaEngine
 
 # --- CONFIGURATION (À récupérer plus tard via une table Campaign) ---
-# Pour l'instant on utilise tes infos Hostinger
-MYSQL_URL = "mysql+pymysql://u100076301_enqDash:capiENSPD25@123.456.78.90/u100076301_enqDash"
-MYSQL_TABLE = "ma_table_enquete"
+# Mise à jour avec les infos de 2026
+MYSQL_URL = "mysql+pymysql://u100076301_enq2026:Enq20252026@193.203.168.147/u100076301_enq2026"
+MYSQL_TABLE = "QUESTIONNAIRE_ENQ_2024_2025_DICT"
 
 def calculate_distance(lat1, lon1, lat2, lon2):
     """
@@ -202,13 +202,14 @@ def sync_surveys():
             new_survey = SurveyData(
                 user_id=agent.id,
                 source_id=source_id,
-                date_enquete=datetime.now(), # À remplacer par la vraie date
+                date_enquete=datetime.now(), 
                 duree_minutes=duree_reelle,
                 gps_lat=lat,
                 gps_lon=lon,
-                is_valid=is_globally_valid, # Vert ou Rouge
-                qc_results=qc_results,      # Le détail pour le filtrage
-                answers=data                # On garde une copie des réponses (Optionnel)
+                is_valid=is_globally_valid,
+                status=SurveyStatus.complet if is_globally_valid else SurveyStatus.partiel, # <--- Fix status
+                qc_results=qc_results,
+                answers=data
             )
             db.add(new_survey)
 
