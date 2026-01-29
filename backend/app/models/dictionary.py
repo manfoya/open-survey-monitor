@@ -1,3 +1,5 @@
+# backend/app/models/dictionary.py
+
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, JSON, Text
 from sqlalchemy.orm import relationship
 from app.core.database import Base

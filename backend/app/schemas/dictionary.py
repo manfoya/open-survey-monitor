@@ -1,3 +1,5 @@
+# backend/app/schemas/dictionary.py
+
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional, Dict, Any
 from app.models.dictionary import VariableDataType
@@ -34,6 +36,13 @@ class VariableCreate(VariableBase):
     @field_validator('slug')
     def slug_must_be_lowercase(cls, v):
         return v.lower().strip().replace(" ", "_")
+
+class VariableUpdate(BaseModel):
+    label: Optional[str] = None
+    is_quota: Optional[bool] = None
+    ui_config: Optional[Dict[str, Any]] = None
+    excluded_operators: Optional[List[str]] = None
+    modalites: Optional[List[ModaliteCreate]] = None
 
 class VariableOut(VariableBase):
     id: int
