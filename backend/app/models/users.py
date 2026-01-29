@@ -47,3 +47,6 @@ class User(Base):
     
     # Relation avec les quotas assignés à cet utilisateur
     user_quotas = relationship("UserQuota", back_populates="user")
+    
+    # Relation vers les enquêtes réalisées
+    surveys = relationship("SurveyData", back_populates="user")
