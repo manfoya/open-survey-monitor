@@ -1,16 +1,18 @@
-from typing import List, Any
+# backend/app/api/v1/variables.py
+
+from typing  import List, Any, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import cast, String
+from sqlalchemy import cast, String, or_
 
 from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.models.users import User, RoleEnum
-# Imports des NOUVEAUX modèles
+# Import des modèles
 from app.models.dictionary import Variable, Modalite, VariableDataType
 from app.models.quotas import Quota
-# Imports des NOUVEAUX schémas
-from app.schemas.dictionary import VariableCreate, VariableOut
+# Import des schémas (Validation des données)
+from app.schemas.dictionary import VariableCreate, VariableOut, VariableUpdate
 
 router = APIRouter()
 
@@ -23,28 +25,30 @@ def get_query_builder_config(db: Session = Depends(get_db)):
     """
     Renvoie la configuration formatée pour React Query Builder.
     Utilisé par le Frontend pour générer les champs intelligemment.
+    Ne renvoie QUE les variables marquées 'is_quota = True'.
     """
     variables = db.query(Variable).filter(Variable.is_quota == True).all()
     fields_config = []
 
     for var in variables:
-        # Base
+        # Configuration de base
         field_def = {
-            "name": var.slug,
-            "label": var.label,
+            "name": var.slug,   # C'est l'ID technique (ex: q01_sexe)
+            "label": var.label, # C'est le nom affiché (ex: Sexe du chef)
             "placeholder": var.ui_config.get("placeholder", "") if var.ui_config else "",
         }
 
-        # Configuration spécifique par type
+        # Configuration spécifique par type de variable
         if var.data_type == VariableDataType.NUMBER:
             field_def["inputType"] = "number"
             if var.ui_config:
-                # Injecte min, max, step s'ils existent
+                # Injecte min, max, step s'ils existent dans la config
                 field_def.update(var.ui_config)
                 
         elif var.data_type == VariableDataType.LIST:
             field_def["inputType"] = "select"
             field_def["valueEditorType"] = "select"
+            # On trie les options par l'ordre défini, ou par défaut
             field_def["values"] = [
                 {"name": m.value, "label": m.label} 
                 for m in sorted(var.modalites, key=lambda x: x.order or 0)
@@ -57,10 +61,8 @@ def get_query_builder_config(db: Session = Depends(get_db)):
             field_def["inputType"] = "checkbox"
             field_def["values"] = [{"name": "true", "label": "Oui"}, {"name": "false", "label": "Non"}]
 
-        # Gestion des opérateurs exclus
+        # Gestion des opérateurs exclus (ex: pas de ">" pour une ville)
         if var.excluded_operators:
-             # Note: Le frontend devra filtrer sa liste d'opérateurs par défaut 
-             # en fonction de cette liste (ou tu peux renvoyer la liste explicite ici)
              field_def["excludedOperators"] = var.excluded_operators
 
         fields_config.append(field_def)
@@ -72,6 +74,24 @@ def get_query_builder_config(db: Session = Depends(get_db)):
 # 2. ZONE ADMINISTRATION (CRUD Variables)
 # --------------------------------------------------------------------------
 
+@router.get("/", response_model=List[VariableOut])
+def read_variables(
+    quota_only: bool = False,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Lister les variables.
+    Option ?quota_only=true pour ne voir que celles activées pour les quotas.
+    """
+    query = db.query(Variable)
+    if quota_only:
+        query = query.filter(Variable.is_quota == True)
+    
+    # On trie par slug alphabétique pour que ce soit propre
+    return query.order_by(Variable.slug).all()
+
+
 @router.post("/", response_model=VariableOut)
 def create_variable(
     var_in: VariableCreate,
@@ -79,17 +99,17 @@ def create_variable(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Ajouter une nouvelle variable au dictionnaire.
-    Réservé au Directeur.
+    Ajouter une nouvelle variable manuellement.
+    Utile surtout pour le script automatique, mais accessible au Directeur.
     """
     if current_user.role != RoleEnum.directeur:
         raise HTTPException(status_code=403, detail="Réservé au Directeur.")
 
-    # 1. Vérifier unicité du slug
+    # Vérifier si le slug existe déjà
     if db.query(Variable).filter(Variable.slug == var_in.slug).first():
         raise HTTPException(status_code=400, detail=f"La variable '{var_in.slug}' existe déjà.")
 
-    # 2. Création Variable
+    # Création Variable
     new_var = Variable(
         slug=var_in.slug,
         label=var_in.label,
@@ -102,7 +122,7 @@ def create_variable(
     db.commit()
     db.refresh(new_var)
 
-    # 3. Création Modalités (si liste)
+    # Création des Modalités associées (si type LIST)
     if var_in.data_type == VariableDataType.LIST and var_in.modalites:
         for mod in var_in.modalites:
             new_mod = Modalite(
@@ -118,17 +138,59 @@ def create_variable(
     return new_var
 
 
-@router.get("/", response_model=List[VariableOut])
-def read_variables(
-    quota_only: bool = False,
+@router.put("/{variable_id}", response_model=VariableOut)
+def update_variable(
+    variable_id: int,
+    var_in: VariableUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Lister les variables (Admin dashboard)."""
-    query = db.query(Variable)
-    if quota_only:
-        query = query.filter(Variable.is_quota == True)
-    return query.all()
+    """
+    Modifier une variable existante.
+    CRUCIAL : Cette route NE permet PAS de modifier le 'slug' (identifiant technique).
+    On s'en sert pour changer le Label (nom humain), activer is_quota, etc.
+    """
+    if current_user.role != RoleEnum.directeur:
+        raise HTTPException(status_code=403, detail="Réservé au Directeur.")
+
+    # 1. Récupérer la variable en base
+    var_db = db.query(Variable).filter(Variable.id == variable_id).first()
+    if not var_db:
+        raise HTTPException(status_code=404, detail="Variable introuvable")
+
+    # 2. Préparer les données de mise à jour
+    # exclude_unset=True signifie qu'on ne touche qu'aux champs envoyés par le frontend
+    update_data = var_in.model_dump(exclude_unset=True)
+    
+    # On retire 'modalites' du dictionnaire pour le traiter séparément
+    modalites_in = update_data.pop("modalites", None)
+
+    # Mise à jour des champs simples (Label, is_quota, ui_config...)
+    for field, value in update_data.items():
+        if hasattr(var_db, field):
+            setattr(var_db, field, value)
+
+    # 3. Mise à jour des Modalités (ex: Renommer "1" en "Homme")
+    if modalites_in is not None and var_db.data_type == VariableDataType.LIST:
+        # On charge les modalités existantes pour les modifier
+        existing_mods = {m.value: m for m in var_db.modalites}
+        
+        for mod_data in modalites_in:
+            val_cle = mod_data.value # La valeur technique (ex: "1")
+            
+            if val_cle in existing_mods:
+                # Si elle existe, on met à jour son label et son ordre
+                existing_mod = existing_mods[val_cle]
+                existing_mod.label = mod_data.label
+                if mod_data.order is not None:
+                    existing_mod.order = mod_data.order
+            else:
+                # Optionnel : Créer une modalité si elle n'existe pas (rare ici, car géré par le script)
+                pass
+
+    db.commit()
+    db.refresh(var_db)
+    return var_db
 
 
 @router.delete("/{variable_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -139,7 +201,8 @@ def delete_variable(
 ):
     """
     Supprimer une variable.
-    ATTENTION : Vérifie d'abord si elle est utilisée dans un Quota actif.
+    SÉCURITÉ : Vérifie d'abord si elle est utilisée dans un Quota actif.
+    Si oui, bloque la suppression.
     """
     if current_user.role != RoleEnum.directeur:
         raise HTTPException(status_code=403, detail="Réservé au Directeur.")
@@ -148,15 +211,11 @@ def delete_variable(
     if not var_db:
         raise HTTPException(status_code=404, detail="Variable introuvable")
 
-    # --- SÉCURITÉ INTÉGRITÉ ---
-    # On vérifie si un quota utilise ce slug dans son JSON.
-    # Postgres permet de chercher du texte dans le JSONB.
-    # Une approche simple et robuste : chercher le slug en tant que chaîne dans la définition.
-    
+    # --- VÉRIFICATION D'INTÉGRITÉ ---
+    # On cherche si le slug de cette variable est mentionné dans le JSON de définition d'un quota
     slug_to_check = var_db.slug
     
-    # Recherche : est-ce que le champ "field": "slug" apparait dans les quotas ?
-    # Note : Cette requête dépend de ton moteur DB. Pour Postgres + SQLAlchemy :
+    # Recherche texte brute dans le JSONB (compatible Postgres/SQLite pour le texte)
     quotas_using_var = db.query(Quota).filter(
         cast(Quota.definition, String).like(f'%"{slug_to_check}"%')
     ).first()
@@ -164,7 +223,7 @@ def delete_variable(
     if quotas_using_var:
         raise HTTPException(
             status_code=400, 
-            detail=f"Impossible de supprimer '{var_db.label}'. Elle est utilisée dans le quota '{quotas_using_var.description}'."
+            detail=f"Impossible de supprimer '{var_db.label}'. Elle est utilisée par le quota '{quotas_using_var.description}'."
         )
 
     db.delete(var_db)
