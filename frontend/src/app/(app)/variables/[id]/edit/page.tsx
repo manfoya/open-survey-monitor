@@ -6,7 +6,6 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { notFound } from "next/navigation";
 import { getMe } from "@/features/auth/services/auth";
 import { UserRole } from "@/features/auth/types";
@@ -15,6 +14,7 @@ import UpdateVariableForm from "@/features/variables/components/update-variable-
 import { Settings2 } from "lucide-react";
 import PageHeader from "@/components/page-header";
 import ErrorState from "@/components/error-state";
+import { VariableFormSkeleton } from "@/features/variables/components/variable-form-skeleton";
 
 interface UpdateVariablePageProps {
   params: Promise<{ id: string }>;
@@ -37,7 +37,7 @@ export default async function UpdateVariablePage({ params }: UpdateVariablePageP
         backLabel="Retour aux variables"
       />
 
-      <Suspense fallback={<UpdateVariableFormSkeleton />}>
+      <Suspense fallback={<VariableFormSkeleton />}>
         <UpdateVariableFormAsync variableId={variableId} />
       </Suspense>
     </div>
@@ -95,34 +95,6 @@ async function UpdateVariableFormAsync({ variableId }: { variableId: number }) {
       </CardHeader>
       <CardContent>
         <UpdateVariableForm variable={variable} />
-      </CardContent>
-    </Card>
-  );
-}
-
-function UpdateVariableFormSkeleton() {
-  return (
-    <Card>
-      <CardHeader>
-        <Skeleton className="h-6 w-48" />
-        <Skeleton className="h-4 w-full" />
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-20 w-full" />
-        </div>
-        <Skeleton className="h-10 w-full" />
       </CardContent>
     </Card>
   );

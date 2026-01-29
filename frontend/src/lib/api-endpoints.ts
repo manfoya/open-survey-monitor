@@ -24,4 +24,8 @@ export const API_ENDPOINTS = {
   STATS: {
     DASHBOARD: "/stats/dashboard",
   },
+  QUOTAS: {
+    BASE: "/api/v1/quotas/",
+    BY_ID: (id: number) => `/api/v1/quotas/${id}`,
+  },
 } as const;

@@ -51,7 +51,7 @@ export const MOCK_VARIABLES: VariableDataType[] = [
     label: "Revenu mensuel",
     slug: "revenu_mensuel",
     data_type: DataType.NUMBER,
-    is_quota: false,
+    is_quota: true,
     ui_config: {
       min: 0,
       unit: "FCFA",
@@ -77,7 +77,7 @@ export const MOCK_VARIABLES: VariableDataType[] = [
     label: "Date de l'entretien",
     slug: "date_entretien",
     data_type: DataType.DATE,
-    is_quota: false,
+    is_quota: true,
     ui_config: {
        minDate: "2024-01-01",
        maxDate: "2024-12-31"

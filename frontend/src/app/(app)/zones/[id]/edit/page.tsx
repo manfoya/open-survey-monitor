@@ -6,7 +6,6 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { notFound } from "next/navigation";
 import { getZoneById } from "@/features/zones/services";
 import UpdateZoneForm from "@/features/zones/components/update-zone-form";
@@ -15,6 +14,7 @@ import PageHeader from "@/components/page-header";
 import ErrorState from "@/components/error-state";
 import { RoleGuard } from "@/features/auth/components/role-guard";
 import { UserRole } from "@/features/auth/types";
+import { ZoneFormSkeleton } from "@/features/zones/components/zone-form-skeleton";
 
 interface EditZonePageProps {
   params: Promise<{ id: string }>;
@@ -50,7 +50,7 @@ export default async function EditZonePage({ params }: EditZonePageProps) {
           backLabel="Retour aux zones"
         />
 
-        <Suspense fallback={<EditZoneFormSkeleton />}>
+        <Suspense fallback={<ZoneFormSkeleton />}>
           <EditZoneFormAsync zoneId={zoneId} />
         </Suspense>
       </div>
@@ -92,38 +92,6 @@ async function EditZoneFormAsync({ zoneId }: { zoneId: number }) {
       </CardHeader>
       <CardContent>
         <UpdateZoneForm zone={zone} />
-      </CardContent>
-    </Card>
-  );
-}
-
-function EditZoneFormSkeleton() {
-  return (
-    <Card>
-      <CardHeader>
-        <Skeleton className="h-6 w-48" />
-        <Skeleton className="h-4 w-full" />
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-10 w-full" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-10 w-full" />
-        </div>
-        <Skeleton className="h-10 w-full" />
       </CardContent>
     </Card>
   );

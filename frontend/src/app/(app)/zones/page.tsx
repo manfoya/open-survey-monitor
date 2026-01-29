@@ -5,12 +5,13 @@ import { getMe } from "@/features/auth/services/auth";
 import { Button } from "@/components/ui/button";
 import { MapPin } from "lucide-react";
 import Link from "next/link";
-import { Skeleton } from "@/components/ui/skeleton";
 import { RoleGuard } from "@/features/auth/components/role-guard";
 import { UserRole } from "@/features/auth/types";
 import Search from "@/components/search";
 import PageHeader from "@/components/page-header";
 import { PaginationQuery } from "@/lib/api-types";
+import { ZonesTableSkeleton } from "@/features/zones/components/zones-table-skeleton";
+import { ZonesEmptyState } from "@/features/zones/components/zones-empty-state";
 
 export default async function ZonesPage(props: {
   searchParams?: Promise<{
@@ -98,31 +99,7 @@ async function ZonesTableAsync({
   const paginatedZones = await getZones(paginationParams);
 
   if (paginatedZones.meta.total_items === 0) {
-    return (
-      <div className="text-center py-12">
-        <MapPin className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-semibold mb-2">
-          {query 
-            ? `Aucune zone trouvée pour "${query}"`
-            : "Aucune zone configurée"
-          }
-        </h3>
-        <p className="text-muted-foreground mb-4">
-          {query 
-            ? "Essayez de modifier votre recherche."
-            : "Commencez par créer votre première zone géographique."
-          }
-        </p>
-        <RoleGuard allowedRoles={[UserRole.DIRECTEUR]}>
-          <Button asChild>
-            <Link href="/zones/create">
-              <MapPin className="mr-2 h-4 w-4" />
-              Créer une zone
-            </Link>
-          </Button>
-        </RoleGuard>
-      </div>
-    );
+    return <ZonesEmptyState query={query} />;
   }
 
   return (
@@ -130,38 +107,5 @@ async function ZonesTableAsync({
       paginatedZones={paginatedZones}
       query={query}
     />
-  );
-}
-
-function ZonesTableSkeleton() {
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-8 w-24" />
-      </div>
-      <div className="border rounded-md">
-        <div className="border-b px-4 py-3">
-          <div className="flex space-x-4">
-            <Skeleton className="h-4 w-8" />
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-20" />
-            <Skeleton className="h-4 w-16" />
-          </div>
-        </div>
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="border-b px-4 py-3">
-            <div className="flex space-x-4">
-              <Skeleton className="h-4 w-8" />
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-4 w-16" />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }
