@@ -13,6 +13,11 @@ export const API_ENDPOINTS = {
     ALL: "/maps/zones/all",
     BY_ID: (id: number) => `/maps/zones/${id}`,
   },
+  VARIABLES: {
+    BASE: "/variables/",
+    ALL: "/variables/all",
+    BY_ID: (id: number) => `/variables/${id}`, // ID is uuid? or number?
+  },
   SETTINGS: {
     GLOBAL: "/api/global-settings",
   },

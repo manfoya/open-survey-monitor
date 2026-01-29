@@ -1,4 +1,4 @@
-import { createVariableAction } from "@/features/variables/actions";
+import { createVariableAction } from "@/features/variables/actions/create-variable-action";
 import {
   DataType,
   UIConfig,
@@ -126,9 +126,13 @@ export default function useVariableForm() {
   const submitData = async () => {
     startTransition(async () => {
       try {
-        await createVariableAction(formData);
-        toast.success("Variable créée avec succès !");
-        resetForm();
+        const result = await createVariableAction(null, formData);
+        if (result.success) {
+          toast.success("Variable créée avec succès !");
+          resetForm();
+        } else {
+          toast.error(result.message || "Erreur lors de la création de la variable.");
+        }
       } catch (err) {
         console.error("Erreur lors de la création de la variable", err);
         toast.error("Erreur lors de la création de la variable.");

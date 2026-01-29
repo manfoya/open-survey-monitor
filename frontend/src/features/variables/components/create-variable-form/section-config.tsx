@@ -79,13 +79,13 @@ function renderDynamicConfigByType(
   }
 ) {
   switch (dataType) {
-    case "NUMBER":
+    case DataType.NUMBER:
       return <NumberDynamicConfig {...handlers} />;
-    case "LIST":
+    case DataType.LIST:
       return <ListDynamicConfig {...handlers} />;
-    case "DATE":
+    case DataType.DATE:
       return <DateDynamicConfig {...handlers} />;
-    case "TEXT":
+    case DataType.TEXT:
       return <TextDynamicConfig {...handlers} />;
     default:
       return null;
