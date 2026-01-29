@@ -65,6 +65,8 @@ class Affectation(Base):
     # personne à questionner, des fois on doit atteindre un effectif par modalité de 
     # variable, c'est ce que nous faisons en créant un fichier de configuration
     # 2. C'est ici qu'on va mettre cette configuration de quotas par variables
+    # [DEPRECATED] Ce champ est déprécié au profit du système centralisé (Quota/UserQuota).
+    # Ne plus utiliser pour les nouvelles implémentations.
     # Ex: { "sexe": {"H": 10, "F": 10}, "ethnie": {"A": 5, "B": 5} }
     objectifs_quota = Column(JSON, nullable=True)
 

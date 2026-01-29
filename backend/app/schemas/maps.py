@@ -56,9 +56,8 @@ class AffectationBase(BaseModel):
     date_fin: Optional[datetime] = None
     est_actif: bool = True
     
-    # On utilise un schéma complexe ici : l'idée, c'est de permettre les 
-    # quotas croisés
-    objectifs_quota: Optional[QuotaConfig] = None 
+    # [DEPRECATED] Ne plus utiliser. Utiliser les Quota/UserQuota via /api/v1/quotas
+    objectifs_quota: Optional[QuotaConfig] = Field(None, description="DEPRECATED. Utilisez l'API /quotas.", deprecated=True)
 
 class AffectationCreate(AffectationBase):
     pass
