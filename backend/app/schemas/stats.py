@@ -1,6 +1,6 @@
 # backend/app/schemas/stats.py
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Dict, Optional, Any
 
 class QuotaProgressItem(BaseModel):
@@ -20,7 +20,12 @@ class DashboardStats(BaseModel):
     total_suspect: int
     
     progression_quotas: List[QuotaProgressItem] = []
-    repartition_erreurs: Optional[Dict[str, int]] = None
+    
+    # Ce champ est NULL pour les agents et contrôleurs (réservé Superviseur/Directeur)
+    repartition_erreurs: Optional[Dict[str, int]] = Field(
+        None, 
+        description="Détail des erreurs (GPS, Durée...). Null si l'utilisateur n'a pas les droits de voir les détails."
+    )
 
     class Config:
         from_attributes = True
