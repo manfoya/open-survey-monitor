@@ -23,6 +23,14 @@ class SettingsBase(BaseModel):
 
     message_du_jour: Optional[str] = None
 
+    # Mappings Variables
+    variable_duree_start: Optional[str] = None
+    variable_duree_end: Optional[str] = None
+    variable_gps_lat: Optional[str] = None
+    variable_gps_lon: Optional[str] = None
+    variable_date_enquete: Optional[str] = None
+    variable_heure_enquete: Optional[str] = None
+
 class SettingsUpdate(SettingsBase):
     pass
 

@@ -79,3 +79,18 @@ class GlobalSettings(Base):
     # Utile pour les annonces urgentes (ex: "Synchronisez vos tablettes avant 18h ce soir !")
     # Type Text : permet d'écrire un message long contrairement à String qui est souvent limité.
     message_du_jour = Column(Text, nullable=True)
+
+    # 7. MAPPINGS VARIABLES (Configuration Dynamique)
+    # Le Directeur indique ici quel champ de l'enquête correspond à quoi.
+    
+    # Pour la Durée
+    variable_duree_start = Column(String, nullable=True) # Ex: "q0_heure_debut"
+    variable_duree_end = Column(String, nullable=True)   # Ex: "q0_heure_fin"
+    
+    # Pour le GPS
+    variable_gps_lat = Column(String, nullable=True)     # Ex: "gps_latitude"
+    variable_gps_lon = Column(String, nullable=True)     # Ex: "gps_longitude"
+    
+    # Pour le Temps (Jours interdits, Heures limites, Quota journalier)
+    variable_date_enquete = Column(String, nullable=True) # Ex: "q0_date_enquete" ou system date
+    variable_heure_enquete = Column(String, nullable=True) # Ex: "q0_heure"
