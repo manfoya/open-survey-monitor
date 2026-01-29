@@ -1,6 +1,7 @@
 # backend/app/models/survey.py
 
-from sqlalchemy import Column, Integer, String, Float, DateTime, Enum
+from sqlalchemy import Column, Integer, String, Float, DateTime, Enum, Boolean, ForeignKey, JSON
+from sqlalchemy.orm import relationship
 from app.core.database import Base
 import enum
 
@@ -34,7 +35,11 @@ class SurveyData(Base):
     # Ce qu'on essaie d'éviter c'est de ne pas faire planter le script si un agent synchronise
     # ses données avant que son compte utilisateur ne soit créer sur le Dashboard.
     # Alors on garde agent_code en String au lieu de ForeignKey vers User
-    agent_code = Column(String, index=True) 
+    agent_code = Column(String, index=True)
+
+    # Ajout pour les Quotas : Lien technique vers l'utilisateur (si trouvé)
+    # Permet de faire les jointures pour compter les quotas de l'agent
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     
     # Métadonnées extraites
     status = Column(Enum(SurveyStatus), default=SurveyStatus.partiel)
@@ -50,3 +55,13 @@ class SurveyData(Base):
     
     # Contrôle Qualité
     duree_minutes = Column(Integer, nullable=True)
+
+    # Ajouts pour le système de validation (Vert/Rouge)
+    is_valid = Column(Boolean, default=True)
+    qc_results = Column(JSON, default=dict)
+    
+    # Contenu brut des réponses pour affichage
+    answers = Column(JSON, default=dict)
+
+    # Relation avec User
+    user = relationship("User", back_populates="surveys")
