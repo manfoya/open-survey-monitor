@@ -27,6 +27,12 @@ class UserQuotaBase(BaseModel):
 class UserQuotaCreate(UserQuotaBase):
     pass
 
+class UserQuotaBulkAssign(BaseModel):
+    quota_id: int
+    user_ids: List[int]
+    effectif_cible: int
+    is_active: bool = True
+
 class UserQuotaUpdate(BaseModel):
     # Tout est optionnel pour permettre la modif partielle
     effectif_cible: Optional[int] = None

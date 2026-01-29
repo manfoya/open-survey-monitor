@@ -1,3 +1,5 @@
+# backend/app/models/quotas.py
+
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, JSON
 from sqlalchemy.orm import relationship
 from app.core.database import Base

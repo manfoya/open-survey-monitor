@@ -1,3 +1,5 @@
+# backend/app/api/v1/quotas.py
+
 from typing import List, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -8,7 +10,7 @@ from app.models.users import User, RoleEnum
 from app.models.quotas import Quota, UserQuota
 from app.schemas.quotas import (
     QuotaCreate, QuotaUpdate, QuotaResponse,
-    UserQuotaCreate, UserQuotaUpdate, UserQuotaResponse
+    UserQuotaCreate, UserQuotaUpdate, UserQuotaResponse, UserQuotaBulkAssign
 )
 # On importe le moteur logique
 from app.services.quota_engine import QuotaEngine
@@ -194,6 +196,62 @@ def assign_quota_to_user(
     db.refresh(new_assign)
     return new_assign
 
+@router.post("/assignments/bulk", response_model=List[UserQuotaResponse])
+def bulk_assign_quota(
+    assignment_in: UserQuotaBulkAssign,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    [Directeur] Assigner un même quota à plusieurs enquêteurs simultanément.
+    """
+    if current_user.role != RoleEnum.directeur:
+        raise HTTPException(status_code=403, detail="Non autorisé")
+
+    # 1. Vérifier le quota
+    quota = db.query(Quota).filter(Quota.id == assignment_in.quota_id).first()
+    if not quota:
+        raise HTTPException(status_code=404, detail="Quota introuvable")
+
+    created_assignments = []
+    
+    # 2. Boucler sur les users
+    for uid in assignment_in.user_ids:
+        # Vérifier si l'user existe (optionnel, mais propre)
+        user = db.query(User).filter(User.id == uid).first()
+        if not user:
+            continue # On skip les ID invalides
+
+        # Gérer l'upsert (si existe déjà, on met à jour ?)
+        # Ici on fait simple: si existe, on skip ou on error ? 
+        # Pour le bulk, skip si existe est souvent mieux.
+        existing = db.query(UserQuota).filter(
+            UserQuota.user_id == uid,
+            UserQuota.quota_id == assignment_in.quota_id
+        ).first()
+
+        if existing:
+            # On met à jour la cible
+            existing.effectif_cible = assignment_in.effectif_cible
+            existing.is_active = assignment_in.is_active
+            created_assignments.append(existing)
+        else:
+            new_assign = UserQuota(
+                user_id=uid,
+                quota_id=assignment_in.quota_id,
+                effectif_cible=assignment_in.effectif_cible,
+                is_active=assignment_in.is_active
+            )
+            db.add(new_assign)
+            created_assignments.append(new_assign)
+    
+    db.commit()
+    # On refresh pour avoir les ID
+    for a in created_assignments:
+        db.refresh(a)
+        
+    return created_assignments
+
 @router.get("/assignments/me", response_model=List[UserQuotaResponse])
 def read_my_assignments(
     db: Session = Depends(get_db),
@@ -207,6 +265,16 @@ def read_my_assignments(
         UserQuota.user_id == current_user.id,
         UserQuota.is_active == True
     ).all()
+
+@router.get("/my-quotas")
+def get_my_quotas(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if current_user.role == RoleEnum.agent:
+        # L'agent ne voit que ses assignations
+        return db.query(UserQuota).filter(UserQuota.user_id == current_user.id).all()
+    
+    # Si c'est un superviseur, il faut filtrer par ses subordonnés (si la relation existe)
+    # Si c'est le directeur, il voit tout
+    return db.query(UserQuota).all()
 
 @router.patch("/assignments/{assignment_id}", response_model=UserQuotaResponse)
 def update_assignment(
