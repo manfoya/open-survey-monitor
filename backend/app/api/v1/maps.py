@@ -1,3 +1,5 @@
+# backend/app/api/v1/maps.py
+
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -180,6 +182,38 @@ def create_affectation(
     affectation.nom_zone = affectation.zone.nom_zone
     affectation.nom_controleur = affectation.controleur.username
     
+    # --- AUTOMATISATION : CASCADING ASSIGNMENT ---
+    # Si l'utilisateur affecté est un Contrôleur, on affecte automatiquement ses subordonnés (Agents)
+    if controleur.role == RoleEnum.controleur:
+        subordonnes = db.query(User).filter(User.chef_id == controleur.id).all()
+        for agent in subordonnes:
+            # 1. Chercher si l'agent a déjà une affectation ACTIVE
+            existing_aff = db.query(Affectation).filter(
+                Affectation.controleur_id == agent.id,
+                Affectation.est_actif == True
+            ).first()
+
+            if existing_aff:
+                # Mise à jour de l'affectation existante (Déplacement de l'agent)
+                existing_aff.zone_id = affectation.zone_id
+                existing_aff.date_debut = affectation.date_debut
+                existing_aff.date_fin = affectation.date_fin
+                # Note: On ne touche pas aux quotas (géré ailleurs maintenant)
+            else:
+                # Création d'une nouvelle affectation
+                new_aff = Affectation(
+                    controleur_id=agent.id,
+                    zone_id=affectation.zone_id,
+                    date_debut=affectation.date_debut,
+                    date_fin=affectation.date_fin,
+                    est_actif=True,
+                    objectifs_quota=None # Déprécié
+                )
+                db.add(new_aff)
+        
+        # On commit les changements pour les agents
+        db.commit()
+
     return affectation
 
 @router.get("/affectations/", response_model=List[AffectationOut])
