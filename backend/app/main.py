@@ -3,6 +3,7 @@
 from fastapi import FastAPI
 from app.api.v1 import auth
 from app.api.v1 import auth, users, maps, settings, variables, quotas
+from fastapi.middleware.cors import CORSMiddleware # <--- L'IMPORT CRUCIAL
 
 # Nettoyage des imports (tu avais des doublons)
 from app.api.v1 import auth, users, maps, settings, dictionary
@@ -10,7 +11,11 @@ from app.api.v1 import auth, users, maps, settings, dictionary
 app = FastAPI(
     title="Open Survey Monitor API",
     description="Backend pour le suivi d'enquêtes terrain CSPro",
-    version="1.0.0"
+    version="1.0.0",
+    root_path="/8000",
+    servers=[
+        {"url": "/8000", "description": "Serveur Proxy VS Code"}
+    ],
 )
 
 # En production, on mettra l'URL réelle du site au lieu de "*"
@@ -25,6 +30,9 @@ app.include_router(maps.router, prefix="/api/v1/maps", tags=["Maps & Quotas"])
 app.include_router(settings.router, prefix="/api/v1/settings", tags=["Global Settings"])
 app.include_router(variables.router, prefix="/api/v1/variables", tags=["Variables"]) 
 app.include_router(quotas.router, prefix="/api/v1/quotas", tags=["Quotas"]) 
+# Ajout du module de stats
+from app.api.v1 import stats
+app.include_router(stats.router, prefix="/api/v1/stats", tags=["Statistiques"])
 
 @app.get("/")
 def read_root():
