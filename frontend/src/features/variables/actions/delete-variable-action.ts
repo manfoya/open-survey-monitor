@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { deleteVariable } from "../services";
 
-export async function deleteVariableAction(id: string) {
+export async function deleteVariableAction(id: number) {
   try {
     await deleteVariable(id);
     revalidatePath("/variables");

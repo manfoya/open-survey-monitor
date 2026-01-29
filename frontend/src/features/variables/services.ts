@@ -63,7 +63,7 @@ export const getAllVariables = async (): Promise<VariableDataType[]> => {
   }
 };
 
-export const getVariableById = async (id: string): Promise<VariableDataType | null> => {
+export const getVariableById = async (id: number): Promise<VariableDataType | null> => {
   const headers = await getHeaders();
   if (!headers) return null;
 
@@ -89,7 +89,7 @@ export const createVariable = async (
 };
 
 export const updateVariable = async (
-  id: string,
+  id: number,
   data: Partial<CreateVariableDataType>
 ): Promise<VariableDataType | null> => {
   const headers = await getHeaders();
@@ -102,7 +102,7 @@ export const updateVariable = async (
   });
 };
 
-export const deleteVariable = async (id: string): Promise<VariableDataType | null> => {
+export const deleteVariable = async (id: number): Promise<VariableDataType | null> => {
   const headers = await getHeaders();
   if (!headers) return null;
 

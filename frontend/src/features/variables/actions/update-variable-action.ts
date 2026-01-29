@@ -13,7 +13,7 @@ export type ActionState = {
 };
 
 export async function updateVariableAction(
-  id: string,
+  id: number,
   prevState: ActionState | null,
   data: Partial<CreateVariableDataType>
 ): Promise<ActionState> {
