@@ -19,7 +19,21 @@
 
 ## Fonctionnalité en cours
 
-- Vérifier le bon fonctionnement des routes pour les zones
 
-- Rendre ce tableau de users personnalisable (en choisissant les champs à afficher)
+### Variables
+- Implémentation de la création de variables (déjà commencé, review, refactor et binding avec le backend au travers de servers actions)
+- Implémentation de la consultation de toutes les variables dans une structure tabulaire + suppression
+- Implémentation de la consultation/modification d'une variable (et liaision avec le backend)
+  
+### Quotas
+- Opérations diverses de création de quotas, de suppression, de modification et autres
+- 
+
+### Affectations
+- Attribution de zone à un controleur
+
+
+
+## Points importants
 - La pagination doit gérer le cas où page est trop grand ou trop petit
+- Utiliser `urlcat` pour éviter les problèmes avec les slashs

@@ -1,5 +1,3 @@
-import { ALL } from "dns";
-
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: "/auth/login",

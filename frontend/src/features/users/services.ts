@@ -67,7 +67,7 @@ export const getUserById = async (id: number): Promise<UserProfile | null> => {
   if (!token) return null;
 
   try {
-    return await apiClient<UserProfile>(`${API_ENDPOINTS.USERS.BASE}/${id}`, {
+    return await apiClient<UserProfile>(`${API_ENDPOINTS.USERS.BASE}${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
   } catch (error) {
@@ -99,7 +99,7 @@ export const updateUser = async (
   const token = await getAccessToken();
   if (!token) return null;
 
-  return await apiClient<UserProfile>(`${API_ENDPOINTS.USERS.BASE}/${id}`, {
+  return await apiClient<UserProfile>(`${API_ENDPOINTS.USERS.BASE}${id}`, {
     method: "PUT",
     headers: { Authorization: `Bearer ${token}` },
     body: JSON.stringify(userData),
@@ -110,7 +110,7 @@ export const deleteUser = async (id: number): Promise<UserProfile | null> => {
   const token = await getAccessToken();
   if (!token) return null;
 
-  return await apiClient<UserProfile>(`${API_ENDPOINTS.USERS.BASE}/${id}`, {
+  return await apiClient<UserProfile>(`${API_ENDPOINTS.USERS.BASE}${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });

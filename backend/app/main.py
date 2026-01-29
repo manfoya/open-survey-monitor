@@ -1,12 +1,8 @@
 # backend/app/main.py
 
 from fastapi import FastAPI
-<<<<<<< Updated upstream
 from app.api.v1 import auth
 from app.api.v1 import auth, users, maps, settings, variables, quotas
-=======
-from fastapi.middleware.cors import CORSMiddleware # <--- L'IMPORT CRUCIAL
->>>>>>> Stashed changes
 
 # Nettoyage des imports (tu avais des doublons)
 from app.api.v1 import auth, users, maps, settings, dictionary
@@ -20,13 +16,6 @@ app = FastAPI(
 # En production, on mettra l'URL réelle du site au lieu de "*"
 origins = ["*"]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"], # Autorise GET, POST, PUT, DELETE, etc.
-    allow_headers=["*"], # Autorise les tokens d'auth
-)
 # 
 
 # On inclut nos routes
