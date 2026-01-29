@@ -37,16 +37,23 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 from app.core.database import SessionLocal
 from app.models.users import User
-from app.models.quotas import UserQuota
+from app.models.quotas import UserQuota$ 
 from app.models.settings import GlobalSettings
 from app.models.survey import SurveyData
 from app.models.dictionary import Variable
-from app.services.quota_engine import QuotaEngine
-
 # --- CONFIGURATION (À récupérer plus tard via une table Campaign) ---
-# Mise à jour avec les infos de 2026
-MYSQL_URL = "mysql+pymysql://u100076301_enq2026:Enq20252026@193.203.168.147/u100076301_enq2026"
-MYSQL_TABLE = "QUESTIONNAIRE_ENQ_2024_2025_DICT"
+# Sécurisation via variables d'environnement
+MYSQL_USER = os.getenv("MYSQL_USER", "u100076301_enq2026")
+MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
+MYSQL_HOST = os.getenv("MYSQL_HOST", "193.203.168.147")
+MYSQL_DB = os.getenv("MYSQL_DB", "u100076301_enq2026")
+MYSQL_TABLE = os.getenv("MYSQL_TABLE", "QUESTIONNAIRE_ENQ_2024_2025_DICT")
+
+MYSQL_URL = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_DB}"
+
+if not MYSQL_PASSWORD:
+    print("❌ Erreur: La variable d'environnement MYSQL_PASSWORD n'est pas définie dans .env")
+    sys.exit(1)
 
 def calculate_distance(lat1, lon1, lat2, lon2):
     """

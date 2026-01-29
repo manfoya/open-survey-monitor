@@ -14,12 +14,16 @@ from app.models.dictionary import Variable, Modalite, VariableDataType
 
 # 1. CONFIGURATION MYSQL HOSTINGER
 # 1. CONFIGURATION MYSQL HOSTINGER
-# Mise à jour avec les infos de 2026
-MYSQL_USER = "u100076301_enq2026"
-MYSQL_PASSWORD = "Enq20252026"
-MYSQL_HOST = "193.203.168.147" # Info Hostinger
-MYSQL_DB = "u100076301_enq2026"
-MYSQL_TABLE = "QUESTIONNAIRE_ENQ_2024_2025_DICT" # Table identifiée
+# On récupère les infos depuis les variables d'environnement (Sécurité !)
+MYSQL_USER = os.getenv("MYSQL_USER", "u100076301_enq2026")
+MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
+MYSQL_HOST = os.getenv("MYSQL_HOST", "193.203.168.147")
+MYSQL_DB = os.getenv("MYSQL_DB", "u100076301_enq2026")
+MYSQL_TABLE = os.getenv("MYSQL_TABLE", "QUESTIONNAIRE_ENQ_2024_2025_DICT")
+
+if not MYSQL_PASSWORD:
+    print("❌ Erreur: La variable d'environnement MYSQL_PASSWORD n'est pas définie dans .env")
+    sys.exit(1)
 
 # Construction de l'URL de connexion
 MYSQL_URL = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_DB}"
