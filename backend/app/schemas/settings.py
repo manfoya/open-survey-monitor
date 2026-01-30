@@ -29,6 +29,14 @@ class SettingsBase(BaseModel):
     variable_gps_lat: Optional[str] = None
     variable_gps_lon: Optional[str] = None
     variable_date_enquete: Optional[str] = None
+    target_table_name: Optional[str] = None
+    
+    variable_indicateur_partiel: Optional[str] = None
+    valeur_partiel: Optional[str] = "1"
+
+    variable_id_interne: Optional[str] = None
+    variable_code_agent: Optional[str] = None
+
     variable_heure_enquete: Optional[str] = None
 
 class SettingsUpdate(SettingsBase):

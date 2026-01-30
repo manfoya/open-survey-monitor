@@ -92,5 +92,18 @@ class GlobalSettings(Base):
     variable_gps_lon = Column(String, nullable=True)     # Ex: "gps_longitude"
     
     # Pour le Temps (Jours interdits, Heures limites, Quota journalier)
-    variable_date_enquete = Column(String, nullable=True) # Ex: "q0_date_enquete" ou system date
+    variable_date_enquete = Column(String, default="date_enquete")
+    
+    # Indicateur Entretien Partiel (Nouveau)
+    variable_indicateur_partiel = Column(String, nullable=True, comment="Variable indiquant si l'entretien est partiel/incomplet (ex: SS_STATUS)")
+    valeur_partiel = Column(String, default="1", comment="Valeur qui signifie 'Partiel' (ex: '1' ou 'Partial')")
+
+    # Configuration Source de Données (Dynamique)
+    target_table_name = Column(String, nullable=True, comment="Nom de la table MySQL source (ex: 2024, 2025)")
+
+    # Mapping Identifiants (Flexible)
+    variable_id_interne = Column(String, nullable=True, comment="Nom de la colonne UUID (ex: questionnaire_uuid)")
+    variable_code_agent = Column(String, nullable=True, comment="Nom de la colonne Code Agent (ex: agent_id)")
+
+    # Seuils et Règles QC
     variable_heure_enquete = Column(String, nullable=True) # Ex: "q0_heure"
