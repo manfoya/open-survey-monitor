@@ -17,51 +17,43 @@ class GenderEnum(str, enum.Enum):
 
 class SurveyData(Base):
     """
-    DONNÉES DU TERRAIN OBTENU APRÈS QUE L'AGENT AIT SYNCHRONISÉ
-    Cette table est remplie automatiquement par le script ETL.
-    On évite de la modifier manuellement pour ne pas dire de ne pas la modifier.
+    données du terrain obtenu après que l'agent ait synchronisé
+    cette table est remplie automatiquement par le script etl.
     """
     __tablename__ = "survey_data"
 
     id = Column(Integer, primary_key=True, index=True)
     
-    # IMPORTANT : UUID venant de CSPro. 
-    # C'est ce qui empêche d'avoir des doublons si on relance le script de synchro 10 fois.
-    # Comment ça marche ? : Les questionnaires ont un identifiant unique, on vérifie à chaque 
-    # fois si cet UUID unique est déjà présent dans la base de données, si non, on peut.
+    # important : uuid venant de cspro. 
     questionnaire_uuid = Column(String, unique=True, index=True, nullable=False)
     
-    # On stocke le code textuel (ex: "AG045") pour un couplage "lâche" avec la table User.
-    # Ce qu'on essaie d'éviter c'est de ne pas faire planter le script si un agent synchronise
-    # ses données avant que son compte utilisateur ne soit créer sur le Dashboard.
-    # Alors on garde agent_code en String au lieu de ForeignKey vers User
+    # code agent textuel (ex: "ag045") pour couplage lâche
     agent_code = Column(String, index=True)
 
-    # Ajout pour les Quotas : Lien technique vers l'utilisateur (si trouvé)
-    # Permet de faire les jointures pour compter les quotas de l'agent
+    # lien technique vers l'utilisateur (si trouvé)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     
-    # Métadonnées extraites
+    # métadonnées extraites
     status = Column(Enum(SurveyStatus), default=SurveyStatus.partiel)
     respondent_sex = Column(Enum(GenderEnum), default=GenderEnum.Inconnu)
     
-    # Géolocalisation réelle (Où l'enquête a vraiment eu lieu)
+    # géolocalisation réelle
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
     
-    # Horodatage
-    date_entretien = Column(DateTime, nullable=True) # Date déclarée dans la tablette
-    date_synchro = Column(DateTime, nullable=True)   # Date où le serveur a reçu la donnée
+    # horodatage
+    date_entretien = Column(DateTime, nullable=True) # date déclarée dans la tablette
+    date_synchro = Column(DateTime, nullable=True)   # date où le serveur a reçu la donnée
     
-    # Contrôle Qualité
+    # contrôle qualité
     duree_minutes = Column(Integer, nullable=True)
 
-    # Ajouts pour le système de validation (Vert/Rouge)
-    is_valid = Column(Boolean, default=True)
+    # ajouts pour le système de validation
+    is_valid = Column(Boolean, default=False) # par défaut invalide tant que pas validé par le QC
     qc_results = Column(JSON, default=dict)
     
-    # Contenu brut des réponses pour affichage
+    # contenu brut des réponses pour affichage
     answers = Column(JSON, default=dict)
 
-    # Relation avec User
+    # relation avec user
     user = relationship("User", back_populates="surveys")
