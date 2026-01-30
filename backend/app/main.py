@@ -10,7 +10,7 @@ app = FastAPI(
     version="1.0.0",
     root_path="/8000",
     servers=[
-        {"url": "/8000", "description": "Serveur Proxy VS Code"}
+        {"url": "/8000", "description": ""}
     ],
 )
 
