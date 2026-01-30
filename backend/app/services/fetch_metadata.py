@@ -7,10 +7,11 @@ from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 
 # Ajout du dossier parent au path pour pouvoir importer 'app'
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from app.core.database import SessionLocal
 from app.models.dictionary import Variable, Modalite, VariableDataType
+from app.models.settings import GlobalSettings
 
 # 1. CONFIGURATION MYSQL HOSTINGER
 # 1. CONFIGURATION MYSQL HOSTINGER
@@ -67,11 +68,25 @@ def main():
     # Session PostgreSQL (Destination)
     pg_db = SessionLocal()
 
+    # Détermination de la table cible
+    target_table = MYSQL_TABLE # Valeur par défaut .env
+    
+    # On regarde si une config spécifique existe en base
+    try:
+        settings = pg_db.query(GlobalSettings).first()
+        if settings and settings.target_table_name:
+            target_table = settings.target_table_name
+            print(f"Utilisation de la table configurée : {target_table}")
+        else:
+            print(f"Utilisation de la table par défaut (.env) : {target_table}")
+    except Exception as e:
+        print(f"Erreur lecture settings: {e}")
+
     try:
         inspector = inspect(source_engine)
-        columns = inspector.get_columns(MYSQL_TABLE)
+        columns = inspector.get_columns(target_table)
         
-        print(f"Analyse de la table '{MYSQL_TABLE}'...")
+        print(f"Analyse de la table '{target_table}'...")
 
         for col in columns:
             col_name = col['name']
@@ -82,7 +97,8 @@ def main():
 
             # 1. Analyse Optimisée (Échantillonnage)
             # Au lieu de scanner toute la table (Lent !), on regarde les 100 premières lignes
-            query_sample = text(f"SELECT {col_name} FROM {MYSQL_TABLE} WHERE {col_name} IS NOT NULL LIMIT 100")
+            # Au lieu de scanner toute la table (Lent !), on regarde les 100 premières lignes
+            query_sample = text(f"SELECT {col_name} FROM {target_table} WHERE {col_name} IS NOT NULL LIMIT 100")
             rows_sample = connection.execute(query_sample).fetchall()
             
             values_sample = [str(r[0]) for r in rows_sample]
@@ -133,7 +149,7 @@ def main():
                 # Mais on le fait SEULEMENT sur les colonnes identifiées comme LISTES
                 # On ajoute un try/except pour éviter le crash si trop long
                 try:
-                    query_distinct = text(f"SELECT DISTINCT {col_name} FROM {MYSQL_TABLE} WHERE {col_name} IS NOT NULL")
+                    query_distinct = text(f"SELECT DISTINCT {col_name} FROM {target_table} WHERE {col_name} IS NOT NULL")
                     rows_distinct = connection.execute(query_distinct).fetchall()
                     
                     existing_mods = pg_db.query(Modalite).filter(Modalite.variable_id == variable.id).all()
@@ -147,7 +163,7 @@ def main():
                     pg_db.commit()
                     
                 except Exception as e:
-                    print(f"⚠️ Warning: Impossible de récupérer toutes les modalités pour {col_name} (Timeout?). Utilisation de l'échantillon.")
+                    print(f"Warning: Impossible de récupérer toutes les modalités pour {col_name} (Timeout?). Utilisation de l'échantillon.")
                     # Fallback : on stocke au moins celles vues dans l'échantillon
                     for val in unique_sample:
                          # (Check existence logic duplicated roughly here or simplified)
