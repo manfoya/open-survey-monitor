@@ -22,7 +22,7 @@ MYSQL_DB = os.getenv("MYSQL_DB", "u100076301_enq2026")
 MYSQL_TABLE = os.getenv("MYSQL_TABLE", "QUESTIONNAIRE_ENQ_2024_2025_DICT")
 
 if not MYSQL_PASSWORD:
-    print("❌ Erreur: La variable d'environnement MYSQL_PASSWORD n'est pas définie dans .env")
+    print(" Erreur: La variable d'environnement MYSQL_PASSWORD n'est pas définie dans .env")
     sys.exit(1)
 
 # Construction de l'URL de connexion
