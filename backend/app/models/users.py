@@ -49,4 +49,31 @@ class User(Base):
     user_quotas = relationship("UserQuota", back_populates="user")
     
     # Relation vers les enquêtes réalisées
+    # relation vers les enquêtes réalisées
     surveys = relationship("SurveyData", back_populates="user")
+
+    def get_active_zone(self, db_session):
+        """
+        récupère la zone active de l'agent.
+        l'agent doit être relié à un contrôleur qui a une affectation active.
+        """
+        # attention imports circulaires
+        from app.models.zones import Affectation
+        
+        # si je suis contrôleur
+        if self.role == RoleEnum.controleur:
+             # on cherche une affectation active
+             affectation = db_session.query(Affectation).filter(
+                 Affectation.controleur_id == self.id,
+                 Affectation.est_actif == True
+             ).first()
+             return affectation.zone if affectation else None
+        
+        # si je suis agent, je demande à mon chef
+        if self.role == RoleEnum.agent and self.chef_id:
+             # on remonte au chef
+             chef = self.chef
+             if chef:
+                 return chef.get_active_zone(db_session)
+                 
+        return None
