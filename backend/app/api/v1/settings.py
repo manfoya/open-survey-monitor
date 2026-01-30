@@ -3,13 +3,28 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.schemas.settings import SettingsOut, SettingsUpdate
 from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.models.users import User, RoleEnum
 from app.models.settings import GlobalSettings
-from app.schemas.settings import SettingsUpdate, SettingsOut
+from app.services.fetch_tables import get_remote_tables
 
 router = APIRouter()
+
+@router.get("/tables", response_model=list[str])
+def list_remote_tables(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Liste les tables disponibles sur le serveur MySQL distant.
+    """
+    if current_user.role != RoleEnum.directeur:
+         raise HTTPException(status_code=403, detail="Accès réservé au Directeur.")
+    
+    tables = get_remote_tables()
+    return tables
+
 
 @router.get("/", response_model=SettingsOut)
 def read_settings(
