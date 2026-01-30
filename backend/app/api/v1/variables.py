@@ -14,6 +14,13 @@ from app.models.quotas import Quota
 # Import des schémas (Validation des données)
 from app.schemas.dictionary import VariableCreate, VariableOut, VariableUpdate
 
+from app.api.v1.pagination import (
+    PaginatedResponse, 
+    PaginationParams, 
+    create_pagination_params,
+    paginate_sqlalchemy_query
+)
+
 router = APIRouter()
 
 # --------------------------------------------------------------------------
@@ -74,14 +81,14 @@ def get_query_builder_config(db: Session = Depends(get_db)):
 # 2. ZONE ADMINISTRATION (CRUD Variables)
 # --------------------------------------------------------------------------
 
-@router.get("/", response_model=List[VariableOut])
-def read_variables(
+@router.get("/all", response_model=List[VariableOut])
+def read_all_variables(
     quota_only: bool = False,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """
-    Lister les variables.
+    Lister TOUTES les variables (Sans pagination).
     Option ?quota_only=true pour ne voir que celles activées pour les quotas.
     """
     query = db.query(Variable)
@@ -90,6 +97,31 @@ def read_variables(
     
     # On trie par slug alphabétique pour que ce soit propre
     return query.order_by(Variable.slug).all()
+
+
+@router.get("/", response_model=PaginatedResponse[VariableOut])
+def read_variables(
+    pagination: PaginationParams = Depends(create_pagination_params),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Lister les variables avec PAGINATION.
+    
+    Paramètres :
+    - page: numéro de page
+    - size: taille de page
+    - sort_by: champ de tri
+    - search: recherche textuelle
+    """
+    query = db.query(Variable)
+    return paginate_sqlalchemy_query(
+        query,
+        pagination,
+        allowed_sort_fields=["slug", "label", "id", "created_at"],
+        search_fields=["slug", "label"],
+        text_sort_fields=["slug", "label"]
+    )
 
 
 @router.post("/", response_model=VariableOut)
@@ -138,6 +170,22 @@ def create_variable(
     return new_var
 
 
+@router.get("/{variable_id}", response_model=VariableOut)
+def read_variable_by_id(
+    variable_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Récupérer une seule variable via son ID.
+    Accessble à tout utilisateur connecté.
+    """
+    var = db.query(Variable).filter(Variable.id == variable_id).first()
+    if not var:
+        raise HTTPException(status_code=404, detail="Variable introuvable")
+    return var
+
+
 @router.put("/{variable_id}", response_model=VariableOut)
 def update_variable(
     variable_id: int,
@@ -176,14 +224,14 @@ def update_variable(
         existing_mods = {m.value: m for m in var_db.modalites}
         
         for mod_data in modalites_in:
-            val_cle = mod_data.value # La valeur technique (ex: "1")
+            val_cle = mod_data.get("value") # La valeur technique (ex: "1")
             
             if val_cle in existing_mods:
                 # Si elle existe, on met à jour son label et son ordre
                 existing_mod = existing_mods[val_cle]
-                existing_mod.label = mod_data.label
-                if mod_data.order is not None:
-                    existing_mod.order = mod_data.order
+                existing_mod.label = mod_data.get("label")
+                if mod_data.get("order") is not None:
+                    existing_mod.order = mod_data.get("order")
             else:
                 # Optionnel : Créer une modalité si elle n'existe pas (rare ici, car géré par le script)
                 pass

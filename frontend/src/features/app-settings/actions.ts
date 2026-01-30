@@ -51,6 +51,11 @@ export async function updateSettingsAction(
       variable_gps_lon: getVar("variable_gps_lon"),
       variable_date_enquete: getVar("variable_date_enquete"),
       variable_heure_enquete: getVar("variable_heure_enquete"),
+      target_table_name: getVar("target_table_name"),
+      variable_indicateur_partiel: getVar("variable_indicateur_partiel"),
+      valeur_partiel: getVar("valeur_partiel"),
+      variable_id_interne: getVar("variable_id_interne"),
+      variable_code_agent: getVar("variable_code_agent"),
     };
 
     // Validation basique

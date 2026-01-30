@@ -22,3 +22,11 @@ export async function updateGlobalSettings(
     body: JSON.stringify(settings),
   });
 }
+
+export async function getTables(): Promise<string[]> {
+  const token = await getAccessToken();
+  return apiClient<string[]>("/settings/tables", {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}

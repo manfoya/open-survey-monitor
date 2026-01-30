@@ -12,12 +12,19 @@ export interface GlobalSettings {
   check_vitesse: boolean;
   max_enquetes_par_jour: number;
   message_du_jour?: string;
+  
+  // Mapping Variables
+  target_table_name?: string;
   variable_duree_start?: string;
   variable_duree_end?: string;
   variable_gps_lat?: string;
   variable_gps_lon?: string;
   variable_date_enquete?: string;
   variable_heure_enquete?: string;
+  variable_indicateur_partiel?: string;
+  valeur_partiel?: string;
+  variable_id_interne?: string;
+  variable_code_agent?: string;
 }
 
 export interface GlobalSettingsFormData {
@@ -33,10 +40,15 @@ export interface GlobalSettingsFormData {
   check_vitesse: boolean;
   max_enquetes_par_jour: number;
   message_du_jour?: string;
+  target_table_name?: string;
   variable_duree_start?: string;
   variable_duree_end?: string;
   variable_gps_lat?: string;
   variable_gps_lon?: string;
   variable_date_enquete?: string;
   variable_heure_enquete?: string;
+  variable_indicateur_partiel?: string;
+  valeur_partiel?: string;
+  variable_id_interne?: string;
+  variable_code_agent?: string;
 }

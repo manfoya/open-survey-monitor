@@ -25,6 +25,34 @@ def get_team_ids_recursive(user: User) -> List[int]:
 
 router = APIRouter()
 
+@router.get("/map", response_model=List[dict])
+def read_surveys_map(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Récupérer tous les points d'enquête pour la carte.
+    Retourne uniquement le strict nécessaire (id, lat, long, status).
+    """
+    query = db.query(SurveyData.id, SurveyData.latitude, SurveyData.longitude, SurveyData.status)
+    
+    # Même logique de visibilité que la liste
+    if current_user.role == RoleEnum.directeur:
+        pass
+    elif current_user.role == RoleEnum.agent:
+        query = query.filter(SurveyData.user_id == current_user.id)
+    else:
+        team_ids = get_team_ids_recursive(current_user)
+        query = query.filter(SurveyData.user_id.in_(team_ids))
+        
+    results = query.all()
+    
+    # Conversion en liste de dictionnaires pour coller au format attendu
+    return [
+        {"id": r.id, "latitude": r.latitude, "longitude": r.longitude, "status": r.status} 
+        for r in results if r.latitude is not None and r.longitude is not None
+    ]
+
 @router.get("/", response_model=PaginatedResponse[SurveyOut])
 def read_surveys(
     status: Optional[SurveyStatus] = None,

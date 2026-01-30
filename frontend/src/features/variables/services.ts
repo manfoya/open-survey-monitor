@@ -5,96 +5,8 @@ import { getAccessToken } from "@/features/auth/services/auth";
 import { API_ENDPOINTS } from "@/lib/api-endpoints";
 import { CreateVariableDataType, VariableDataType } from "./types";
 import { PaginatedResponse, PaginationQuery } from "@/lib/api-types";
-import { MOCK_VARIABLES } from "@/mockdata/variables";
-
-// --- MOCK IMPLEMENTATION ---
-
-// Helper to simulate delay
-const simulateDelay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-export const getVariables = async (params: PaginationQuery = {}): Promise<PaginatedResponse<VariableDataType>> => {
-  // await simulateDelay(500); // Simulate network latency
-  
-  // Basic Mock Pagination
-  const page = Number(params.page) || 1;
-  const size = Number(params.size) || 10;
-  const start = (page - 1) * size;
-  const end = start + size;
-  
-  const items = MOCK_VARIABLES.slice(start, end);
-
-  return {
-    items,
-    meta: {
-      current_page: page,
-      page_size: size,
-      total_items: MOCK_VARIABLES.length,
-      total_pages: Math.ceil(MOCK_VARIABLES.length / size),
-    }
-  };
-};
-
-export const getAllVariables = async (): Promise<VariableDataType[]> => {
-  // await simulateDelay(500);
-  return MOCK_VARIABLES;
-};
-
-export const getVariableById = async (id: number): Promise<VariableDataType | null> => {
-//   await simulateDelay(300);
-  const variable = MOCK_VARIABLES.find(v => v.id === id);
-  return variable || null;
-};
-
-export const createVariable = async (
-  data: CreateVariableDataType
-): Promise<VariableDataType | null> => {
-  //   await simulateDelay(800);
-  
-  // Generate a fake numeric ID (simple max + 1 logic)
-  const maxId = MOCK_VARIABLES.reduce((max, v) => (typeof v.id === 'number' && v.id > max ? v.id : max), 0);
-  const newId = maxId + 1;
-
-  const newVariable: VariableDataType = {
-    ...data,
-    id: newId, 
-  };
-  
-  MOCK_VARIABLES.push(newVariable); 
-  
-  return newVariable;
-};
-
-export const updateVariable = async (
-  id: number,
-  data: Partial<CreateVariableDataType>
-): Promise<VariableDataType | null> => {
-//   await simulateDelay(500);
-  
-  const index = MOCK_VARIABLES.findIndex(v => v.id === id);
-  if (index === -1) return null;
-  
-  const updatedVariable = { ...MOCK_VARIABLES[index], ...data };
-  MOCK_VARIABLES[index] = updatedVariable;
-  
-  return updatedVariable;
-};
-
-export const deleteVariable = async (id: number): Promise<VariableDataType | null> => {
-//   await simulateDelay(500);
-  
-  const index = MOCK_VARIABLES.findIndex(v => v.id === id);
-  if (index === -1) return null;
-  
-  const deleted = MOCK_VARIABLES[index];
-  MOCK_VARIABLES.splice(index, 1);
-  
-  return deleted;
-};
 
 
-// --- ORIGINAL IMPLEMENTATION (PRESERVED) ---
-
-/*
 // Helper to handle empty tokens consistently
 const getHeaders = async () => {
   const token = await getAccessToken();
@@ -200,4 +112,4 @@ export const deleteVariable = async (id: number): Promise<VariableDataType | nul
     headers,
   });
 };
-*/
+
