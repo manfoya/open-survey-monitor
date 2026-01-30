@@ -49,3 +49,8 @@
 - La pagination doit gérer le cas où page est trop grand ou trop petit
 - (dev) Utiliser `urlcat` pour éviter les problèmes avec les slashs
 - Pouvoir filtrer spécialement selon les rôles
+
+
+## Fonctionnalités futures
+- Pour le moment, toutes les données sont centralisées autour d'une seule enquête. Il faudra prévoir le cas où il y a plusieurs enquêtes. Seule les interfaces du directeur devraient être concernées par ce changement. En effet, le backend déterminera pour les autres utilisateurs la seule enquête à laquelle ils ont accès et les interfaces n'auront qu'à afficher les données de cette enquête.
+Mais pour le directeur, il faudra prévoir un moyen de sélectionner l'enquête à laquelle il veut accéder. On pourrait par exemple mettre un sélecteur d'enquête dans la barre latérale. Un composant de sélection d'enquete sera chargera à son changement d'ajouter une searchParam "surveyId" à l'URL et de recharger la page.
