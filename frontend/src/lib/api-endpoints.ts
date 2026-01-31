@@ -16,7 +16,7 @@ export const API_ENDPOINTS = {
   VARIABLES: {
     BASE: "/variables/",
     ALL: "/variables/all",
-    BY_ID: (id: number) => `/variables/${id}`, // ID is uuid? or number?
+    BY_ID: (id: number) => `/variables/${id}`,
   },
   SETTINGS: {
     GLOBAL: "/api/global-settings",
