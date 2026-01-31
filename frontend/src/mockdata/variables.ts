@@ -12,10 +12,10 @@ export const MOCK_VARIABLES: VariableDataType[] = [
       max: 120,
       step: 1,
       unit: "ans",
-      placeholder: "Ex: 45"
+      placeholder: "Ex: 45",
     },
     excluded_operators: [],
-    modalites: []
+    modalites: [],
   },
   {
     id: 2,
@@ -27,8 +27,8 @@ export const MOCK_VARIABLES: VariableDataType[] = [
     excluded_operators: [],
     modalites: [
       { value: "M", label: "Masculin", order: 1 },
-      { value: "F", label: "Féminin", order: 2 }
-    ]
+      { value: "F", label: "Féminin", order: 2 },
+    ],
   },
   {
     id: 3,
@@ -43,8 +43,8 @@ export const MOCK_VARIABLES: VariableDataType[] = [
       { value: "PRIMAIRE", label: "Primaire", order: 2 },
       { value: "SECONDAIRE", label: "Secondaire", order: 3 },
       { value: "SUPERIEUR", label: "Supérieur", order: 4 },
-      { value: "CORANIQUE", label: "Coranique", order: 5 }
-    ]
+      { value: "CORANIQUE", label: "Coranique", order: 5 },
+    ],
   },
   {
     id: 4,
@@ -55,10 +55,10 @@ export const MOCK_VARIABLES: VariableDataType[] = [
     ui_config: {
       min: 0,
       unit: "FCFA",
-      step: 5000
+      step: 5000,
     },
     excluded_operators: [],
-    modalites: []
+    modalites: [],
   },
   {
     id: 5,
@@ -67,10 +67,10 @@ export const MOCK_VARIABLES: VariableDataType[] = [
     data_type: DataType.TEXT,
     is_quota: false,
     ui_config: {
-      placeholder: "Observations particulières sur le ménage..."
+      placeholder: "Observations particulières sur le ménage...",
     },
     excluded_operators: [],
-    modalites: []
+    modalites: [],
   },
   {
     id: 6,
@@ -79,10 +79,10 @@ export const MOCK_VARIABLES: VariableDataType[] = [
     data_type: DataType.DATE,
     is_quota: true,
     ui_config: {
-       minDate: "2024-01-01",
-       maxDate: "2024-12-31"
+      minDate: "2024-01-01",
+      maxDate: "2024-12-31",
     },
     excluded_operators: [],
-    modalites: []
-  }
+    modalites: [],
+  },
 ];

@@ -14,7 +14,7 @@ export type ActionState = {
 
 export async function createVariableAction(
   prevState: ActionState | null,
-  data: CreateVariableDataType
+  data: CreateVariableDataType,
 ): Promise<ActionState> {
   const result = await createVariable(data);
 
@@ -26,7 +26,7 @@ export async function createVariableAction(
   }
 
   revalidatePath("/variables");
-  
+
   return {
     success: true,
     message: "Variable créée avec succès !",

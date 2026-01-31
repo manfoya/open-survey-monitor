@@ -1,10 +1,16 @@
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Info } from  "lucide-react";
+import { Info } from "lucide-react";
 import { OperatorType, AVAILABLE_OPERATORS } from "../../types";
 
-export default  function AdvancedSettingsSection({
+export default function AdvancedSettingsSection({
   excludedOperators,
   toggleOperator,
 }: {

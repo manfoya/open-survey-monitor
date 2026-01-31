@@ -33,9 +33,7 @@ export default function VariableJsonDebug({
             ) : (
               <ChevronRight className="h-4 w-4" />
             )}
-            <span className="sr-only">
-              {isOpen ? "Masquer" : "Afficher"}
-            </span>
+            <span className="sr-only">{isOpen ? "Masquer" : "Afficher"}</span>
           </Button>
         </div>
       </CardHeader>

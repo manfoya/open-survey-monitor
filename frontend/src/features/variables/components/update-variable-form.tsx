@@ -17,7 +17,9 @@ interface UpdateVariableFormProps {
   variable: VariableDataType;
 }
 
-export default function UpdateVariableForm({ variable }: UpdateVariableFormProps) {
+export default function UpdateVariableForm({
+  variable,
+}: UpdateVariableFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const {
@@ -54,7 +56,9 @@ export default function UpdateVariableForm({ variable }: UpdateVariableFormProps
           router.push("/variables"); // Redirection vers la liste
           router.refresh(); // Rafraîchir les données
         } else {
-          toast.error(result.message || "Erreur lors de la mise à jour de la variable.");
+          toast.error(
+            result.message || "Erreur lors de la mise à jour de la variable.",
+          );
           if (result.errors) {
             console.error("Erreurs de validation:", result.errors);
           }
@@ -111,12 +115,12 @@ export default function UpdateVariableForm({ variable }: UpdateVariableFormProps
         <Button type="submit" className="flex-1" disabled={isPending}>
           {isPending ? "Enregistrement..." : "Enregistrer les modifications"}
         </Button>
-        <Button 
-            type="button" 
-            variant="outline" 
-            className="flex-1" 
-            onClick={() => router.back()}
-            disabled={isPending}
+        <Button
+          type="button"
+          variant="outline"
+          className="flex-1"
+          onClick={() => router.back()}
+          disabled={isPending}
         >
           Annuler
         </Button>

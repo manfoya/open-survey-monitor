@@ -3,7 +3,13 @@ import CreateVariableForm from "@/features/variables/components/create-variable-
 import PageHeader from "@/components/page-header";
 import { RoleGuard } from "@/features/auth/components/role-guard";
 import { UserRole } from "@/features/auth/types";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Variable, Plus } from "lucide-react";
 import { VariableFormSkeleton } from "@/features/variables/components/variable-form-skeleton";
 

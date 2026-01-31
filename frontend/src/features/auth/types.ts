@@ -19,7 +19,7 @@ export interface UserProfile {
     id: number;
     username: string;
   } | null;
-};
+}
 
 export interface UserCreatePayload {
   username: string;

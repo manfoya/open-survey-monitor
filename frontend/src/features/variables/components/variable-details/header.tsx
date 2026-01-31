@@ -8,14 +8,7 @@ import {
   DataType,
   VariableDataType,
 } from "@/features/variables/types";
-import {
-  Calendar,
-  Edit,
-  Filter,
-  Hash,
-  List,
-  Type,
-} from "lucide-react";
+import { Calendar, Edit, Filter, Hash, List, Type } from "lucide-react";
 import Link from "next/link";
 import DeleteVariableForm from "@/features/variables/components/delete-variable-form";
 

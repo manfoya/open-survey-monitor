@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  TableCell,
-  TableRow,
-} from "@/components/ui/table";
+import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,7 +20,10 @@ import { toast } from "sonner";
 import { useRoleGuard } from "@/features/auth/components/role-guard";
 import { UserRole } from "@/features/auth/types";
 import { PaginatedResponse } from "@/lib/api-types";
-import { availableColumns, defaultZoneColumnVisibility } from "@/features/zones/types/table-columns";
+import {
+  availableColumns,
+  defaultZoneColumnVisibility,
+} from "@/features/zones/types/table-columns";
 import { useTableColumnVisibility } from "@/hooks/use-table-column-visibility";
 import { DataTable } from "@/components/shared/data-table";
 
@@ -38,7 +38,7 @@ interface ZoneActionsDropdownProps {
 
 function ZoneActionsDropdown({ zone }: ZoneActionsDropdownProps) {
   const { RoleGuard } = useRoleGuard();
-  
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -88,15 +88,18 @@ function ZoneActionsDropdown({ zone }: ZoneActionsDropdownProps) {
 // Fonction pour obtenir la valeur d'une cellule selon la colonne
 function getCellValue(zone: Zone, columnKey: string) {
   switch (columnKey) {
-    case 'id':
+    case "id":
       return <span className="font-medium">{zone.id}</span>;
-    case 'nom_zone':
+    case "nom_zone":
       return (
-        <Link href={`/zones/${zone.id}`} className="hover:underline font-medium">
+        <Link
+          href={`/zones/${zone.id}`}
+          className="hover:underline font-medium"
+        >
           {zone.nom_zone}
         </Link>
       );
-    case 'coordinates':
+    case "coordinates":
       return (
         <div className="space-y-1 text-sm">
           <div className="font-mono text-xs">
@@ -107,13 +110,13 @@ function getCellValue(zone: Zone, columnKey: string) {
           </div>
         </div>
       );
-    case 'rayon_tolerance_metres':
+    case "rayon_tolerance_metres":
       return (
         <Badge variant="secondary" className="font-mono text-xs">
           {formatRadius(zone.rayon_tolerance_metres)}
         </Badge>
       );
-    case 'actions':
+    case "actions":
       return <ZoneActionsDropdown zone={zone} />;
     default:
       return null;
@@ -122,23 +125,21 @@ function getCellValue(zone: Zone, columnKey: string) {
 
 export default function ZonesDataTable({
   paginatedZones,
-  query = ""
+  query = "",
 }: ZonesTableProps) {
-  const { 
-    columnVisibility, 
-    updateColumnVisibility, 
-    isLoaded 
-  } = useTableColumnVisibility({
-    storageKey: "zones-table-column-visibility",
-    defaultVisibility: defaultZoneColumnVisibility,
-  });
+  const { columnVisibility, updateColumnVisibility, isLoaded } =
+    useTableColumnVisibility({
+      storageKey: "zones-table-column-visibility",
+      defaultVisibility: defaultZoneColumnVisibility,
+    });
 
   const searchParams = useSearchParams();
   const { items: zones, meta: paginationMeta } = paginatedZones;
 
   // Récupérer les paramètres de tri actuels depuis l'URL
-  const currentSort = searchParams.get("sort_by") || 'id';
-  const currentOrder = (searchParams.get("sort_order") as 'asc' | 'desc') || 'asc';
+  const currentSort = searchParams.get("sort_by") || "id";
+  const currentOrder =
+    (searchParams.get("sort_order") as "asc" | "desc") || "asc";
 
   useEffect(() => {
     if (searchParams.get("deleted") === "true") {
@@ -168,8 +169,12 @@ export default function ZonesDataTable({
           {visibleColumns.map((column) => (
             <TableCell
               key={column.key}
-              className={column.key === 'actions' ? 'text-right' : ''}
-              onClick={column.key === 'actions' ? (e) => e.stopPropagation() : undefined}
+              className={column.key === "actions" ? "text-right" : ""}
+              onClick={
+                column.key === "actions"
+                  ? (e) => e.stopPropagation()
+                  : undefined
+              }
             >
               {getCellValue(zone, column.key)}
             </TableCell>

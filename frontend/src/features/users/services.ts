@@ -6,7 +6,9 @@ import { API_ENDPOINTS } from "@/lib/api-endpoints";
 import { UserCreatePayload, UserProfile } from "@/features/auth/types";
 import { PaginatedResponse, PaginationQuery } from "@/lib/api-types";
 
-export const getSubordinates = async (params: PaginationQuery = {}): Promise<PaginatedResponse<UserProfile>> => {
+export const getSubordinates = async (
+  params: PaginationQuery = {},
+): Promise<PaginatedResponse<UserProfile>> => {
   const token = await getAccessToken();
   if (!token) {
     return {
@@ -16,17 +18,17 @@ export const getSubordinates = async (params: PaginationQuery = {}): Promise<Pag
         page_size: 50,
         total_items: 0,
         total_pages: 0,
-      }
+      },
     };
   }
 
   // Construire les paramètres de requête
   const searchParams = new URLSearchParams();
-  if (params.page) searchParams.set('page', params.page);
-  if (params.size) searchParams.set('size', params.size);
-  if (params.sort_by) searchParams.set('sort_by', params.sort_by);
-  if (params.sort_order) searchParams.set('sort_order', params.sort_order);
-  if (params.search) searchParams.set('search', params.search);
+  if (params.page) searchParams.set("page", params.page);
+  if (params.size) searchParams.set("size", params.size);
+  if (params.sort_by) searchParams.set("sort_by", params.sort_by);
+  if (params.sort_order) searchParams.set("sort_order", params.sort_order);
+  if (params.search) searchParams.set("search", params.search);
 
   const url = `${API_ENDPOINTS.USERS.BASE}?${searchParams.toString()}`;
 
@@ -43,7 +45,7 @@ export const getSubordinates = async (params: PaginationQuery = {}): Promise<Pag
         page_size: Number(params.size) || 50,
         total_items: 0,
         total_pages: 0,
-      }
+      },
     };
   }
 };
@@ -57,7 +59,10 @@ export const getAllSubordinates = async (): Promise<UserProfile[]> => {
       headers: { Authorization: `Bearer ${token}` },
     });
   } catch (error) {
-    console.error("Erreur lors de la récupération de tous les utilisateurs:\n", error);
+    console.error(
+      "Erreur lors de la récupération de tous les utilisateurs:\n",
+      error,
+    );
     return [];
   }
 };

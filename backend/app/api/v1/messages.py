@@ -42,6 +42,28 @@ def send_message(
     new_msg.sender_username = current_user.username
     return new_msg
 
+@router.get("/sent", response_model=List[MessageOut])
+def read_sent_messages(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    limit: int = 20
+):
+    """
+    récupère les messages envoyés par le directeur connecté.
+    """
+    if current_user.role != RoleEnum.directeur:
+        raise HTTPException(status_code=403, detail="accès réservé au directeur.")
+
+    messages = db.query(Message).filter(
+        Message.sender_id == current_user.id
+    ).order_by(desc(Message.created_at)).limit(limit).all()
+    
+    # injection du nom de l'expéditeur (soi-même)
+    for m in messages:
+        m.sender_username = current_user.username
+        
+    return messages
+
 @router.get("/", response_model=List[MessageOut])
 def read_my_messages(
     db: Session = Depends(get_db),

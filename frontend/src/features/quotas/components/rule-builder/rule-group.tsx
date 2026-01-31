@@ -51,7 +51,10 @@ export default function RuleGroup({
     });
   };
 
-  const handleUpdateItem = (index: number, updatedItem: QuotaRule | QuotaGroup) => {
+  const handleUpdateItem = (
+    index: number,
+    updatedItem: QuotaRule | QuotaGroup,
+  ) => {
     const newRules = [...group.rules];
     newRules[index] = updatedItem;
     onChange({ ...group, rules: newRules });
@@ -65,7 +68,9 @@ export default function RuleGroup({
   return (
     <div
       className={`p-4 rounded-lg border flex flex-col gap-4 ${
-        depth === 0 ? "bg-card" : "bg-muted/30 ml-8 border-l-4 border-l-primary/20"
+        depth === 0
+          ? "bg-card"
+          : "bg-muted/30 ml-8 border-l-4 border-l-primary/20"
       }`}
     >
       <div className="flex items-center justify-between">
@@ -116,7 +121,9 @@ export default function RuleGroup({
                 group={ruleOrGroup as QuotaGroup}
                 variables={variables}
                 depth={depth + 1}
-                onChange={(updatedGroup) => handleUpdateItem(index, updatedGroup)}
+                onChange={(updatedGroup) =>
+                  handleUpdateItem(index, updatedGroup)
+                }
                 onRemove={() => handleRemoveItem(index)}
               />
             );

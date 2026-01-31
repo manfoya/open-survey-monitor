@@ -15,7 +15,8 @@ export function useTableColumnVisibility<T extends ColumnVisibility>({
   storageKey,
   defaultVisibility,
 }: UseTableColumnVisibilityOptions<T>) {
-  const [columnVisibility, setColumnVisibility] = useState<T>(defaultVisibility);
+  const [columnVisibility, setColumnVisibility] =
+    useState<T>(defaultVisibility);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Charger les préférences depuis le localStorage au montage
@@ -27,7 +28,10 @@ export function useTableColumnVisibility<T extends ColumnVisibility>({
         setColumnVisibility({ ...defaultVisibility, ...parsed } as T);
       }
     } catch (error) {
-      console.warn(`Erreur lors du chargement des préférences (${storageKey}):`, error);
+      console.warn(
+        `Erreur lors du chargement des préférences (${storageKey}):`,
+        error,
+      );
     } finally {
       setIsLoaded(true);
     }
@@ -49,7 +53,10 @@ export function useTableColumnVisibility<T extends ColumnVisibility>({
     try {
       localStorage.removeItem(storageKey);
     } catch (error) {
-      console.warn(`Erreur lors de la réinitialisation (${storageKey}):`, error);
+      console.warn(
+        `Erreur lors de la réinitialisation (${storageKey}):`,
+        error,
+      );
     }
   };
 

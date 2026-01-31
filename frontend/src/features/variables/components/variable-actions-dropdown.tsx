@@ -9,7 +9,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Edit, MoreVertical, Eye, Trash2, Settings } from "lucide-react";
 import Link from "next/link";
-import { ClientRoleGuard, useRoleGuard } from "@/features/auth/components/role-guard";
+import {
+  ClientRoleGuard,
+  useRoleGuard,
+} from "@/features/auth/components/role-guard";
 import { UserRole } from "@/features/auth/types";
 import DeleteVariableForm from "./delete-variable-form";
 
@@ -19,8 +22,10 @@ interface VariableActionsDropdownProps {
   variable: VariableDataType;
 }
 
-export default function VariableActionsDropdown({ variable }: VariableActionsDropdownProps) {
-    const { currentUser: user } = useRoleGuard();
+export default function VariableActionsDropdown({
+  variable,
+}: VariableActionsDropdownProps) {
+  const { currentUser: user } = useRoleGuard();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -39,9 +44,12 @@ export default function VariableActionsDropdown({ variable }: VariableActionsDro
         </DropdownMenuItem>
 
         {/* Action Configuration - Protégée pour directeurs seulement */}
-        <ClientRoleGuard allowedRoles={[UserRole.DIRECTEUR]} user={user} >
+        <ClientRoleGuard allowedRoles={[UserRole.DIRECTEUR]} user={user}>
           <DropdownMenuItem asChild>
-            <Link href={`/variables/${variable.id}/`} className="cursor-pointer">
+            <Link
+              href={`/variables/${variable.id}/`}
+              className="cursor-pointer"
+            >
               <Settings className="mr-2 h-4 w-4" />
               Configurer
             </Link>
@@ -49,13 +57,10 @@ export default function VariableActionsDropdown({ variable }: VariableActionsDro
         </ClientRoleGuard>
 
         {/* Action Suppression - Protégée pour directeurs seulement */}
-        <ClientRoleGuard allowedRoles={[UserRole.DIRECTEUR]} user={user} >
-            <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-             <DeleteVariableForm 
-                variableId={variable.id} 
-                className="w-full" 
-             />
-            </DropdownMenuItem>
+        <ClientRoleGuard allowedRoles={[UserRole.DIRECTEUR]} user={user}>
+          <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+            <DeleteVariableForm variableId={variable.id} className="w-full" />
+          </DropdownMenuItem>
         </ClientRoleGuard>
       </DropdownMenuContent>
     </DropdownMenu>

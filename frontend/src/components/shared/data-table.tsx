@@ -18,13 +18,13 @@ import React from "react";
 
 interface DataTableProps<T> {
   data: T[];
-  paginationMeta: PaginatedResponse<T>['meta'];
+  paginationMeta: PaginatedResponse<T>["meta"];
   columns: TableColumn[];
   columnVisibility: ColumnVisibility;
   onColumnVisibilityChange: (visibility: ColumnVisibility) => void;
   renderRow: (item: T, visibleColumns: TableColumn[]) => React.ReactNode;
   currentSort?: string;
-  currentOrder?: 'asc' | 'desc';
+  currentOrder?: "asc" | "desc";
   entityLabel: string; // e.g. "utilisateur", "zone"
   pluralEntityLabel?: string; // e.g. "utilisateurs", "zones" (optional, defaults to entityLabel + 's')
   query?: string;
@@ -45,11 +45,10 @@ export function DataTable<T extends { id: string | number }>({
   pluralEntityLabel,
   query,
   caption,
-  isLoaded = true
+  isLoaded = true,
 }: DataTableProps<T>) {
-  
   const pluralLabel = pluralEntityLabel || `${entityLabel}s`;
-  const visibleColumns = columns.filter(col => columnVisibility[col.key]);
+  const visibleColumns = columns.filter((col) => columnVisibility[col.key]);
 
   if (!isLoaded) {
     return <div className="rounded-md border p-4">Chargement...</div>;
@@ -61,18 +60,20 @@ export function DataTable<T extends { id: string | number }>({
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <div className="text-sm text-muted-foreground">
-            {paginationMeta.total_items} {paginationMeta.total_items > 1 ? pluralLabel : entityLabel} • 
-            Page {paginationMeta.current_page} sur {paginationMeta.total_pages}
+            {paginationMeta.total_items}{" "}
+            {paginationMeta.total_items > 1 ? pluralLabel : entityLabel} • Page{" "}
+            {paginationMeta.current_page} sur {paginationMeta.total_pages}
             {currentSort && (
               <span className="ml-2 text-xs">
-                • Trié par {columns.find(col => col.sortKey === currentSort)?.label} 
-                ({currentOrder === 'asc' ? 'croissant' : 'décroissant'})
+                • Trié par{" "}
+                {columns.find((col) => col.sortKey === currentSort)?.label}(
+                {currentOrder === "asc" ? "croissant" : "décroissant"})
               </span>
             )}
           </div>
           <PageSizeSelector currentPageSize={paginationMeta.page_size} />
         </div>
-        <ColumnSelector 
+        <ColumnSelector
           columns={columns}
           columnVisibility={columnVisibility}
           onColumnVisibilityChange={onColumnVisibilityChange}
@@ -106,24 +107,31 @@ export function DataTable<T extends { id: string | number }>({
               data.map((item) => renderRow(item, visibleColumns))
             ) : (
               <TableRow>
-                <TableCell colSpan={visibleColumns.length} className="h-24 text-center">
-                  {query 
+                <TableCell
+                  colSpan={visibleColumns.length}
+                  className="h-24 text-center"
+                >
+                  {query
                     ? `Aucun ${entityLabel} trouvé pour "${query}".`
-                    : `Aucun ${entityLabel} configuré.`
-                  }
+                    : `Aucun ${entityLabel} configuré.`}
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
-        
+
         {/* Pagination */}
         <div className="border-t">
           <div className="flex items-center justify-between px-4 py-3">
             <div className="text-sm text-muted-foreground">
-              Affichage de {((paginationMeta.current_page - 1) * paginationMeta.page_size) + 1} à{" "}
-              {Math.min(paginationMeta.current_page * paginationMeta.page_size, paginationMeta.total_items)} sur{" "}
-              {paginationMeta.total_items} {pluralLabel}
+              Affichage de{" "}
+              {(paginationMeta.current_page - 1) * paginationMeta.page_size + 1}{" "}
+              à{" "}
+              {Math.min(
+                paginationMeta.current_page * paginationMeta.page_size,
+                paginationMeta.total_items,
+              )}{" "}
+              sur {paginationMeta.total_items} {pluralLabel}
             </div>
             <Pagination totalPages={paginationMeta.total_pages} />
           </div>

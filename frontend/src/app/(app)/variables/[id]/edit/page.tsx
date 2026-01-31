@@ -20,7 +20,9 @@ interface UpdateVariablePageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function UpdateVariablePage({ params }: UpdateVariablePageProps) {
+export default async function UpdateVariablePage({
+  params,
+}: UpdateVariablePageProps) {
   const { id } = await params;
   const variableId = Number(id);
 
@@ -90,7 +92,8 @@ async function UpdateVariableFormAsync({ variableId }: { variableId: number }) {
           {variable.label}
         </CardTitle>
         <CardDescription>
-          Modifiez les paramètres de la variable. Le changement de type peut entraîner une perte de données.
+          Modifiez les paramètres de la variable. Le changement de type peut
+          entraîner une perte de données.
         </CardDescription>
       </CardHeader>
       <CardContent>

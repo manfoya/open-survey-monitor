@@ -21,14 +21,17 @@ export function generateDashboardStats(): DashboardStats {
     { id: 5, nom: "Ruraux Global", cible: 500 },
   ];
 
-  const progression_quotas = quotas.map(q => {
-    const fait = randomInt(Math.floor(q.cible * 0.2), Math.floor(q.cible * 1.1));
+  const progression_quotas = quotas.map((q) => {
+    const fait = randomInt(
+      Math.floor(q.cible * 0.2),
+      Math.floor(q.cible * 1.1),
+    );
     const pourcentage = (fait / q.cible) * 100;
     return {
       ...q,
       fait,
       pourcentage,
-      est_atteint: pourcentage >= 100
+      est_atteint: pourcentage >= 100,
     };
   });
 
@@ -40,15 +43,15 @@ export function generateDashboardStats(): DashboardStats {
     "Manquant non justifié",
     "Numéro de téléphone invalide",
     "Signature manquante",
-    "Photo floue"
+    "Photo floue",
   ];
 
   // Pick 3 to 6 random error types
   const shuffledErrors = errorTypes.sort(() => 0.5 - Math.random());
   const selectedErrors = shuffledErrors.slice(0, randomInt(3, 8));
-  
+
   const repartition_erreurs: Record<string, number> = {};
-  selectedErrors.forEach(err => {
+  selectedErrors.forEach((err) => {
     repartition_erreurs[err] = randomInt(5, 60);
   });
 
@@ -60,7 +63,7 @@ export function generateDashboardStats(): DashboardStats {
     total_valide,
     total_suspect,
     progression_quotas,
-    repartition_erreurs
+    repartition_erreurs,
   };
 }
 

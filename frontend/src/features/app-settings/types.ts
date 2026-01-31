@@ -12,7 +12,7 @@ export interface GlobalSettings {
   check_vitesse: boolean;
   max_enquetes_par_jour: number;
   message_du_jour?: string;
-  
+
   // Mapping Variables
   target_table_name?: string;
   variable_duree_start?: string;

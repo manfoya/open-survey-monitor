@@ -21,11 +21,15 @@ export const API_ENDPOINTS = {
   SETTINGS: {
     GLOBAL: "/api/global-settings",
   },
+  MESSAGES: {
+    BASE: "/messages/",
+    SENT: "/messages/sent",
+  },
   STATS: {
     DASHBOARD: "/stats/dashboard",
   },
   QUOTAS: {
-    BASE: "/api/v1/quotas/",
-    BY_ID: (id: number) => `/api/v1/quotas/${id}`,
+    BASE: "/quotas/",
+    BY_ID: (id: number) => `/quotas/${id}`,
   },
 } as const;

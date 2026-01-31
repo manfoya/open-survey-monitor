@@ -36,7 +36,7 @@ export default function DynamicConfigSection({
   updateModalite: (
     id: string,
     field: keyof Modalite,
-    value: string | number
+    value: string | number,
   ) => void;
   removeModalite: (id: string) => void;
 }) {
@@ -73,10 +73,10 @@ function renderDynamicConfigByType(
     updateModalite: (
       id: string,
       field: keyof Modalite,
-      value: string | number
+      value: string | number,
     ) => void;
     removeModalite: (id: string) => void;
-  }
+  },
 ) {
   switch (dataType) {
     case DataType.NUMBER:
@@ -112,7 +112,7 @@ function NumberDynamicConfig({
             onChange={(e) =>
               updateUIConfig(
                 "min",
-                e.target.value ? Number(e.target.value) : undefined
+                e.target.value ? Number(e.target.value) : undefined,
               )
             }
           />
@@ -127,7 +127,7 @@ function NumberDynamicConfig({
             onChange={(e) =>
               updateUIConfig(
                 "max",
-                e.target.value ? Number(e.target.value) : undefined
+                e.target.value ? Number(e.target.value) : undefined,
               )
             }
           />
@@ -142,7 +142,7 @@ function NumberDynamicConfig({
             onChange={(e) =>
               updateUIConfig(
                 "step",
-                e.target.value ? Number(e.target.value) : undefined
+                e.target.value ? Number(e.target.value) : undefined,
               )
             }
           />
@@ -183,7 +183,7 @@ function ListDynamicConfig({
   updateModalite: (
     id: string,
     field: keyof Modalite,
-    value: string | number
+    value: string | number,
   ) => void;
   removeModalite: (id: string) => void;
 }) {

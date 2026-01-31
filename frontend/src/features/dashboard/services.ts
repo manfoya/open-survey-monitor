@@ -14,7 +14,10 @@ export const getDashboardStats = async (): Promise<DashboardStats | null> => {
       headers: { Authorization: `Bearer ${token}` },
     });
   } catch (error) {
-    console.error("Erreur lors de la récupération des statistiques du dashboard:", error);
+    console.error(
+      "Erreur lors de la récupération des statistiques du dashboard:",
+      error,
+    );
     return null;
   }
 };

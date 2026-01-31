@@ -22,7 +22,9 @@ export function DashboardRefreshButton() {
       onClick={handleRefresh}
       disabled={isPending}
     >
-      <RefreshCw className={`mr-2 h-4 w-4 ${isPending ? "animate-spin" : ""}`} />
+      <RefreshCw
+        className={`mr-2 h-4 w-4 ${isPending ? "animate-spin" : ""}`}
+      />
       {isPending ? "Chargement..." : "Actualiser"}
     </Button>
   );

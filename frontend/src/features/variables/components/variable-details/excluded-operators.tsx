@@ -1,6 +1,9 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AVAILABLE_OPERATORS, VariableDataType } from "@/features/variables/types";
+import {
+  AVAILABLE_OPERATORS,
+  VariableDataType,
+} from "@/features/variables/types";
 import { Ban } from "lucide-react";
 import { cn } from "@/lib/utils"; // Assurez-vous d'importer cn
 
@@ -20,7 +23,8 @@ export default function VariableExcludedOperators({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {variable.excluded_operators && variable.excluded_operators.length > 0 ? (
+        {variable.excluded_operators &&
+        variable.excluded_operators.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {variable.excluded_operators.map((op) => {
               const opInfo = AVAILABLE_OPERATORS.find((o) => o.value === op);

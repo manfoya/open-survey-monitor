@@ -49,7 +49,9 @@ export default async function AppLayout({
               <ThemeToggle />
               {/* Futur composant : UserAccountNav (Avatar + Mini menu) */}
               <div className="h-8 w-8 rounded-full bg-primary/10 border flex items-center justify-center text-xs font-bold">
-                {currentUser ? currentUser.username.charAt(0).toUpperCase() : "?"}
+                {currentUser
+                  ? currentUser.username.charAt(0).toUpperCase()
+                  : "?"}
               </div>
             </div>
           </header>

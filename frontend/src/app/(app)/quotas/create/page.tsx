@@ -30,7 +30,7 @@ async function CreateQuotaFormAsync() {
   let variables;
 
   try {
-    // Fetch variables that can be used for quotas? 
+    // Fetch variables that can be used for quotas?
     // Usually we just want all variables, potentially filtered by is_quota on the UI or backend
     // For now, let's fetch all and let the user pick
     variables = await getAllVariables();
@@ -45,16 +45,16 @@ async function CreateQuotaFormAsync() {
   }
 
   // Filter variables that are marked as usable for quotas?
-  const quotaVariables = variables.filter(v => v.is_quota);
+  const quotaVariables = variables.filter((v) => v.is_quota);
 
   if (quotaVariables.length === 0) {
-     return (
-        <ErrorState
-            title="Aucune variable disponible"
-            message="Aucune variable n'est configurée pour être utilisée dans les quotas ('is_quota'). Veuillez d'abord configurer vos variables."
-            primaryAction={{ label: "Gérer les variables", href: "/variables" }}
-        />
-     )
+    return (
+      <ErrorState
+        title="Aucune variable disponible"
+        message="Aucune variable n'est configurée pour être utilisée dans les quotas ('is_quota'). Veuillez d'abord configurer vos variables."
+        primaryAction={{ label: "Gérer les variables", href: "/variables" }}
+      />
+    );
   }
 
   return <CreateQuotaForm variables={quotaVariables} />;

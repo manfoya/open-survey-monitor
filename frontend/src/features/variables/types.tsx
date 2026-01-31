@@ -127,7 +127,7 @@ export const AVAILABLE_OPERATORS: {
 
 export type PropertySetter<T> = <K extends keyof T>(
   key: K,
-  value: T[K]
+  value: T[K],
 ) => void;
 
 export type CreateVariableDataType = {
@@ -152,10 +152,15 @@ export type VariableDataType = {
 };
 
 export const availableColumns: TableColumn[] = [
-  {key: 'id', label: 'ID', sortable: true, sortKey: 'id' },
-  {key: 'label', label: 'Libellé', sortable: true, sortKey: 'label' },
-  {key: 'slug', label: 'Nom technique', sortable: true, sortKey: 'slug' },
-  {key: 'data_type', label: 'Type', sortable: true, sortKey: 'data_type' },
-  {key: 'is_quota', label: 'Utilisé pour quota ?', sortable: true, sortKey: 'is_quota' },
-  {key: 'actions', label:'Actions', sortable: false }
-]
+  { key: "id", label: "ID", sortable: true, sortKey: "id" },
+  { key: "label", label: "Libellé", sortable: true, sortKey: "label" },
+  { key: "slug", label: "Nom technique", sortable: true, sortKey: "slug" },
+  { key: "data_type", label: "Type", sortable: true, sortKey: "data_type" },
+  {
+    key: "is_quota",
+    label: "Utilisé pour quota ?",
+    sortable: true,
+    sortKey: "is_quota",
+  },
+  { key: "actions", label: "Actions", sortable: false },
+];

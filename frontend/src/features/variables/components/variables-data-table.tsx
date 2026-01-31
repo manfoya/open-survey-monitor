@@ -1,12 +1,12 @@
 "use client";
 
-import {
-  TableCell,
-  TableRow,
-} from "@/components/ui/table";
+import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { availableColumns, defaultVariableColumnVisibility } from "../types/table-columns";
+import {
+  availableColumns,
+  defaultVariableColumnVisibility,
+} from "../types/table-columns";
 import { useTableColumnVisibility } from "@/hooks/use-table-column-visibility";
 import React from "react";
 import { PaginatedResponse } from "@/lib/api-types";
@@ -23,23 +23,21 @@ interface VariablesTableProps {
 
 export default function VariablesDataTable({
   paginatedVariables,
-  query = ""
+  query = "",
 }: VariablesTableProps) {
-  const { 
-    columnVisibility, 
-    updateColumnVisibility, 
-    isLoaded 
-  } = useTableColumnVisibility({
-    storageKey: "variables-table-column-visibility",
-    defaultVisibility: defaultVariableColumnVisibility,
-  });
-  
+  const { columnVisibility, updateColumnVisibility, isLoaded } =
+    useTableColumnVisibility({
+      storageKey: "variables-table-column-visibility",
+      defaultVisibility: defaultVariableColumnVisibility,
+    });
+
   const searchParams = useSearchParams();
   const { items: variables, meta: paginationMeta } = paginatedVariables;
 
   // Récupérer les paramètres de tri actuels depuis l'URL
-  const currentSort = searchParams.get("sort_by") || 'id';
-  const currentOrder = (searchParams.get("sort_order") as 'asc' | 'desc') || 'asc';
+  const currentSort = searchParams.get("sort_by") || "id";
+  const currentOrder =
+    (searchParams.get("sort_order") as "asc" | "desc") || "asc";
 
   return (
     <DataTable
@@ -63,8 +61,12 @@ export default function VariablesDataTable({
           {visibleColumns.map((column) => (
             <TableCell
               key={column.key}
-              className={column.key === 'actions' ? 'text-right' : ''}
-              onClick={column.key === 'actions' ? (e) => e.stopPropagation() : undefined}
+              className={column.key === "actions" ? "text-right" : ""}
+              onClick={
+                column.key === "actions"
+                  ? (e) => e.stopPropagation()
+                  : undefined
+              }
             >
               {getCellValue(variable, column.key)}
             </TableCell>
@@ -78,42 +80,46 @@ export default function VariablesDataTable({
 // Fonction pour obtenir la valeur d'une cellule selon la colonne
 function getCellValue(variable: VariableDataType, columnKey: string) {
   switch (columnKey) {
-    case 'id':
+    case "id":
       return <span className="font-medium">{variable.id}</span>;
-    
-    case 'label':
+
+    case "label":
       return (
-        <Link href={`/variables/${variable.id}`} className="hover:underline font-medium">
+        <Link
+          href={`/variables/${variable.id}`}
+          className="hover:underline font-medium"
+        >
           {variable.label}
         </Link>
       );
-    
-    case 'slug':
+
+    case "slug":
       return (
         <span className="font-mono text-sm bg-muted/50 px-2 py-1 rounded">
           {variable.slug}
         </span>
       );
-    
-    case 'data_type':
+
+    case "data_type":
       return (
-        <Badge variant="outline" className={getDataTypeBadge(variable.data_type)}>
+        <Badge
+          variant="outline"
+          className={getDataTypeBadge(variable.data_type)}
+        >
           {getDataTypeLabel(variable.data_type)}
         </Badge>
       );
-    
-    case 'is_quota':
+
+    case "is_quota":
       return (
         <Badge variant={variable.is_quota ? "default" : "secondary"}>
           {variable.is_quota ? "Oui" : "Non"}
         </Badge>
       );
-    
 
-    
-    case 'actions':
+    case "actions":
       return <VariableActionsDropdown variable={variable} />;
-    
+
     default:
       return null;
   }
@@ -122,11 +128,11 @@ function getCellValue(variable: VariableDataType, columnKey: string) {
 // Helper pour les labels des types de données
 function getDataTypeLabel(dataType: string): string {
   const labels: Record<string, string> = {
-    'number': 'Nombre',
-    'list': 'Liste',
-    'text': 'Texte',
-    'date': 'Date',
-    'boolean': 'Booléen',
+    number: "Nombre",
+    list: "Liste",
+    text: "Texte",
+    date: "Date",
+    boolean: "Booléen",
   };
   return labels[dataType.toLowerCase()] || dataType;
 }
@@ -134,11 +140,16 @@ function getDataTypeLabel(dataType: string): string {
 // Helper pour les couleurs des badges de type de données
 function getDataTypeBadge(dataType: string): string {
   const styles: Record<string, string> = {
-    'number': "border-blue-500/20 text-blue-700 dark:text-blue-300 hover:border-blue-500/30",
-    'list': "border-green-500/20 text-green-700 dark:text-green-300 hover:border-green-500/30",
-    'text': "border-purple-500/20 text-purple-700 dark:text-purple-300 hover:border-purple-500/30",
-    'date': "border-orange-500/20 text-orange-700 dark:text-orange-300 hover:border-orange-500/30",
-    'boolean': "border-gray-500/20 text-gray-700 dark:text-gray-300 hover:border-gray-500/30",
+    number:
+      "border-blue-500/20 text-blue-700 dark:text-blue-300 hover:border-blue-500/30",
+    list: "border-green-500/20 text-green-700 dark:text-green-300 hover:border-green-500/30",
+    text: "border-purple-500/20 text-purple-700 dark:text-purple-300 hover:border-purple-500/30",
+    date: "border-orange-500/20 text-orange-700 dark:text-orange-300 hover:border-orange-500/30",
+    boolean:
+      "border-gray-500/20 text-gray-700 dark:text-gray-300 hover:border-gray-500/30",
   };
-  return styles[dataType.toLowerCase()] || "border-gray-500/20 text-gray-700 dark:text-gray-300";
+  return (
+    styles[dataType.toLowerCase()] ||
+    "border-gray-500/20 text-gray-700 dark:text-gray-300"
+  );
 }

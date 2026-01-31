@@ -19,15 +19,15 @@ export default async function ZonesPage(props: {
     page?: string;
     size?: string;
     sort_by?: string;
-    sort_order?: 'asc' | 'desc';
+    sort_order?: "asc" | "desc";
   }>;
 }) {
   const searchParams = await props.searchParams;
   const query = searchParams?.query || "";
   const page = searchParams?.page || "1";
   const size = searchParams?.size || "10";
-  const sort_by = searchParams?.sort_by || 'id';
-  const sort_order = searchParams?.sort_order || 'asc';
+  const sort_by = searchParams?.sort_by || "id";
+  const sort_order = searchParams?.sort_order || "asc";
 
   return (
     <div className="container mx-auto py-6">
@@ -51,9 +51,9 @@ export default async function ZonesPage(props: {
       </div>
 
       <Suspense fallback={<ZonesTableSkeleton />}>
-        <ZonesTableAsync 
-          query={query} 
-          page={page} 
+        <ZonesTableAsync
+          query={query}
+          page={page}
           size={size}
           sort_by={sort_by}
           sort_order={sort_order}
@@ -74,7 +74,7 @@ async function ZonesTableAsync({
   page: string;
   size: string;
   sort_by?: string;
-  sort_order: 'asc' | 'desc';
+  sort_order: "asc" | "desc";
 }) {
   const currentUser = await getMe();
 
@@ -102,10 +102,5 @@ async function ZonesTableAsync({
     return <ZonesEmptyState query={query} />;
   }
 
-  return (
-    <ZonesDataTable
-      paginatedZones={paginatedZones}
-      query={query}
-    />
-  );
+  return <ZonesDataTable paginatedZones={paginatedZones} query={query} />;
 }

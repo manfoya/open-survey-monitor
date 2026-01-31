@@ -1,4 +1,8 @@
-import { QuotaDefinition, QuotaGroup, QuotaRule } from "@/features/quotas/types";
+import {
+  QuotaDefinition,
+  QuotaGroup,
+  QuotaRule,
+} from "@/features/quotas/types";
 import { VariableDataType } from "@/features/variables/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText } from "lucide-react";
@@ -18,17 +22,28 @@ export default function QuotaExpressionPreview({
 
   const formatOperator = (op: string) => {
     switch (op) {
-      case "equals": return "=";
-      case "not_equals": return "≠";
-      case "greater_than": return ">";
-      case "less_than": return "<";
-      case "greater_equal": return "≥";
-      case "less_equal": return "≤";
-      case "contains": return "contient";
-      case "begins_with": return "commence par";
-      case "ends_with": return "finit par";
-      case "in_list": return "dans";
-      default: return op;
+      case "equals":
+        return "=";
+      case "not_equals":
+        return "≠";
+      case "greater_than":
+        return ">";
+      case "less_than":
+        return "<";
+      case "greater_equal":
+        return "≥";
+      case "less_equal":
+        return "≤";
+      case "contains":
+        return "contient";
+      case "begins_with":
+        return "commence par";
+      case "ends_with":
+        return "finit par";
+      case "in_list":
+        return "dans";
+      default:
+        return op;
     }
   };
 
@@ -37,21 +52,26 @@ export default function QuotaExpressionPreview({
     return String(val);
   };
 
-  const renderGroup = (group: QuotaGroup | QuotaDefinition, depth = 0): string => {
+  const renderGroup = (
+    group: QuotaGroup | QuotaDefinition,
+    depth = 0,
+  ): string => {
     if (!group.rules || group.rules.length === 0) return "";
 
-    const parts = group.rules.map((ruleOrGroup) => {
-      if ("combinator" in ruleOrGroup) {
-        // It's a group
-        const groupStr = renderGroup(ruleOrGroup as QuotaGroup, depth + 1);
-        return groupStr ? `(${groupStr})` : "";
-      } else {
-        // It's a rule
-        const rule = ruleOrGroup as QuotaRule;
-        if (!rule.field) return "???";
-        return `(${getVariableLabel(rule.field)} ${formatOperator(rule.operator)} ${formatValue(rule.value)})`;
-      }
-    }).filter(Boolean);
+    const parts = group.rules
+      .map((ruleOrGroup) => {
+        if ("combinator" in ruleOrGroup) {
+          // It's a group
+          const groupStr = renderGroup(ruleOrGroup as QuotaGroup, depth + 1);
+          return groupStr ? `(${groupStr})` : "";
+        } else {
+          // It's a rule
+          const rule = ruleOrGroup as QuotaRule;
+          if (!rule.field) return "???";
+          return `(${getVariableLabel(rule.field)} ${formatOperator(rule.operator)} ${formatValue(rule.value)})`;
+        }
+      })
+      .filter(Boolean);
 
     if (parts.length === 0) return "";
 

@@ -33,7 +33,7 @@ export default function RuleItem({
 
   // Filter operators based on selected variable type (optional refinement)
   // For now, allow all, but you could restrict lists to "equals/in_list" etc.
-  const operators = AVAILABLE_OPERATORS; 
+  const operators = AVAILABLE_OPERATORS;
 
   // Reset value/operator if variable changes type? (complex, let's keep simple first)
   const handleVariableChange = (slug: string) => {
@@ -48,10 +48,7 @@ export default function RuleItem({
   return (
     <div className="flex items-center gap-2 p-2 bg-background border rounded-md">
       {/* Variable Selector */}
-      <Select
-        value={rule.field}
-        onValueChange={handleVariableChange}
-      >
+      <Select value={rule.field} onValueChange={handleVariableChange}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Variable" />
         </SelectTrigger>
@@ -104,7 +101,9 @@ export default function RuleItem({
           <Input
             type="number"
             value={rule.value as string}
-            onChange={(e) => onChange({ ...rule, value: Number(e.target.value) })}
+            onChange={(e) =>
+              onChange({ ...rule, value: Number(e.target.value) })
+            }
             placeholder="Valeur numérique"
           />
         ) : (

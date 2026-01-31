@@ -28,7 +28,11 @@ export function VariableSelector({
   return (
     <div className="space-y-2">
       <Label htmlFor={name}>{label}</Label>
-      <Select name={name} defaultValue={value || "__none__"} disabled={disabled}>
+      <Select
+        name={name}
+        defaultValue={value || "__none__"}
+        disabled={disabled}
+      >
         <SelectTrigger>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

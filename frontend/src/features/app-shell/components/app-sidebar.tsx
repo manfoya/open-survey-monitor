@@ -50,8 +50,10 @@ export default function AppSideBar() {
       <SidebarContent>
         {navGroups.map((group) => {
           // Filtrer les éléments du groupe selon les permissions
-          const accessibleItems = group.items.filter((item) => hasAccess(item.roles));
-          
+          const accessibleItems = group.items.filter((item) =>
+            hasAccess(item.roles),
+          );
+
           // Ne pas afficher le groupe s'il n'y a aucun élément accessible
           if (accessibleItems.length === 0) return null;
 

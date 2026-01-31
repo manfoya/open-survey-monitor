@@ -51,17 +51,17 @@ export function ClientRoleGuard({
 // Hook personnalisé pour simplifier l'utilisation avec le Context
 export function useRoleGuard() {
   const currentUser = useCurrentUser();
-  
+
   const hasRole = (allowedRoles: UserRole | UserRole[]): boolean => {
     if (!currentUser) return false;
     const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
     return roles.includes(currentUser.role);
   };
 
-  const RoleGuard = ({ 
-    children, 
-    allowedRoles, 
-    fallback = null 
+  const RoleGuard = ({
+    children,
+    allowedRoles,
+    fallback = null,
   }: {
     children: React.ReactNode;
     allowedRoles: UserRole | UserRole[];

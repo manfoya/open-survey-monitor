@@ -6,12 +6,30 @@ export type { TableColumn, ColumnVisibility };
 
 // Configuration des colonnes disponibles
 export const availableColumns: TableColumn[] = [
-  { key: 'id', label: 'ID', className: 'w-[100px]', required: true, sortable: true, sortKey: 'id' },
-  { key: 'username', label: 'Utilisateur', required: true, sortable: true, sortKey: 'username' },
-  { key: 'role', label: 'Rôle', sortable: true, sortKey: 'role' },
-  { key: 'cspro_code', label: 'Code CSPro', sortable: true, sortKey: 'cspro_code' },
-  { key: 'chef', label: 'Chef', sortable: true, sortKey: 'id'},
-  { key: 'actions', label: 'Actions', className: 'text-right', required: true },
+  {
+    key: "id",
+    label: "ID",
+    className: "w-[100px]",
+    required: true,
+    sortable: true,
+    sortKey: "id",
+  },
+  {
+    key: "username",
+    label: "Utilisateur",
+    required: true,
+    sortable: true,
+    sortKey: "username",
+  },
+  { key: "role", label: "Rôle", sortable: true, sortKey: "role" },
+  {
+    key: "cspro_code",
+    label: "Code CSPro",
+    sortable: true,
+    sortKey: "cspro_code",
+  },
+  { key: "chef", label: "Chef", sortable: true, sortKey: "id" },
+  { key: "actions", label: "Actions", className: "text-right", required: true },
 ];
 
 // Configuration par défaut des colonnes visibles

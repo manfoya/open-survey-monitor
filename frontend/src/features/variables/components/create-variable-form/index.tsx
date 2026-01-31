@@ -48,7 +48,9 @@ export default function CreateVariableForm() {
           toast.success("Variable créée avec succès !");
           resetForm();
         } else {
-          toast.error(result.message || "Erreur lors de la création de la variable.");
+          toast.error(
+            result.message || "Erreur lors de la création de la variable.",
+          );
         }
       } catch (err) {
         console.error("Erreur lors de la création de la variable", err);
@@ -102,7 +104,6 @@ export default function CreateVariableForm() {
     </form>
   );
 }
-
 
 // Composant pour les actions du formulaire
 function FormActions({ isPending = false }: { isPending?: boolean }) {

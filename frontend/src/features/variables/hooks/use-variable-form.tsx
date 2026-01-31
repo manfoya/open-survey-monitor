@@ -1,4 +1,3 @@
-
 import {
   DataType,
   UIConfig,
@@ -13,15 +12,19 @@ import { toast } from "sonner";
 import { VariableDataType } from "@/features/variables/types";
 
 export default function useVariableForm(initialValues?: VariableDataType) {
-  const defaultDataType = DataType.NUMBER
-  
+  const defaultDataType = DataType.NUMBER;
+
   const [label, setLabel] = useState(initialValues?.label || "");
   const [slug, setSlug] = useState(initialValues?.slug || "");
-  const [dataType, setDataType] = useState<DataType>(initialValues?.data_type || defaultDataType);
+  const [dataType, setDataType] = useState<DataType>(
+    initialValues?.data_type || defaultDataType,
+  );
   const [isQuota, setIsQuota] = useState(initialValues?.is_quota ?? true);
-  
+
   // Initialisation de la config UI
-  const [uiConfig, setUiConfig] = useState<UIConfig>(initialValues?.ui_config || {});
+  const [uiConfig, setUiConfig] = useState<UIConfig>(
+    initialValues?.ui_config || {},
+  );
 
   // Initialisation des modalités : on ajoute des ID temporaires si besoin (pour React keys)
   const [modalites, setModalites] = useState<Modalite[]>(
@@ -29,11 +32,11 @@ export default function useVariableForm(initialValues?: VariableDataType) {
       ...m,
       order: m.order ?? index + 1, // Fallback si pas d'ordre
       id: crypto.randomUUID(), // ID temporaire pour le drag & drop / listes React
-    })) || []
+    })) || [],
   );
 
   const [excludedOperators, setExcludedOperators] = useState<Set<OperatorType>>(
-    new Set<OperatorType>(initialValues?.excluded_operators || [])
+    new Set<OperatorType>(initialValues?.excluded_operators || []),
   );
   const [isPending, startTransition] = useTransition();
 
@@ -81,10 +84,12 @@ export default function useVariableForm(initialValues?: VariableDataType) {
   const updateModalite = (
     id: string,
     field: keyof Modalite,
-    value: string | number
+    value: string | number,
   ) => {
     setModalites(
-      modalites.map((mod) => (mod.id === id ? { ...mod, [field]: value } : mod))
+      modalites.map((mod) =>
+        mod.id === id ? { ...mod, [field]: value } : mod,
+      ),
     );
   };
 
@@ -133,10 +138,8 @@ export default function useVariableForm(initialValues?: VariableDataType) {
         excludedOperators,
         uiConfig,
       }),
-    [label, slug, dataType, isQuota, modalites, excludedOperators, uiConfig]
+    [label, slug, dataType, isQuota, modalites, excludedOperators, uiConfig],
   );
-
-
 
   return {
     state: {

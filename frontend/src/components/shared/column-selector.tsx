@@ -47,7 +47,7 @@ export default function ColumnSelector({
       <DropdownMenuContent align="end" className="w-[200px]">
         <DropdownMenuLabel>Affichage des colonnes</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        
+
         {columns.map((column) => (
           <DropdownMenuItem
             key={column.key}
@@ -57,15 +57,15 @@ export default function ColumnSelector({
             <Checkbox
               id={`column-${column.key}`}
               checked={columnVisibility[column.key] || false}
-              onCheckedChange={(checked) => 
+              onCheckedChange={(checked) =>
                 handleColumnToggle(column.key, checked as boolean)
               }
               disabled={column.required}
             />
-            <label 
+            <label
               htmlFor={`column-${column.key}`}
               className={`text-sm cursor-pointer flex-1 ${
-                column.required ? 'text-muted-foreground' : ''
+                column.required ? "text-muted-foreground" : ""
               }`}
             >
               {column.label}
@@ -75,7 +75,7 @@ export default function ColumnSelector({
             </label>
           </DropdownMenuItem>
         ))}
-        
+
         <DropdownMenuSeparator />
         <div className="px-2 py-1 text-xs text-muted-foreground">
           * Colonnes obligatoires

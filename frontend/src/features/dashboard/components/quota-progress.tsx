@@ -25,9 +25,13 @@ export function QuotaProgress({ stats }: QuotaProgressProps) {
                 {quota.fait} / {quota.cible} ({quota.pourcentage.toFixed(1)}%)
               </span>
             </div>
-            <Progress 
-              value={Math.min(quota.pourcentage, 100)} 
-              className={quota.est_atteint ? "[&>[data-slot=progress-indicator]]:bg-green-500" : ""}
+            <Progress
+              value={Math.min(quota.pourcentage, 100)}
+              className={
+                quota.est_atteint
+                  ? "[&>[data-slot=progress-indicator]]:bg-green-500"
+                  : ""
+              }
             />
           </div>
         ))}

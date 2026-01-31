@@ -65,7 +65,7 @@ function ListConfigView({
   }
 
   const sortedModalites = [...modalites].sort(
-    (a, b) => (a.order || 0) - (b.order || 0)
+    (a, b) => (a.order || 0) - (b.order || 0),
   );
 
   return (
@@ -128,7 +128,9 @@ function TextConfigView({ config }: { config: UIConfig }) {
       <div className="space-y-1">
         <p className="text-xs font-medium text-muted-foreground">Placeholder</p>
         <p className="text-sm">
-          {config.placeholder || <span className="text-muted-foreground">—</span>}
+          {config.placeholder || (
+            <span className="text-muted-foreground">—</span>
+          )}
         </p>
       </div>
       <div className="space-y-1">

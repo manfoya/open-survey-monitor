@@ -1,12 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardStats } from "../types";
-import { 
-  CheckCircle2, 
-  XCircle, 
-  HelpCircle, 
-  FileText, 
-  FileCheck, 
-  FileQuestion 
+import {
+  CheckCircle2,
+  XCircle,
+  HelpCircle,
+  FileText,
+  FileCheck,
+  FileQuestion,
 } from "lucide-react";
 
 interface StatsCardsProps {

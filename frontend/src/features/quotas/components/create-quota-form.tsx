@@ -10,7 +10,13 @@ import { VariableDataType } from "@/features/variables/types";
 import { CreateQuotaDTO, QuotaDefinition } from "@/features/quotas/types";
 import { createQuota } from "@/features/quotas/services";
 import RuleBuilder from "./rule-builder";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Sliders } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import QuotaExpressionPreview from "./quota-expression-preview";
@@ -59,7 +65,8 @@ export default function CreateQuotaForm({ variables }: CreateQuotaFormProps) {
         await createQuota(payload);
 
         toast.success("Quota créé", {
-          description: "Le nouveau modèle de quota a été enregistré avec succès.",
+          description:
+            "Le nouveau modèle de quota a été enregistré avec succès.",
         });
 
         router.push("/quotas"); // Assuming listing page exists or will exist
@@ -129,9 +136,9 @@ export default function CreateQuotaForm({ variables }: CreateQuotaFormProps) {
               onChange={setDefinition}
             />
 
-            <QuotaExpressionPreview 
-              definition={definition} 
-              variables={variables} 
+            <QuotaExpressionPreview
+              definition={definition}
+              variables={variables}
             />
           </CardContent>
         </Card>

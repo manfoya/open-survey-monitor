@@ -6,6 +6,7 @@ import {
   Settings2,
   MapPin,
   Database,
+  Mail,
 } from "lucide-react";
 import { UserRole } from "../auth/types";
 
@@ -26,25 +27,41 @@ export const navGroups: NavGroup[] = [
     label: "Opérations",
     items: [
       { title: "Overview", url: "/overview", icon: LayoutDashboard },
+      { title: "Messages", url: "/messages", icon: Mail },
     ],
   },
   {
     label: "Données",
     items: [
-      { title: "Users", url: "/users", icon: Users, roles: [UserRole.DIRECTEUR, UserRole.SUPERVISEUR, UserRole.CONTROLEUR] }, // Tout sauf AGENT
+      {
+        title: "Users",
+        url: "/users",
+        icon: Users,
+        roles: [UserRole.DIRECTEUR, UserRole.SUPERVISEUR, UserRole.CONTROLEUR],
+      }, // Tout sauf AGENT
       { title: "Zones", url: "/zones", icon: MapPin },
-      { title: "Variables", url: "/variables", icon: Database, roles: [UserRole.DIRECTEUR] },
+      {
+        title: "Variables",
+        url: "/variables",
+        icon: Database,
+        roles: [UserRole.DIRECTEUR],
+      },
     ],
   },
   {
     label: "Configuration",
     items: [
       { title: "Paramètres", url: "/user-settings", icon: Settings },
-      { title: "Paramètres du site", url: "/app-settings", icon: Settings2, roles: [UserRole.DIRECTEUR] },
+      {
+        title: "Paramètres du site",
+        url: "/app-settings",
+        icon: Settings2,
+        roles: [UserRole.DIRECTEUR],
+      },
       { title: "Mon Profil", url: "/users/me", icon: UserCircle },
     ],
   },
 ];
 
-export type NavGroupType = typeof navGroups[0];
-export type NavItemType = typeof navGroups[0]["items"][0];
+export type NavGroupType = (typeof navGroups)[0];
+export type NavItemType = (typeof navGroups)[0]["items"][0];

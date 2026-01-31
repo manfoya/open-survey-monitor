@@ -1,7 +1,7 @@
 "use client";
 
-import React, { createContext, useContext } from 'react';
-import { UserProfile } from '@/features/auth/types';
+import React, { createContext, useContext } from "react";
+import { UserProfile } from "@/features/auth/types";
 
 interface UserContextType {
   currentUser: UserProfile | null;
@@ -25,7 +25,7 @@ export function UserProvider({ children, currentUser }: UserProviderProps) {
 export function useUser() {
   const context = useContext(UserContext);
   if (context === undefined) {
-    throw new Error('useUser must be used within a UserProvider');
+    throw new Error("useUser must be used within a UserProvider");
   }
   return context;
 }

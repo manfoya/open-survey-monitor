@@ -14,13 +14,13 @@ export default async function Page() {
 
   return (
     <div className="container mx-auto py-6">
-      <PageHeader 
-        title="Tableau de bord" 
+      <PageHeader
+        title="Tableau de bord"
         description="Aperçu global de l'activité de collecte et de la qualité des données."
         actions={<DashboardRefreshButton />}
       />
       <div className="mt-6">
-      <DashboardView stats={stats} />
+        <DashboardView stats={stats} />
       </div>
     </div>
   );
@@ -29,20 +29,21 @@ export default async function Page() {
 function FallbackPage() {
   return (
     <div className="container mx-auto py-6">
-      <PageHeader 
-        title="Tableau de bord" 
+      <PageHeader
+        title="Tableau de bord"
         description="Aperçu global de l'activité de collecte et de la qualité des données."
         actions={<DashboardRefreshButton />}
       />
       <div className="mt-6">
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Erreur</AlertTitle>
-            <AlertDescription>
-              Impossible de charger les statistiques du tableau de bord. Veuillez réessayer plus tard.
-            </AlertDescription>
-          </Alert>
-        </div>
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Erreur</AlertTitle>
+          <AlertDescription>
+            Impossible de charger les statistiques du tableau de bord. Veuillez
+            réessayer plus tard.
+          </AlertDescription>
+        </Alert>
       </div>
-    );
+    </div>
+  );
 }

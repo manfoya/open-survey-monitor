@@ -1,9 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import {
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Zone } from "@/features/zones/types";
 import { MapPin } from "lucide-react";
 

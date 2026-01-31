@@ -1,7 +1,10 @@
 "use client";
 
 import { Trash2 } from "lucide-react";
-import { deleteVariableAction, DeleteVariableState } from "@/features/variables/actions/delete-variable-action";
+import {
+  deleteVariableAction,
+  DeleteVariableState,
+} from "@/features/variables/actions/delete-variable-action";
 import { toast } from "sonner";
 import { useActionState, useEffect } from "react";
 
@@ -22,11 +25,14 @@ export default function DeleteVariableForm({
   buttonText = "Supprimer",
   redirectOnSuccess = false,
 }: DeleteVariableFormProps) {
-  const deleteVariableActionWithId = deleteVariableAction.bind(null, variableId);
-  const [state, formAction, isPending] = useActionState<DeleteVariableState, FormData>(
-    deleteVariableActionWithId,
-    {},
+  const deleteVariableActionWithId = deleteVariableAction.bind(
+    null,
+    variableId,
   );
+  const [state, formAction, isPending] = useActionState<
+    DeleteVariableState,
+    FormData
+  >(deleteVariableActionWithId, {});
 
   useEffect(() => {
     if (state.success === true) {

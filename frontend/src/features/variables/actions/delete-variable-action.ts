@@ -29,10 +29,10 @@ export async function deleteVariableAction(
     };
   }
   revalidatePath("/variables");
-  
+
   // Support for optional redirect logic if added to form later
   if (formData && formData.get("redirectOnSuccess") === "true") {
-      redirect("/variables");
+    redirect("/variables");
   }
 
   return { success: true, message: "Variable supprimée avec succès" };

@@ -111,4 +111,3 @@ async function UserDetailsAsync({ userId }: { userId: number }) {
     </div>
   );
 }
-

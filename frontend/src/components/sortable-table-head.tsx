@@ -11,10 +11,14 @@ import { TableColumn } from "@/types/table";
 interface SortableTableHeadProps {
   column: TableColumn;
   currentSort?: string;
-  currentOrder?: 'asc' | 'desc';
+  currentOrder?: "asc" | "desc";
 }
 
-export function SortableTableHead({ column, currentSort, currentOrder }: SortableTableHeadProps) {
+export function SortableTableHead({
+  column,
+  currentSort,
+  currentOrder,
+}: SortableTableHeadProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -22,12 +26,12 @@ export function SortableTableHead({ column, currentSort, currentOrder }: Sortabl
     if (!column.sortable || !column.sortKey) return;
 
     const params = new URLSearchParams(searchParams);
-    
+
     // Déterminer le nouvel ordre de tri
-    let newOrder: 'asc' | 'desc' = 'asc';
+    let newOrder: "asc" | "desc" = "asc";
     if (currentSort === column.sortKey) {
       // Si on clique sur la même colonne, inverser l'ordre
-      newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+      newOrder = currentOrder === "asc" ? "desc" : "asc";
     }
 
     params.set("sort_by", column.sortKey);
@@ -38,14 +42,12 @@ export function SortableTableHead({ column, currentSort, currentOrder }: Sortabl
   };
 
   const isCurrentSort = currentSort === column.sortKey;
-  const isAscending = isCurrentSort && currentOrder === 'asc';
-  const isDescending = isCurrentSort && currentOrder === 'desc';
+  const isAscending = isCurrentSort && currentOrder === "asc";
+  const isDescending = isCurrentSort && currentOrder === "desc";
 
   if (!column.sortable) {
     return (
-      <TableHead className={column.className || ""}>
-        {column.label}
-      </TableHead>
+      <TableHead className={column.className || ""}>{column.label}</TableHead>
     );
   }
 
@@ -57,14 +59,16 @@ export function SortableTableHead({ column, currentSort, currentOrder }: Sortabl
         className={cn(
           "h-8 p-2 -ml-2 hover:bg-muted/50 font-medium",
           isCurrentSort && "bg-muted/30",
-          "cursor-pointer"
+          "cursor-pointer",
         )}
         onClick={handleSort}
       >
         <span className="mr-2">{column.label}</span>
         {isAscending && <ArrowUp className="h-4 w-4" />}
         {isDescending && <ArrowDown className="h-4 w-4" />}
-        {!isCurrentSort && <ArrowUpDown className="h-4 w-4 text-muted-foreground" />}
+        {!isCurrentSort && (
+          <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+        )}
       </Button>
     </TableHead>
   );

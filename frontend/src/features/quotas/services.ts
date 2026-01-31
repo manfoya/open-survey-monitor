@@ -10,11 +10,11 @@ export async function createQuota(data: CreateQuotaDTO): Promise<Quota> {
 }
 
 export async function getQuotas(): Promise<Quota[]> {
-    // This assumes a list endpoint exists, typically needed for index pages
-    // Adjust endpoint as needed if it differs
-    return apiClient<Quota[]>(API_ENDPOINTS.QUOTAS.BASE);
+  // This assumes a list endpoint exists, typically needed for index pages
+  // Adjust endpoint as needed if it differs
+  return apiClient<Quota[]>(API_ENDPOINTS.QUOTAS.BASE);
 }
 
 export async function getQuotaById(id: number): Promise<Quota> {
-    return apiClient<Quota>(`${API_ENDPOINTS.QUOTAS.BASE}/${id}`);
+  return apiClient<Quota>(`${API_ENDPOINTS.QUOTAS.BASE}/${id}`);
 }

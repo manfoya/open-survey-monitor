@@ -7,10 +7,7 @@ import { GlobalSettings } from "@/features/app-settings/types";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import {
-  CheckCircle,
-  AlertCircle,
-} from "lucide-react";
+import { CheckCircle, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { VariableDataType } from "@/features/variables/types";
 import { CommunicationCard } from "./sections/communication-card";
@@ -103,50 +100,50 @@ export default function GlobalSettingsForm({
 
       <form action={handleSubmit} className="space-y-6">
         <DataSourceCard
-            defaultValues={initialSettings}
-            variables={variables}
-            disabled={isPending}
-            tables={tables}
-            loadingTables={loadingTables}
+          defaultValues={initialSettings}
+          variables={variables}
+          disabled={isPending}
+          tables={tables}
+          loadingTables={loadingTables}
         />
 
         <TimeRulesCard
-            defaultValues={initialSettings}
-            variables={variables}
-            disabled={isPending}
-            errors={state.errors}
+          defaultValues={initialSettings}
+          variables={variables}
+          disabled={isPending}
+          errors={state.errors}
         />
 
         <DayRulesCard
-            defaultValues={initialSettings}
-            disabled={isPending}
-            joursInterdits={joursInterdits}
-            onJourChange={handleJourChange}
+          defaultValues={initialSettings}
+          disabled={isPending}
+          joursInterdits={joursInterdits}
+          onJourChange={handleJourChange}
         />
 
         <GpsRulesCard
-            defaultValues={initialSettings}
-            variables={variables}
-            disabled={isPending}
-            errors={state.errors}
+          defaultValues={initialSettings}
+          variables={variables}
+          disabled={isPending}
+          errors={state.errors}
         />
 
         <DurationRulesCard
-            defaultValues={initialSettings}
-            variables={variables}
-            disabled={isPending}
-            errors={state.errors}
+          defaultValues={initialSettings}
+          variables={variables}
+          disabled={isPending}
+          errors={state.errors}
         />
 
         <SpeedRulesCard
-            defaultValues={initialSettings}
-            disabled={isPending}
-            errors={state.errors}
+          defaultValues={initialSettings}
+          disabled={isPending}
+          errors={state.errors}
         />
 
         <CommunicationCard
-            defaultValues={initialSettings}
-            disabled={isPending}
+          defaultValues={initialSettings}
+          disabled={isPending}
         />
 
         <Separator />

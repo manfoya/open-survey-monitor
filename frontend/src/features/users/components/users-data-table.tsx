@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  TableCell,
-  TableRow,
-} from "@/components/ui/table";
+import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,14 +13,16 @@ import { UserProfile, UserRole } from "@/features/auth/types";
 import { Edit, MoreVertical, Eye } from "lucide-react";
 import Link from "next/link";
 import DeleteUserForm from "@/features/users/components/delete-user-form";
-import { availableColumns, defaultUserColumnVisibility } from "@/features/users/types/table-columns";
+import {
+  availableColumns,
+  defaultUserColumnVisibility,
+} from "@/features/users/types/table-columns";
 import { useTableColumnVisibility } from "@/hooks/use-table-column-visibility";
 import React from "react";
 import { useCurrentUser } from "@/features/auth/contexts/user-context";
 import { PaginatedResponse } from "@/lib/api-types";
 import { useSearchParams } from "next/navigation";
 import { DataTable } from "@/components/shared/data-table";
-
 
 interface UserActionsDropdownProps {
   user: UserProfile;
@@ -37,23 +36,21 @@ interface UsersTableProps {
 
 export default function UsersTable({
   paginatedUsers,
-  query = ""
+  query = "",
 }: UsersTableProps) {
-  const { 
-    columnVisibility, 
-    updateColumnVisibility, 
-    isLoaded 
-  } = useTableColumnVisibility({
-    storageKey: "users-table-column-visibility",
-    defaultVisibility: defaultUserColumnVisibility,
-  });
+  const { columnVisibility, updateColumnVisibility, isLoaded } =
+    useTableColumnVisibility({
+      storageKey: "users-table-column-visibility",
+      defaultVisibility: defaultUserColumnVisibility,
+    });
   const currentUser = useCurrentUser();
   const searchParams = useSearchParams();
   const { items: users, meta: paginationMeta } = paginatedUsers;
 
   // Récupérer les paramètres de tri actuels depuis l'URL
-  const currentSort = searchParams.get("sort_by") || 'id';
-  const currentOrder = (searchParams.get("sort_order") as 'asc' | 'desc') || 'asc';
+  const currentSort = searchParams.get("sort_by") || "id";
+  const currentOrder =
+    (searchParams.get("sort_order") as "asc" | "desc") || "asc";
 
   return (
     <DataTable
@@ -77,8 +74,12 @@ export default function UsersTable({
           {visibleColumns.map((column) => (
             <TableCell
               key={column.key}
-              className={column.key === 'actions' ? 'text-right' : ''}
-              onClick={column.key === 'actions' ? (e) => e.stopPropagation() : undefined}
+              className={column.key === "actions" ? "text-right" : ""}
+              onClick={
+                column.key === "actions"
+                  ? (e) => e.stopPropagation()
+                  : undefined
+              }
             >
               {getCellValue(user, column.key, currentUser)}
             </TableCell>
@@ -90,35 +91,40 @@ export default function UsersTable({
 }
 
 // Fonction pour obtenir la valeur d'une cellule selon la colonne
-function getCellValue (user: UserProfile, columnKey: string, currentUser: UserProfile | null = null) {
+function getCellValue(
+  user: UserProfile,
+  columnKey: string,
+  currentUser: UserProfile | null = null,
+) {
   switch (columnKey) {
-    case 'id':
+    case "id":
       return <span className="font-medium">{user.id}</span>;
-    case 'username':
+    case "username":
       return (
-        <Link href={`/users/${user.id}`} className="hover:underline font-medium">
+        <Link
+          href={`/users/${user.id}`}
+          className="hover:underline font-medium"
+        >
           {user.username}
         </Link>
       );
-    case 'role':
+    case "role":
       return (
         <Badge variant="outline" className={getRoleBadge(user.role)}>
           {user.role}
         </Badge>
       );
-    case 'cspro_code':
+    case "cspro_code":
       return (
-        <span className="font-mono text-sm">
-          {user.cspro_code || "N/A"}
-        </span>
+        <span className="font-mono text-sm">{user.cspro_code || "N/A"}</span>
       );
-    case 'chef':
+    case "chef":
       return (
         <span className="text-sm">
           {user.chef?.username ? `${user.chef?.username}` : "Aucun"}
         </span>
       );
-    case 'actions':
+    case "actions":
       return <UserActionsDropdown user={user} currentUser={currentUser} />;
     default:
       return null;
@@ -127,7 +133,7 @@ function getCellValue (user: UserProfile, columnKey: string, currentUser: UserPr
 
 function UserActionsDropdown({ user, currentUser }: UserActionsDropdownProps) {
   if (!currentUser) return null;
-  
+
   // Logique de permission pour l'affichage du bouton supprimer
   const canDelete =
     currentUser.role === UserRole.DIRECTEUR && // Seul le directeur peut supprimer

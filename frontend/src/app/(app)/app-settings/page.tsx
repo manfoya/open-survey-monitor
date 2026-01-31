@@ -68,5 +68,7 @@ async function AppSettingsFormAsync() {
     );
   }
 
-  return <GlobalSettingsForm initialSettings={settings} variables={variables} />;
+  return (
+    <GlobalSettingsForm initialSettings={settings} variables={variables} />
+  );
 }

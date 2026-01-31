@@ -67,21 +67,27 @@ export function ThemeSelector() {
       label: "SYSTÈME",
       description: "Suit les préférences système",
       preview: (
-        <div 
+        <div
           className={`aspect-video rounded-md border-2 border-muted p-2 ${
-            systemTheme === 'dark' ? 'bg-slate-950' : 'bg-white'
+            systemTheme === "dark" ? "bg-slate-950" : "bg-white"
           }`}
         >
           <div className="space-y-2">
-            <div className={`h-2 rounded ${
-              systemTheme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'
-            }`} />
-            <div className={`h-2 rounded w-3/4 ${
-              systemTheme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'
-            }`} />
-            <div className={`h-2 rounded w-1/2 ${
-              systemTheme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'
-            }`} />
+            <div
+              className={`h-2 rounded ${
+                systemTheme === "dark" ? "bg-slate-700" : "bg-slate-200"
+              }`}
+            />
+            <div
+              className={`h-2 rounded w-3/4 ${
+                systemTheme === "dark" ? "bg-slate-800" : "bg-slate-100"
+              }`}
+            />
+            <div
+              className={`h-2 rounded w-1/2 ${
+                systemTheme === "dark" ? "bg-slate-800" : "bg-slate-100"
+              }`}
+            />
           </div>
         </div>
       ),
