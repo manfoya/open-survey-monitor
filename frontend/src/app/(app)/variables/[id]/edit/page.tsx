@@ -77,7 +77,7 @@ async function UpdateVariableFormAsync({ variableId }: { variableId: number }) {
     return (
       <ErrorState
         title="Accès refusé"
-        message="Seuls les directeurs peuvent modifier les variables."
+        message="Seuls un directeur peut modifier les variables."
         primaryAction={{ label: "Retour aux variables", href: "/variables" }}
         showRefresh={false}
       />

@@ -35,7 +35,7 @@ export default async function EditZonePage({ params }: EditZonePageProps) {
         <div className="container mx-auto py-6 max-w-2xl">
           <ErrorState
             title="Accès refusé"
-            message="Seuls les directeurs peuvent modifier les zones géographiques."
+            message="Seuls un directeur peut modifier les zones géographiques."
             primaryAction={{ label: "Retour aux zones", href: "/zones" }}
             showRefresh={false}
           />

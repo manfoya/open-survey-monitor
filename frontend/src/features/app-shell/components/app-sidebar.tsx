@@ -62,19 +62,27 @@ export default function AppSideBar() {
               <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
               <SidebarMenu>
                 {accessibleItems.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      tooltip={item.title}
-                      isActive={pathname === item.url}
-                    >
-                      <Link href={item.url}>
-                        <item.icon className="size-4" />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        tooltip={item.title}
+                        isActive={pathname.startsWith(item.url)}
+                      >
+                        {group.label === "Missions" ? (
+                          <div className="text-muted-foreground cursor-not-allowed">
+                            <item.icon className="size-4" />
+                            <span>{item.title}</span>
+                          </div>
+                        ) : (
+                          <Link href={item.url}>
+                            <item.icon className="size-4" />
+                            <span>{item.title}</span>
+                          </Link>
+                        )}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                )}
               </SidebarMenu>
             </SidebarGroup>
           );

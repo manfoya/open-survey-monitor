@@ -18,7 +18,7 @@ export default async function AppSettingsPage() {
         <div className="container mx-auto py-6 max-w-4xl">
           <ErrorState
             title="Accès refusé"
-            message="Seuls les directeurs peuvent accéder aux paramètres de l'application."
+            message="Seuls un directeur peut accéder aux paramètres de l'application."
             primaryAction={{ label: "Retour à l'accueil", href: "/overview" }}
             showRefresh={false}
           />

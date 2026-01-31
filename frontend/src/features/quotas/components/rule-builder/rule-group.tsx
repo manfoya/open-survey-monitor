@@ -8,8 +8,9 @@ import {
 } from "@/components/ui/select";
 import { QuotaGroup, QuotaRule } from "@/features/quotas/types";
 import { VariableDataType } from "@/features/variables/types";
-import { Plus, Trash, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import RuleItem from "./rule-item";
+import { memo } from "react";
 
 interface RuleGroupProps {
   group: QuotaGroup;
@@ -19,7 +20,7 @@ interface RuleGroupProps {
   depth?: number;
 }
 
-export default function RuleGroup({
+const RuleGroup = memo(function RuleGroup({
   group,
   variables,
   onChange,
@@ -27,9 +28,8 @@ export default function RuleGroup({
   depth = 0,
 }: RuleGroupProps) {
   const handleAddRule = () => {
-    // Default new rule
     const newRule: QuotaRule = {
-      // id: crypto.randomUUID(), // Need a way to track inputs if using React keys, but here index might suffice for simple structure
+      id: crypto.randomUUID(),
       field: variables[0]?.slug || "",
       operator: "equals",
       value: "",
@@ -42,6 +42,7 @@ export default function RuleGroup({
 
   const handleAddGroup = () => {
     const newGroup: QuotaGroup = {
+      id: crypto.randomUUID(),
       combinator: "and",
       rules: [],
     };
@@ -97,6 +98,7 @@ export default function RuleGroup({
         <div className="flex items-center gap-2">
           {onRemove && (
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               className="text-destructive h-8 px-2"
@@ -111,13 +113,13 @@ export default function RuleGroup({
 
       <div className="flex flex-col gap-3">
         {group.rules.map((ruleOrGroup, index) => {
-          // Detect if it's a group or a rule
           const isGroup = "rules" in ruleOrGroup;
+          const itemKey = ruleOrGroup.id || index;
 
           if (isGroup) {
             return (
               <RuleGroup
-                key={index} // Ideally use ID if available
+                key={itemKey}
                 group={ruleOrGroup as QuotaGroup}
                 variables={variables}
                 depth={depth + 1}
@@ -130,7 +132,7 @@ export default function RuleGroup({
           } else {
             return (
               <RuleItem
-                key={index}
+                key={itemKey}
                 rule={ruleOrGroup as QuotaRule}
                 variables={variables}
                 onChange={(updatedRule) => handleUpdateItem(index, updatedRule)}
@@ -148,15 +150,27 @@ export default function RuleGroup({
       </div>
 
       <div className="flex items-center gap-2 mt-2">
-        <Button variant="outline" size="sm" onClick={handleAddRule}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleAddRule}
+        >
           <Plus className="h-3 w-3 mr-2" />
           Ajouter une règle
         </Button>
-        <Button variant="ghost" size="sm" onClick={handleAddGroup}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={handleAddGroup}
+        >
           <Plus className="h-3 w-3 mr-2" />
           Ajouter un groupe
         </Button>
       </div>
     </div>
   );
-}
+});
+
+export default RuleGroup;

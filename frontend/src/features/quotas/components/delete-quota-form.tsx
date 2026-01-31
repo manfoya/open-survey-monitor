@@ -1,0 +1,61 @@
+"use client";
+
+import { Trash2 } from "lucide-react";
+import {
+  deleteQuotaAction,
+  DeleteQuotaState,
+} from "@/features/quotas/actions/delete-quota-action";
+import { toast } from "sonner";
+import { useActionState, useEffect } from "react";
+
+interface DeleteQuotaFormProps {
+  quotaId: number;
+  className?: string;
+  buttonClassName?: string;
+  showIcon?: boolean;
+  buttonText?: string;
+  redirectOnSuccess?: boolean;
+}
+
+export default function DeleteQuotaForm({
+  quotaId,
+  className = "inline",
+  buttonClassName = "flex w-full items-center text-destructive cursor-pointer",
+  showIcon = true,
+  buttonText = "Supprimer",
+  redirectOnSuccess = false,
+}: DeleteQuotaFormProps) {
+  const deleteQuotaActionWithId = deleteQuotaAction.bind(null, quotaId);
+  const [state, formAction, isPending] = useActionState<
+    DeleteQuotaState,
+    FormData
+  >(deleteQuotaActionWithId, {});
+
+  useEffect(() => {
+    if (state.success === true) {
+      toast.success(state.message || "Quota supprimé avec succès !");
+    } else if (state.success === false) {
+      toast.error(state.message || "Erreur lors de la suppression du quota.");
+    }
+  }, [state]);
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce quota ?")) {
+      event.preventDefault();
+    }
+  };
+
+  return (
+    <form action={formAction} className={className} onSubmit={handleSubmit}>
+      <button type="submit" className={buttonClassName} disabled={isPending}>
+        {showIcon && <Trash2 className="mr-4 h-4 w-4" />}
+        {isPending ? "Suppression..." : buttonText}
+      </button>
+      <input
+        type="hidden"
+        name="redirectOnSuccess"
+        value={redirectOnSuccess.toString()}
+      />
+    </form>
+  );
+}

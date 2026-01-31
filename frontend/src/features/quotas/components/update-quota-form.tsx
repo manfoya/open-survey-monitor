@@ -7,9 +7,8 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useTransition, useActionState, useEffect } from "react";
 import { VariableDataType } from "@/features/variables/types";
-import { CreateQuotaDTO } from "@/features/quotas/types";
-import { createQuotaAction } from "@/features/quotas/actions/create-quota-action";
-import { CreateQuotaValues } from "@/features/quotas/schemas/quota-schema";
+import { CreateQuotaDTO, Quota } from "@/features/quotas/types";
+import { updateQuotaAction } from "@/features/quotas/actions/update-quota-action";
 import QuotaExpressionPreview from "./quota-expression-preview";
 import useQuotaForm from "../hooks/use-quota-form";
 import RuleBuilder from "./rule-builder";
@@ -17,27 +16,33 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sliders } from "lucide-react";
 import { Label } from "@/components/ui/label";
 
-interface CreateQuotaFormProps {
+interface UpdateQuotaFormProps {
+  quota: Quota;
   variables: VariableDataType[];
 }
 
-export default function CreateQuotaForm({ variables }: CreateQuotaFormProps) {
+export default function UpdateQuotaForm({
+  quota,
+  variables,
+}: UpdateQuotaFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   // Form State
-  const { state: formState, actions: formActions } = useQuotaForm();
+  const { state: formState, actions: formActions } = useQuotaForm(quota);
   const { description, isActive, definition } = formState;
 
   // Server Action
-  const [state, action] = useActionState(createQuotaAction, {
+  // We bind the ID to the action
+  const updateQuotaWithId = updateQuotaAction.bind(null, quota.id);
+  const [state, action] = useActionState(updateQuotaWithId, {
     success: false,
   });
 
   // Effect to handle success
   useEffect(() => {
     if (state.success) {
-      toast.success(state.message || "Quota créé avec succès");
+      toast.success(state.message || "Quota mis à jour avec succès");
       router.push("/quotas");
       router.refresh();
     } else if (state.message && !state.success) {
@@ -62,6 +67,18 @@ export default function CreateQuotaForm({ variables }: CreateQuotaFormProps) {
         is_active: isActive,
         definition,
       };
+      // The action expects the payload directly because we bound the ID
+      // But useActionState wraps it to pass formData?
+      // No, with bind, the first args are fixed.
+      // createQuotaAction signature: (prevState, values).
+      // updateQuotaAction signature: (id, prevState, values).
+      // updateQuotaWithId signature: (prevState, values).
+      // This matches what useActionState expects for the trigger function: (payload) => void
+      // Wait, useActionState(fn, initialState) returns [state, dispatch].
+      // dispatch(payload) calls fn(state, payload).
+      // so dispatch(payload) calls updateQuotaWithId(state, payload)
+      // -> updateQuotaAction(id, state, payload).
+      // Yes, this is correct.
       action(payload);
     });
   };
@@ -93,9 +110,6 @@ export default function CreateQuotaForm({ variables }: CreateQuotaFormProps) {
                   {state.errors.description}
                 </p>
               )}
-              <p className="text-sm text-muted-foreground">
-                Donnez un nom clair qui décrit la population ciblée.
-              </p>
             </div>
 
             <div className="flex flex-row items-center justify-between rounded-lg border p-4">
@@ -153,7 +167,7 @@ export default function CreateQuotaForm({ variables }: CreateQuotaFormProps) {
           Annuler
         </Button>
         <Button type="submit" disabled={isPending}>
-          {isPending ? "Enregistrement..." : "Créer le quota"}
+          {isPending ? "Mise à jour..." : "Mettre à jour le quota"}
         </Button>
       </div>
     </form>

@@ -26,8 +26,20 @@ export interface CreateQuotaDTO {
   definition: QuotaDefinition;
 }
 
+export interface UserQuota {
+  user_id: number;
+  username: string; // Assuming basic info provided, need to verify or handle if it's nested
+  full_name?: string;
+  effectif_actuel: number;
+  taux_completion: number;
+}
+
 export interface Quota extends CreateQuotaDTO {
   id: number;
+  effectif_cible_total: number;
+  effectif_actuel_total: number;
+  taux_completion_global: number;
+  user_quotas: UserQuota[];
   created_at?: string;
   updated_at?: string;
 }

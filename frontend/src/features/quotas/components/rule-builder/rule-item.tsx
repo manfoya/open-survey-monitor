@@ -14,7 +14,7 @@ import {
   VariableDataType,
 } from "@/features/variables/types";
 import { Trash2 } from "lucide-react";
-import { useEffect } from "react";
+import { memo } from "react";
 
 interface RuleItemProps {
   rule: QuotaRule;
@@ -23,31 +23,27 @@ interface RuleItemProps {
   onRemove: () => void;
 }
 
-export default function RuleItem({
+const RuleItem = memo(function RuleItem({
   rule,
   variables,
   onChange,
   onRemove,
 }: RuleItemProps) {
   const selectedVariable = variables.find((v) => v.slug === rule.field);
+  const operators = AVAILABLE_OPERATORS.filter(
+    (op) => !selectedVariable?.excluded_operators?.includes(op.value),
+  );
 
-  // Filter operators based on selected variable type (optional refinement)
-  // For now, allow all, but you could restrict lists to "equals/in_list" etc.
-  const operators = AVAILABLE_OPERATORS;
-
-  // Reset value/operator if variable changes type? (complex, let's keep simple first)
   const handleVariableChange = (slug: string) => {
-    const newVar = variables.find((v) => v.slug === slug);
     onChange({
       ...rule,
       field: slug,
-      value: "", // Reset value on field change
+      value: "",
     });
   };
 
   return (
     <div className="flex items-center gap-2 p-2 bg-background border rounded-md">
-      {/* Variable Selector */}
       <Select value={rule.field} onValueChange={handleVariableChange}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Variable" />
@@ -61,7 +57,6 @@ export default function RuleItem({
         </SelectContent>
       </Select>
 
-      {/* Operator Selector */}
       <Select
         value={rule.operator}
         onValueChange={(val: any) => onChange({ ...rule, operator: val })}
@@ -78,7 +73,6 @@ export default function RuleItem({
         </SelectContent>
       </Select>
 
-      {/* Value Input - Adapts to Variable Type */}
       <div className="flex-1">
         {selectedVariable?.data_type === DataType.LIST &&
         selectedVariable.modalites ? (
@@ -117,6 +111,7 @@ export default function RuleItem({
       </div>
 
       <Button
+        type="button"
         variant="ghost"
         size="icon"
         className="text-destructive hover:bg-destructive/10"
@@ -126,4 +121,6 @@ export default function RuleItem({
       </Button>
     </div>
   );
-}
+});
+
+export default RuleItem;

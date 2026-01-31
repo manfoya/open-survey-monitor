@@ -7,6 +7,8 @@ import {
   MapPin,
   Database,
   Mail,
+  Ruler,
+  Target,
 } from "lucide-react";
 import { UserRole } from "../auth/types";
 
@@ -44,6 +46,29 @@ export const navGroups: NavGroup[] = [
         title: "Variables",
         url: "/variables",
         icon: Database,
+        roles: [UserRole.DIRECTEUR],
+      },
+      {
+        title: "Quotas",
+        url: "/quotas",
+        icon: Ruler,
+        roles: [UserRole.DIRECTEUR],
+      },
+    ],
+  },
+  {
+    label: "Missions",
+    items: [
+      {
+        title: "Affectations de zones",
+        url: "/missions/zones",
+        icon: MapPin,
+        roles: [UserRole.DIRECTEUR],
+      },
+      {
+        title: "Assignations de quotas",
+        url: "/missions/quotas",
+        icon: Target,
         roles: [UserRole.DIRECTEUR],
       },
     ],

@@ -8,10 +8,6 @@ app = FastAPI(
     title="Open Survey Monitor API",
     description="Backend pour le suivi d'enquêtes terrain CSPro",
     version="1.0.0",
-    root_path="/8000",
-    servers=[
-        {"url": "/8000", "description": ""}
-    ],
 )
 
 # configuration cors
