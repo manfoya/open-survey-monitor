@@ -11,6 +11,7 @@ import ValidationIndicator from "./validation-indicator";
 import { createVariableAction } from "@/features/variables/actions/create-variable-action";
 import { toast } from "sonner";
 import { useTransition } from "react";
+import Link from "next/link";
 
 export default function CreateVariableForm() {
   const [isPending, startTransition] = useTransition();
@@ -112,9 +113,11 @@ function FormActions({ isPending = false }: { isPending?: boolean }) {
       <Button type="submit" className="flex-1" disabled={isPending}>
         Créer la variable
       </Button>
-      <Button type="button" variant="outline" className="flex-1">
-        Annuler
-      </Button>
+      <Link href="/variables">
+        <Button type="button" variant="outline" className="flex-1">
+          Annuler
+        </Button>
+      </Link>
     </div>
   );
 }

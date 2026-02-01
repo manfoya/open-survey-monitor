@@ -39,15 +39,21 @@ export default function AffectationsDataTable({
   affectations,
   query = "",
 }: AffectationsTableProps) {
-  const filteredAffectations = useMemo(() => (affectations.filter((affectation) => {
-    if (!query) return true;
-    const lowerQuery = query.toLowerCase();
-    const zoneMatch = affectation.nom_zone?.toLowerCase().includes(lowerQuery);
-    const controllerMatch = affectation.nom_controleur
-      ?.toLowerCase()
-      .includes(lowerQuery);
-    return zoneMatch || controllerMatch;
-  })), [affectations, query]);
+  const filteredAffectations = useMemo(
+    () =>
+      affectations.filter((affectation) => {
+        if (!query) return true;
+        const lowerQuery = query.toLowerCase();
+        const zoneMatch = affectation.nom_zone
+          ?.toLowerCase()
+          .includes(lowerQuery);
+        const controllerMatch = affectation.nom_controleur
+          ?.toLowerCase()
+          .includes(lowerQuery);
+        return zoneMatch || controllerMatch;
+      }),
+    [affectations, query],
+  );
 
   return (
     <div className="rounded-md border">

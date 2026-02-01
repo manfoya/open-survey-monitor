@@ -13,7 +13,8 @@ import QuotaExpressionPreview from "./quota-expression-preview";
 import useQuotaForm from "../hooks/use-quota-form";
 import RuleBuilder from "./rule-builder";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sliders } from "lucide-react";
+import { AlertCircle, Edit, Sliders } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 
 interface UpdateQuotaFormProps {
@@ -27,6 +28,8 @@ export default function UpdateQuotaForm({
 }: UpdateQuotaFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+
+  const isUsed = quota.user_quotas && quota.user_quotas.some((uq) => uq.effectif_actuel > 0);
 
   // Form State
   const { state: formState, actions: formActions } = useQuotaForm(quota);
@@ -67,24 +70,24 @@ export default function UpdateQuotaForm({
         is_active: isActive,
         definition,
       };
-      // The action expects the payload directly because we bound the ID
-      // But useActionState wraps it to pass formData?
-      // No, with bind, the first args are fixed.
-      // createQuotaAction signature: (prevState, values).
-      // updateQuotaAction signature: (id, prevState, values).
-      // updateQuotaWithId signature: (prevState, values).
-      // This matches what useActionState expects for the trigger function: (payload) => void
-      // Wait, useActionState(fn, initialState) returns [state, dispatch].
-      // dispatch(payload) calls fn(state, payload).
-      // so dispatch(payload) calls updateQuotaWithId(state, payload)
-      // -> updateQuotaAction(id, state, payload).
-      // Yes, this is correct.
       action(payload);
     });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
+      {isUsed && (
+        <Alert className="border-amber-200 text-amber-200">
+          <AlertCircle className="h-4 w-4 text-amber-600" />
+          <AlertTitle className="text-amber-200">Quota en cours d'utilisation</AlertTitle>
+          <AlertDescription className="text-amber-200">
+            Ce quota est déjà utilisé par des agents. Pour garantir la cohérence des données, 
+            sa définition (règles) et son statut ne peuvent plus être modifiés. 
+            Seule la description peut être mise à jour.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="grid gap-6">
         {/* Informations Générales */}
         <Card>
@@ -125,7 +128,7 @@ export default function UpdateQuotaForm({
                 id="is_active"
                 checked={isActive}
                 onCheckedChange={formActions.onIsActiveChange}
-                disabled={isPending}
+                disabled={isPending || isUsed}
               />
             </div>
           </CardContent>
@@ -144,6 +147,7 @@ export default function UpdateQuotaForm({
               variables={variables}
               value={definition}
               onChange={formActions.onDefinitionChange}
+              disabled={isUsed}
             />
 
             <QuotaExpressionPreview

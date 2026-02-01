@@ -11,6 +11,7 @@ import Search from "@/components/search";
 import PageHeader from "@/components/page-header";
 import { AffectationsTableSkeleton } from "@/features/affectations-zones/components/affectations-table-skeleton";
 import { AffectationsEmptyState } from "@/features/affectations-zones/components/affectations-empty-state";
+import { ActiveFilterCheckbox } from "@/components/active-filter-checkbox";
 
 export default async function AffectationsPage(props: {
   searchParams?: Promise<{
@@ -19,6 +20,7 @@ export default async function AffectationsPage(props: {
     size?: string;
     sort_by?: string;
     sort_order?: "asc" | "desc";
+    active_only?: string;
   }>;
 }) {
   const searchParams = await props.searchParams;
@@ -27,6 +29,7 @@ export default async function AffectationsPage(props: {
   const size = searchParams?.size || "10";
   const sort_by = searchParams?.sort_by || "id";
   const sort_order = searchParams?.sort_order || "asc";
+  const activeOnly = searchParams?.active_only === "true";
 
   return (
     <div className="container mx-auto py-6">
@@ -44,9 +47,14 @@ export default async function AffectationsPage(props: {
           </RoleGuard>
         }
       />
-
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col mb-6 gap-4">
         <Search placeholder="Rechercher une affectation..." />
+        <p className="text-muted-foreground text-xs">
+          Filtre d'affectations actives non disponible pour le moment
+        </p>
+        <div className="hidden">
+          <ActiveFilterCheckbox />
+        </div>
       </div>
 
       <Suspense fallback={<AffectationsTableSkeleton />}>
@@ -56,6 +64,7 @@ export default async function AffectationsPage(props: {
           size={size}
           sort_by={sort_by}
           sort_order={sort_order}
+          activeOnly={activeOnly}
         />
       </Suspense>
     </div>
@@ -64,12 +73,14 @@ export default async function AffectationsPage(props: {
 
 async function AffectationsTableAsync({
   query,
+  activeOnly,
 }: {
   query: string;
   page?: string;
   size?: string;
   sort_by?: string;
   sort_order?: "asc" | "desc";
+  activeOnly: boolean;
 }) {
   const currentUser = await getMe();
 
@@ -77,7 +88,7 @@ async function AffectationsTableAsync({
     return <div>Erreur lors du chargement du profil utilisateur.</div>;
   }
 
-  const affectations = await getAffectations(query);
+  const affectations = await getAffectations(query, activeOnly);
 
   if (affectations.length === 0) {
     return <AffectationsEmptyState query={query} />;

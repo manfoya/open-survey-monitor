@@ -21,7 +21,7 @@ export default function JSONPreview({
           Aperçu JSON (Données envoyées)
         </CardTitle>
         <CardDescription>
-          Structure des données qui seront envoyées au backend
+          Structure des données qui seront envoyées au serveur
         </CardDescription>
       </CardHeader>
       <CardContent>

@@ -62,6 +62,11 @@ def assign_quota_to_user(
     if target_user.role != RoleEnum.agent:
         raise HTTPException(status_code=400, detail="Les quotas ne peuvent être assignés qu'aux agents (enquêteurs).")
 
+    # Vérifier l'existence du quota
+    quota = db.query(Quota).filter(Quota.id == assignment_in.quota_id).first()
+    if not quota:
+        raise HTTPException(status_code=404, detail="Quota introuvable")
+
     # Vérifier doublon
     existing = db.query(UserQuota).filter(
         UserQuota.user_id == assignment_in.user_id,
@@ -192,6 +197,26 @@ def update_assignment(
     db.refresh(uq)
     return uq
 
+@router.delete("/assignments/{assignment_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_assignment(
+    assignment_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    [Superviseur/Directeur] Supprimer une assignation de quota.
+    """
+    if current_user.role not in [RoleEnum.directeur, RoleEnum.superviseur]:
+        raise HTTPException(status_code=403, detail="Non autorisé")
+
+    uq = db.query(UserQuota).filter(UserQuota.id == assignment_id).first()
+    if not uq:
+        raise HTTPException(status_code=404, detail="Assignation introuvable")
+
+    db.delete(uq)
+    db.commit()
+    return None
+
 # ==============================================================================
 # 1. GESTION DES DÉFINITIONS DE QUOTAS (ADMINISTRATION)
 # ==============================================================================
@@ -268,9 +293,21 @@ def update_quota(
     if not quota:
         raise HTTPException(status_code=404, detail="Quota introuvable")
 
+    # Vérifier si le quota est "utilisé" (au moins une enquête réalisée)
+    is_used = any(uq.effectif_actuel > 0 for uq in quota.user_quotas)
+    
     # Mise à jour partielle
     update_data = quota_in.model_dump(exclude_unset=True)
-    
+
+    if is_used:
+        # Si utilisé, on ne permet QUE la modification de la description
+        forbidden_fields = [k for k in update_data.keys() if k != "description"]
+        if forbidden_fields:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Ce quota est déjà utilisé. Seule la description peut être modifiée. Champs interdits: {', '.join(forbidden_fields)}"
+            )
+
     # Si on met à jour la définition, on s'assure qu'elle est bien en dict
     if 'definition' in update_data and update_data['definition']:
         # Note: Pydantic a déjà validé la structure
@@ -300,6 +337,14 @@ def delete_quota(
     if not quota:
         raise HTTPException(status_code=404, detail="Quota introuvable")
     
+    # Empêcher la suppression d'un quota déjà utilisé
+    is_used = any(uq.effectif_actuel > 0 for uq in quota.user_quotas)
+    if is_used:
+        raise HTTPException(
+            status_code=400,
+            detail="Impossible de supprimer un quota qui est déjà utilisé (des enquêtes ont été réalisées)."
+        )
+
     # Optional: Vérifier s'il y a des user_quotas liés et bloquer ?
     # Pour l'instant on laisse le cascade delete (si configuré) ou erreur SQL.
     db.delete(quota)

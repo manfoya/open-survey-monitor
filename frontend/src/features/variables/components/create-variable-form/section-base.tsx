@@ -43,35 +43,38 @@ export default function BaseInfoSection({
         <CardDescription>Configuration générale de la variable</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Label pour humain */}
-          <div className="space-y-2">
-            <Label htmlFor="label">Libellé</Label>
-            <Input
-              id="label"
-              placeholder="ex: Sexe du chef de ménage"
-              value={label}
-              onChange={(e) => onLabelChange(e.target.value)}
-            />
-          </div>
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Label pour humain */}
+            <div className="space-y-2">
+              <Label htmlFor="label">Libellé</Label>
+              <Input
+                id="label"
+                placeholder="ex: Sexe du chef de ménage"
+                value={label}
+                onChange={(e) => onLabelChange(e.target.value)}
+              />
+            </div>
 
-          {/* Slug pour système */}
-          <div className="space-y-2">
-            <Label htmlFor="slug">Identifiant technique (slug)</Label>
-            <Input
-              id="slug"
-              value={slug}
-              onChange={(e) => onSlugChange(e.target.value)}
-              className="bg-muted font-mono text-sm"
-              placeholder="sexe_cm"
-            />
-            <p className="text-xs text-muted-foreground">
-              Généré automatiquement à partir du libellé
-            </p>
+            {/* Slug pour système */}
+            <div className="space-y-2">
+              <Label htmlFor="slug">Identifiant technique (slug)</Label>
+              <Input
+                id="slug"
+                value={slug}
+                onChange={(e) => onSlugChange(e.target.value)}
+                className="bg-muted font-mono text-sm"
+                placeholder="sexe_cm"
+              />
+              <p className="text-xs text-muted-foreground">
+                Généré automatiquement à partir du libellé
+              </p>
+            </div>
           </div>
-
-          <DataTypeSelect value={dataType} onValueChange={onDataTypeChange} />
-          <QuotaSwitch value={isQuota} onCheckedChange={onIsQuotaChange} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 shrink-0">
+            <DataTypeSelect value={dataType} onValueChange={onDataTypeChange} />
+            <QuotaSwitch value={isQuota} onCheckedChange={onIsQuotaChange} />
+          </div>
         </div>
       </CardContent>
     </Card>

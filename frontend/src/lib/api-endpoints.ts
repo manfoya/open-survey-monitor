@@ -36,5 +36,7 @@ export const API_ENDPOINTS = {
     BASE: "/quotas/",
     BY_ID: (id: number) => `/quotas/${id}`,
     ASSIGNMENTS: "/quotas/assignments",
+    ASSIGNMENT_BY_ID: (id: number) => `/quotas/assignments/${id}`,
+    BULK_ASSIGNMENTS: "/quotas/assignments/bulk",
   },
 } as const;

@@ -16,7 +16,7 @@ import { VariableFormSkeleton } from "@/features/variables/components/variable-f
 export default function CreateVariablePage() {
   return (
     <RoleGuard allowedRoles={[UserRole.DIRECTEUR]}>
-      <div className="container mx-auto py-6 max-w-2xl">
+      <div className="container mx-auto py-6 lg:max-w-5xl">
         <PageHeader
           title="Créer une nouvelle variable"
           description="Définissez une nouvelle variable de données pour vos enquêtes."

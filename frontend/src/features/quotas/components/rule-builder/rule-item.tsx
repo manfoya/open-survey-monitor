@@ -21,6 +21,7 @@ interface RuleItemProps {
   variables: VariableDataType[];
   onChange: (updatedRule: QuotaRule) => void;
   onRemove: () => void;
+  disabled?: boolean;
 }
 
 const RuleItem = memo(function RuleItem({
@@ -28,6 +29,7 @@ const RuleItem = memo(function RuleItem({
   variables,
   onChange,
   onRemove,
+  disabled = false,
 }: RuleItemProps) {
   const selectedVariable = variables.find((v) => v.slug === rule.field);
   const operators = AVAILABLE_OPERATORS.filter(
@@ -44,7 +46,11 @@ const RuleItem = memo(function RuleItem({
 
   return (
     <div className="flex items-center gap-2 p-2 bg-background border rounded-md">
-      <Select value={rule.field} onValueChange={handleVariableChange}>
+      <Select
+        value={rule.field}
+        onValueChange={handleVariableChange}
+        disabled={disabled}
+      >
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Variable" />
         </SelectTrigger>
@@ -60,6 +66,7 @@ const RuleItem = memo(function RuleItem({
       <Select
         value={rule.operator}
         onValueChange={(val: any) => onChange({ ...rule, operator: val })}
+        disabled={disabled}
       >
         <SelectTrigger className="w-[160px]">
           <SelectValue placeholder="Opérateur" />
@@ -79,6 +86,7 @@ const RuleItem = memo(function RuleItem({
           <Select
             value={String(rule.value)}
             onValueChange={(val) => onChange({ ...rule, value: val })}
+            disabled={disabled}
           >
             <SelectTrigger>
               <SelectValue placeholder="Choisir une valeur" />
@@ -99,6 +107,7 @@ const RuleItem = memo(function RuleItem({
               onChange({ ...rule, value: Number(e.target.value) })
             }
             placeholder="Valeur numérique"
+            disabled={disabled}
           />
         ) : (
           <Input
@@ -106,6 +115,7 @@ const RuleItem = memo(function RuleItem({
             value={rule.value as string}
             onChange={(e) => onChange({ ...rule, value: e.target.value })}
             placeholder="Valeur"
+            disabled={disabled}
           />
         )}
       </div>
@@ -116,6 +126,7 @@ const RuleItem = memo(function RuleItem({
         size="icon"
         className="text-destructive hover:bg-destructive/10"
         onClick={onRemove}
+        disabled={disabled}
       >
         <Trash2 className="h-4 w-4" />
       </Button>

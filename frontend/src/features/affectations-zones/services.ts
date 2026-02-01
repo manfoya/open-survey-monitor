@@ -69,6 +69,7 @@ export const deleteAffectation = async (id: number): Promise<void> => {
 
 export const getAffectations = async (
   query?: string,
+  active_only?: boolean,
 ): Promise<Affectation[]> => {
   const headers = await getHeaders();
   if (!headers) {
@@ -77,6 +78,7 @@ export const getAffectations = async (
 
   const searchParams = new URLSearchParams();
   if (query) searchParams.set("search", query);
+  if (active_only) searchParams.set("active_only", "true");
 
   const url = `${API_ENDPOINTS.AFFECTATIONS.BASE}?${searchParams.toString()}`;
 

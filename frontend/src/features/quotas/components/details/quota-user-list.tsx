@@ -8,10 +8,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { UserQuota } from "@/features/quotas/types";
+import { QuotaAssignment } from "@/features/quotas-assignments/types";
+import Link from "next/link";
 
 interface QuotaUserListProps {
-  userQuotas: UserQuota[];
+  userQuotas: QuotaAssignment[];
 }
 
 export default function QuotaUserList({ userQuotas }: QuotaUserListProps) {
@@ -28,22 +29,19 @@ export default function QuotaUserList({ userQuotas }: QuotaUserListProps) {
                 <TableHead className="w-[80px]">ID</TableHead>
                 <TableHead>Enquêteur</TableHead>
                 <TableHead>Réalisé</TableHead>
+                <TableHead>Cible</TableHead>
                 <TableHead className="w-[200px]">Progression</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {userQuotas.map((uq: UserQuota) => (
+              {userQuotas.map((uq: QuotaAssignment) => (
                 <TableRow key={uq.user_id}>
-                  <TableCell>{uq.user_id}</TableCell>
+                  <TableCell>{uq.user.id}</TableCell>
                   <TableCell className="font-medium">
-                    <div>{uq.full_name || uq.username}</div>
-                    {uq.full_name && (
-                      <div className="text-sm text-muted-foreground">
-                        {uq.username}
-                      </div>
-                    )}
+                    <Link className="hover:underline" href={`/users/${uq.user.id}`}>{uq.user.username}</Link>
                   </TableCell>
                   <TableCell>{uq.effectif_actuel}</TableCell>
+                  <TableCell>{uq.effectif_cible}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Progress

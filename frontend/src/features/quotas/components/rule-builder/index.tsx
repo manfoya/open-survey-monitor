@@ -6,19 +6,22 @@ interface RuleBuilderProps {
   variables: VariableDataType[];
   value: QuotaDefinition;
   onChange: (value: QuotaDefinition) => void;
+  disabled?: boolean;
 }
 
 export default function RuleBuilder({
   variables,
   value,
   onChange,
+  disabled = false,
 }: RuleBuilderProps) {
   return (
-    <div className="border rounded-md bg-muted/10 p-4">
+    <div className={`border rounded-md bg-muted/10 p-4 ${disabled ? "opacity-60 grayscale-[0.5] pointer-events-none" : ""}`}>
       <RuleGroup
         group={value} // QuotaDefinition structure matches QuotaGroup
         variables={variables}
         onChange={onChange}
+        disabled={disabled}
         // Root cannot be removed
       />
     </div>

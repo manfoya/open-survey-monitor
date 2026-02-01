@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Edit, MoreHorizontal } from "lucide-react";
+import { Edit, MoreVertical } from "lucide-react";
 import Link from "next/link";
 import { Affectation } from "../types";
 import { ClientRoleGuard } from "@/features/auth/components/role-guard";
@@ -24,14 +24,14 @@ interface AffectationActionsDropdownProps {
 export default function AffectationActionsDropdown({
   affectation,
 }: AffectationActionsDropdownProps) {
-    const user = useCurrentUser();
+  const user = useCurrentUser();
   return (
     <ClientRoleGuard allowedRoles={[UserRole.DIRECTEUR]} user={user}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-8 w-8 p-0">
             <span className="sr-only">Ouvrir le menu</span>
-            <MoreHorizontal className="h-4 w-4" />
+            <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
@@ -42,9 +42,12 @@ export default function AffectationActionsDropdown({
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          
+
           <DropdownMenuItem asChild>
-             <DeleteAffectationForm affectationId={affectation.id} className="w-full" />
+            <DeleteAffectationForm
+              affectationId={affectation.id}
+              className="w-full"
+            />
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

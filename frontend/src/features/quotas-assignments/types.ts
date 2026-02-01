@@ -1,4 +1,3 @@
-
 import { UserRole } from "@/features/auth/types";
 
 export interface QuotaAssignment {
@@ -21,4 +20,24 @@ export interface QuotaAssignment {
     role: UserRole;
     cspro_code: string;
   };
+}
+
+export interface CreateQuotaAssignmentDTO {
+  user_id: number;
+  quota_id: number;
+  effectif_cible: number;
+  is_active: boolean;
+}
+
+export interface UpdateQuotaAssignmentDTO {
+  effectif_cible: number;
+  effectif_actuel: number;
+  is_active: boolean;
+}
+
+export interface BulkQuotaAssignmentDTO {
+  quota_id: number;
+  user_ids: number[];
+  effectif_cible: number;
+  is_active: boolean;
 }

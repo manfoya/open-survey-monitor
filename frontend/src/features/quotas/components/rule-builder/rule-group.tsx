@@ -18,6 +18,7 @@ interface RuleGroupProps {
   onChange: (updatedGroup: QuotaGroup) => void;
   onRemove?: () => void; // Root group has no remove
   depth?: number;
+  disabled?: boolean;
 }
 
 const RuleGroup = memo(function RuleGroup({
@@ -26,6 +27,7 @@ const RuleGroup = memo(function RuleGroup({
   onChange,
   onRemove,
   depth = 0,
+  disabled = false,
 }: RuleGroupProps) {
   const handleAddRule = () => {
     const newRule: QuotaRule = {
@@ -84,6 +86,7 @@ const RuleGroup = memo(function RuleGroup({
             onValueChange={(val: "and" | "or") =>
               onChange({ ...group, combinator: val })
             }
+            disabled={disabled}
           >
             <SelectTrigger className="w-[100px] h-8 bg-background">
               <SelectValue />
@@ -103,6 +106,7 @@ const RuleGroup = memo(function RuleGroup({
               size="sm"
               className="text-destructive h-8 px-2"
               onClick={onRemove}
+              disabled={disabled}
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Supprimer le groupe
@@ -123,6 +127,7 @@ const RuleGroup = memo(function RuleGroup({
                 group={ruleOrGroup as QuotaGroup}
                 variables={variables}
                 depth={depth + 1}
+                disabled={disabled}
                 onChange={(updatedGroup) =>
                   handleUpdateItem(index, updatedGroup)
                 }
@@ -135,6 +140,7 @@ const RuleGroup = memo(function RuleGroup({
                 key={itemKey}
                 rule={ruleOrGroup as QuotaRule}
                 variables={variables}
+                disabled={disabled}
                 onChange={(updatedRule) => handleUpdateItem(index, updatedRule)}
                 onRemove={() => handleRemoveItem(index)}
               />
@@ -149,26 +155,28 @@ const RuleGroup = memo(function RuleGroup({
         )}
       </div>
 
-      <div className="flex items-center gap-2 mt-2">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleAddRule}
-        >
-          <Plus className="h-3 w-3 mr-2" />
-          Ajouter une règle
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleAddGroup}
-        >
-          <Plus className="h-3 w-3 mr-2" />
-          Ajouter un groupe
-        </Button>
-      </div>
+      {!disabled && (
+        <div className="flex items-center gap-2 mt-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleAddRule}
+          >
+            <Plus className="h-3 w-3 mr-2" />
+            Ajouter une règle
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleAddGroup}
+          >
+            <Plus className="h-3 w-3 mr-2" />
+            Ajouter un groupe
+          </Button>
+        </div>
+      )}
     </div>
   );
 });

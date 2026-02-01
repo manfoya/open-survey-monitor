@@ -65,19 +65,12 @@ export default function AppSideBar() {
                     <SidebarMenuButton
                       asChild
                       tooltip={item.title}
-                      isActive={pathname.startsWith(item.url)}
+                      isActive={pathname === item.url}
                     >
-                      {group.label === "Missions" ? (
-                        <div className="text-muted-foreground cursor-not-allowed">
-                          <item.icon className="size-4" />
-                          <span>{item.title}</span>
-                        </div>
-                      ) : (
-                        <Link href={item.url}>
-                          <item.icon className="size-4" />
-                          <span>{item.title}</span>
-                        </Link>
-                      )}
+                      <Link href={item.url}>
+                        <item.icon className="size-4" />
+                        <span>{item.title}</span>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}

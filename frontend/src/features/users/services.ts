@@ -3,7 +3,11 @@
 import { apiClient } from "@/lib/api-client";
 import { getAccessToken } from "@/features/auth/services/auth";
 import { API_ENDPOINTS } from "@/lib/api-endpoints";
-import { UserCreatePayload, UserProfile } from "@/features/auth/types";
+import {
+  UserCreatePayload,
+  UserProfile,
+  UserRole,
+} from "@/features/auth/types";
 import { PaginatedResponse, PaginationQuery } from "@/lib/api-types";
 
 export const getSubordinates = async (
@@ -67,13 +71,13 @@ export const getAllSubordinates = async (): Promise<UserProfile[]> => {
   }
 };
 
-export const getControllers = async (): Promise<UserProfile[]> => {
+export const getUsersByRole = async (role: string): Promise<UserProfile[]> => {
   const token = await getAccessToken();
   if (!token) return [];
 
   try {
     return await apiClient<UserProfile[]>(
-      `${API_ENDPOINTS.USERS.ALL}?role=controleur`,
+      `${API_ENDPOINTS.USERS.ALL}?role=${role}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       },
@@ -82,6 +86,14 @@ export const getControllers = async (): Promise<UserProfile[]> => {
     console.error("Erreur lors de la récupération des contrôleurs:\n", error);
     return [];
   }
+};
+
+export const getAgents = async (): Promise<UserProfile[]> => {
+  return getUsersByRole(UserRole.AGENT);
+};
+
+export const getControllers = async (): Promise<UserProfile[]> => {
+  return getUsersByRole(UserRole.CONTROLEUR);
 };
 
 export const getUserById = async (id: number): Promise<UserProfile | null> => {
