@@ -21,6 +21,10 @@ export const API_ENDPOINTS = {
   SETTINGS: {
     GLOBAL: "/api/global-settings",
   },
+  AFFECTATIONS: {
+    BASE: "/maps/affectations/",
+    BY_ID: (id: number) => `/maps/affectations/${id}`,
+  },
   MESSAGES: {
     BASE: "/messages/",
     SENT: "/messages/sent",
@@ -31,5 +35,6 @@ export const API_ENDPOINTS = {
   QUOTAS: {
     BASE: "/quotas/",
     BY_ID: (id: number) => `/quotas/${id}`,
+    ASSIGNMENTS: "/quotas/assignments",
   },
 } as const;

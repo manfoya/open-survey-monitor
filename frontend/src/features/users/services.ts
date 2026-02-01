@@ -67,6 +67,23 @@ export const getAllSubordinates = async (): Promise<UserProfile[]> => {
   }
 };
 
+export const getControllers = async (): Promise<UserProfile[]> => {
+  const token = await getAccessToken();
+  if (!token) return [];
+
+  try {
+    return await apiClient<UserProfile[]>(
+      `${API_ENDPOINTS.USERS.ALL}?role=controleur`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+  } catch (error) {
+    console.error("Erreur lors de la récupération des contrôleurs:\n", error);
+    return [];
+  }
+};
+
 export const getUserById = async (id: number): Promise<UserProfile | null> => {
   const token = await getAccessToken();
   if (!token) return null;

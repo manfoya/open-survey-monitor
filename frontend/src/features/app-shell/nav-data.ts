@@ -61,13 +61,13 @@ export const navGroups: NavGroup[] = [
     items: [
       {
         title: "Affectations de zones",
-        url: "/missions/zones",
+        url: "/affectations-zones",
         icon: MapPin,
         roles: [UserRole.DIRECTEUR],
       },
       {
         title: "Assignations de quotas",
-        url: "/missions/quotas",
+        url: "/quotas-assignments",
         icon: Target,
         roles: [UserRole.DIRECTEUR],
       },

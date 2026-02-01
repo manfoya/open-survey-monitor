@@ -13,9 +13,9 @@ from app.api.v1.pagination import (
     PaginatedResponse, 
     PaginationParams, 
     create_pagination_params,
-    paginate_sqlalchemy_query
+    paginate_sqlalchemy_query,
+    paginate_list
 )
-from app.api.v1.pagination import paginate_list
 
 router = APIRouter()
 
@@ -38,6 +38,7 @@ def read_users_me(current_user: User = Depends(get_current_user)):
 
 @router.get("/all", response_model=List[UserOut])
 def read_all_users(
+    role: RoleEnum = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -49,15 +50,24 @@ def read_all_users(
     """
     if current_user.role == RoleEnum.directeur:
         # Le directeur voit tout le monde
-        return db.query(User).all()
+        query = db.query(User)
+        if role:
+            query = query.filter(User.role == role)
+        return query.all()
     
     # Pour les autres, on récupère toute la descendance
     my_team = get_all_subordinates_recursive(current_user)
+    
+    # Filtre par rôle si demandé
+    if role:
+        my_team = [u for u in my_team if u.role == role]
+        
     return my_team
 
 # Route pour voir mes subordonnés avec pagination
 @router.get("/", response_model=PaginatedResponse[UserOut])
 def read_my_team(
+    role: RoleEnum = None,
     pagination: PaginationParams = Depends(create_pagination_params),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -73,10 +83,15 @@ def read_my_team(
     - sort_by: champ de tri (username, role, cspro_code)
     - sort_order: ordre de tri (asc/desc)
     - search: recherche textuelle dans username et cspro_code
+    - role: filtre par rôle (directeur, superviseur, controleur, agent)
     """
     if current_user.role == RoleEnum.directeur:
         # Le directeur peut paginer sur toute la base
         query = db.query(User)
+        
+        if role:
+            query = query.filter(User.role == role)
+            
         return paginate_sqlalchemy_query(
             query,
             pagination,
@@ -86,8 +101,12 @@ def read_my_team(
         )
     
     # Pour les autres, on récupère d'abord la descendance puis on pagine
-    from app.api.v1.pagination import paginate_list
     my_team = get_all_subordinates_recursive(current_user)
+    
+    # Filtre par rôle si demandé
+    if role:
+        my_team = [u for u in my_team if u.role == role]
+        
     return paginate_list(my_team, pagination)
 
 ## Route pour chercher par code

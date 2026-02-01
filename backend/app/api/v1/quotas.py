@@ -17,6 +17,181 @@ from app.services.quota_engine import QuotaEngine
 
 router = APIRouter()
 
+
+# ==============================================================================
+# 3. GESTION DES ASSIGNATIONS (USER QUOTAS)
+# ==============================================================================
+
+@router.get("/assignments", response_model=List[UserQuotaResponse])
+def read_all_assignments(
+    active_only: bool = False,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    [Directeur] Voir toutes les assignations de quotas du système.
+    """
+    if current_user.role != RoleEnum.directeur:
+        raise HTTPException(status_code=403, detail="Accès réservé au Directeur")
+    
+    query = db.query(UserQuota)
+    
+    if active_only:
+        query = query.filter(UserQuota.is_active == True)
+        
+    return query.all()
+
+@router.post("/assignments", response_model=UserQuotaResponse)
+def assign_quota_to_user(
+    assignment_in: UserQuotaCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    [Superviseur/Directeur] Assigner un quota à un enquêteur avec un objectif.
+    Ex: "Jean doit faire 10 enquêtes de ce type."
+    """
+    if current_user.role not in [RoleEnum.directeur, RoleEnum.superviseur]:
+        raise HTTPException(status_code=403, detail="Non autorisé")
+
+    # Vérifier l'utilisateur cible (doit être un agent)
+    target_user = db.query(User).filter(User.id == assignment_in.user_id).first()
+    if not target_user:
+        raise HTTPException(status_code=404, detail="Utilisateur cible introuvable")
+        
+    if target_user.role != RoleEnum.agent:
+        raise HTTPException(status_code=400, detail="Les quotas ne peuvent être assignés qu'aux agents (enquêteurs).")
+
+    # Vérifier doublon
+    existing = db.query(UserQuota).filter(
+        UserQuota.user_id == assignment_in.user_id,
+        UserQuota.quota_id == assignment_in.quota_id
+    ).first()
+
+    if existing:
+        raise HTTPException(status_code=400, detail="Cet utilisateur a déjà ce quota assigné. Utilisez UPDATE.")
+
+    new_assign = UserQuota(
+        user_id=assignment_in.user_id,
+        quota_id=assignment_in.quota_id,
+        effectif_cible=assignment_in.effectif_cible,
+        is_active=assignment_in.is_active
+    )
+    db.add(new_assign)
+    db.commit()
+    db.refresh(new_assign)
+    return new_assign
+
+@router.post("/assignments/bulk", response_model=List[UserQuotaResponse])
+def bulk_assign_quota(
+    assignment_in: UserQuotaBulkAssign,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    [Directeur] Assigner un même quota à plusieurs enquêteurs simultanément.
+    """
+    if current_user.role != RoleEnum.directeur:
+        raise HTTPException(status_code=403, detail="Non autorisé")
+
+    # 1. Vérifier le quota
+    quota = db.query(Quota).filter(Quota.id == assignment_in.quota_id).first()
+    if not quota:
+        raise HTTPException(status_code=404, detail="Quota introuvable")
+
+    created_assignments = []
+    
+    # 2. Boucler sur les users
+    for uid in assignment_in.user_ids:
+        # Vérifier si l'user existe (optionnel, mais propre)
+        user = db.query(User).filter(User.id == uid).first()
+        if not user:
+            continue # On skip les ID invalides
+
+        # Restreindre aux agents uniquement
+        if user.role != RoleEnum.agent:
+            continue
+
+        # Gérer l'upsert (si existe déjà, on met à jour ?)
+        # Ici on fait simple: si existe, on skip ou on error ? 
+        # Pour le bulk, skip si existe est souvent mieux.
+        existing = db.query(UserQuota).filter(
+            UserQuota.user_id == uid,
+            UserQuota.quota_id == assignment_in.quota_id
+        ).first()
+
+        if existing:
+            # On met à jour la cible
+            existing.effectif_cible = assignment_in.effectif_cible
+            existing.is_active = assignment_in.is_active
+            created_assignments.append(existing)
+        else:
+            new_assign = UserQuota(
+                user_id=uid,
+                quota_id=assignment_in.quota_id,
+                effectif_cible=assignment_in.effectif_cible,
+                is_active=assignment_in.is_active
+            )
+            db.add(new_assign)
+            created_assignments.append(new_assign)
+    
+    db.commit()
+    # On refresh pour avoir les ID
+    for a in created_assignments:
+        db.refresh(a)
+        
+    return created_assignments
+
+@router.get("/assignments/me", response_model=List[UserQuotaResponse])
+def read_my_assignments(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    [Enqueteur] Voir MES objectifs et ma progression.
+    """
+    # Retourne les quotas assignés à l'utilisateur connecté
+    return db.query(UserQuota).filter(
+        UserQuota.user_id == current_user.id,
+        UserQuota.is_active == True
+    ).all()
+
+@router.get("/my-quotas")
+def get_my_quotas(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if current_user.role == RoleEnum.agent:
+        # L'agent ne voit que ses assignations
+        return db.query(UserQuota).filter(UserQuota.user_id == current_user.id).all()
+    
+    # Si c'est un superviseur, il faut filtrer par ses subordonnés (si la relation existe)
+    # Si c'est le directeur, il voit tout
+    return db.query(UserQuota).all()
+
+@router.patch("/assignments/{assignment_id}", response_model=UserQuotaResponse)
+def update_assignment(
+    assignment_id: int,
+    update_in: UserQuotaUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    [Superviseur] Modifier l'objectif d'un utilisateur (ex: augmenter la cible).
+    """
+    if current_user.role not in [RoleEnum.directeur, RoleEnum.superviseur]:
+        raise HTTPException(status_code=403, detail="Non autorisé")
+
+    uq = db.query(UserQuota).filter(UserQuota.id == assignment_id).first()
+    if not uq:
+        raise HTTPException(status_code=404, detail="Assignation introuvable")
+
+    update_data = update_in.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(uq, field, value)
+
+    db.add(uq)
+    db.commit()
+    db.refresh(uq)
+    return uq
+
 # ==============================================================================
 # 1. GESTION DES DÉFINITIONS DE QUOTAS (ADMINISTRATION)
 # ==============================================================================
@@ -159,145 +334,3 @@ def check_match(
         "input_data": user_data
     }
 
-# ==============================================================================
-# 3. GESTION DES ASSIGNATIONS (USER QUOTAS)
-# ==============================================================================
-
-@router.post("/assignments", response_model=UserQuotaResponse)
-def assign_quota_to_user(
-    assignment_in: UserQuotaCreate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    """
-    [Superviseur/Directeur] Assigner un quota à un enquêteur avec un objectif.
-    Ex: "Jean doit faire 10 enquêtes de ce type."
-    """
-    if current_user.role not in [RoleEnum.directeur, RoleEnum.superviseur]:
-        raise HTTPException(status_code=403, detail="Non autorisé")
-
-    # Vérifier doublon
-    existing = db.query(UserQuota).filter(
-        UserQuota.user_id == assignment_in.user_id,
-        UserQuota.quota_id == assignment_in.quota_id
-    ).first()
-
-    if existing:
-        raise HTTPException(status_code=400, detail="Cet utilisateur a déjà ce quota assigné. Utilisez UPDATE.")
-
-    new_assign = UserQuota(
-        user_id=assignment_in.user_id,
-        quota_id=assignment_in.quota_id,
-        effectif_cible=assignment_in.effectif_cible,
-        is_active=assignment_in.is_active
-    )
-    db.add(new_assign)
-    db.commit()
-    db.refresh(new_assign)
-    return new_assign
-
-@router.post("/assignments/bulk", response_model=List[UserQuotaResponse])
-def bulk_assign_quota(
-    assignment_in: UserQuotaBulkAssign,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    """
-    [Directeur] Assigner un même quota à plusieurs enquêteurs simultanément.
-    """
-    if current_user.role != RoleEnum.directeur:
-        raise HTTPException(status_code=403, detail="Non autorisé")
-
-    # 1. Vérifier le quota
-    quota = db.query(Quota).filter(Quota.id == assignment_in.quota_id).first()
-    if not quota:
-        raise HTTPException(status_code=404, detail="Quota introuvable")
-
-    created_assignments = []
-    
-    # 2. Boucler sur les users
-    for uid in assignment_in.user_ids:
-        # Vérifier si l'user existe (optionnel, mais propre)
-        user = db.query(User).filter(User.id == uid).first()
-        if not user:
-            continue # On skip les ID invalides
-
-        # Gérer l'upsert (si existe déjà, on met à jour ?)
-        # Ici on fait simple: si existe, on skip ou on error ? 
-        # Pour le bulk, skip si existe est souvent mieux.
-        existing = db.query(UserQuota).filter(
-            UserQuota.user_id == uid,
-            UserQuota.quota_id == assignment_in.quota_id
-        ).first()
-
-        if existing:
-            # On met à jour la cible
-            existing.effectif_cible = assignment_in.effectif_cible
-            existing.is_active = assignment_in.is_active
-            created_assignments.append(existing)
-        else:
-            new_assign = UserQuota(
-                user_id=uid,
-                quota_id=assignment_in.quota_id,
-                effectif_cible=assignment_in.effectif_cible,
-                is_active=assignment_in.is_active
-            )
-            db.add(new_assign)
-            created_assignments.append(new_assign)
-    
-    db.commit()
-    # On refresh pour avoir les ID
-    for a in created_assignments:
-        db.refresh(a)
-        
-    return created_assignments
-
-@router.get("/assignments/me", response_model=List[UserQuotaResponse])
-def read_my_assignments(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    """
-    [Enqueteur] Voir MES objectifs et ma progression.
-    """
-    # Retourne les quotas assignés à l'utilisateur connecté
-    return db.query(UserQuota).filter(
-        UserQuota.user_id == current_user.id,
-        UserQuota.is_active == True
-    ).all()
-
-@router.get("/my-quotas")
-def get_my_quotas(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    if current_user.role == RoleEnum.agent:
-        # L'agent ne voit que ses assignations
-        return db.query(UserQuota).filter(UserQuota.user_id == current_user.id).all()
-    
-    # Si c'est un superviseur, il faut filtrer par ses subordonnés (si la relation existe)
-    # Si c'est le directeur, il voit tout
-    return db.query(UserQuota).all()
-
-@router.patch("/assignments/{assignment_id}", response_model=UserQuotaResponse)
-def update_assignment(
-    assignment_id: int,
-    update_in: UserQuotaUpdate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    """
-    [Superviseur] Modifier l'objectif d'un utilisateur (ex: augmenter la cible).
-    """
-    if current_user.role not in [RoleEnum.directeur, RoleEnum.superviseur]:
-        raise HTTPException(status_code=403, detail="Non autorisé")
-
-    uq = db.query(UserQuota).filter(UserQuota.id == assignment_id).first()
-    if not uq:
-        raise HTTPException(status_code=404, detail="Assignation introuvable")
-
-    update_data = update_in.model_dump(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(uq, field, value)
-
-    db.add(uq)
-    db.commit()
-    db.refresh(uq)
-    return uq

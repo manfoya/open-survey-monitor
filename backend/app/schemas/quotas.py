@@ -1,5 +1,6 @@
 # backend/app/schemas/quotas.py
 
+from app.schemas.users import UserOutMinimal
 from pydantic import BaseModel, Field
 from typing import List, Union, Literal, Any, Optional
 
@@ -23,6 +24,7 @@ class UserQuotaBase(BaseModel):
     user_id: int
     effectif_cible: int
     is_active: bool = True
+    quota_id: int
 
 class UserQuotaCreate(UserQuotaBase):
     pass
@@ -41,7 +43,8 @@ class UserQuotaUpdate(BaseModel):
 
 class UserQuotaResponse(UserQuotaBase):
     id: int
-    quota_id: int
+    quota: "MinimalQuotaResponse"
+    user: UserOutMinimal
     effectif_actuel: int
     taux_completion: float
     is_complete: bool
@@ -78,3 +81,12 @@ class QuotaResponse(QuotaBase):
 
     class Config:
         from_attributes = True
+
+class MinimalQuotaResponse(BaseModel):
+    id: int
+    description: str
+    is_active: bool
+    
+    class Config:
+        from_attributes = True
+    

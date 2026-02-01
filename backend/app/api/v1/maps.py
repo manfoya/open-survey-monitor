@@ -242,6 +242,34 @@ def read_affectations(
         
     return results
 
+@router.get("/affectations/{affectation_id}", response_model=AffectationOut)
+def read_affectation(
+    affectation_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Récupérer les détails d'une affectation spécifique par son ID.
+    - Directeur : Peut voir toutes les affectations.
+    - Contrôleur : Ne peut voir que ses propres affectations.
+    """
+    aff = db.query(Affectation).filter(Affectation.id == affectation_id).first()
+    
+    if not aff:
+        raise HTTPException(status_code=404, detail="Affectation introuvable")
+
+    # Vérification des droits
+    if current_user.role != RoleEnum.directeur:
+        # Si c'est un contrôleur, il doit être le propriétaire
+        if aff.controleur_id != current_user.id:
+             raise HTTPException(status_code=403, detail="Vous n'avez pas accès à cette affectation.")
+
+    # On enrichit la réponse avec les noms
+    aff.nom_zone = aff.zone.nom_zone
+    aff.nom_controleur = aff.controleur.username
+    
+    return aff
+
 @router.put("/affectations/{id}", response_model=AffectationOut)
 def update_affectation(
     id: int,
@@ -269,3 +297,24 @@ def update_affectation(
     db.commit()
     db.refresh(aff)
     return aff
+
+@router.delete("/affectations/{id}")
+def delete_affectation(
+    id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Supprimer une affectation (Directeur seulement).
+    """
+    if current_user.role != RoleEnum.directeur:
+        raise HTTPException(status_code=403, detail="Réservé au Directeur.")
+        
+    aff = db.query(Affectation).filter(Affectation.id == id).first()
+    if not aff:
+        raise HTTPException(status_code=404, detail="Affectation introuvable")
+    
+    db.delete(aff)
+    db.commit()
+    
+    return {"message": "Affectation supprimée avec succès"}
