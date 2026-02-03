@@ -6,6 +6,8 @@ export enum DataType {
   TEXT = "text",
   LIST = "list",
   DATE = "date",
+  TIME = "time",
+  BOOLEAN = "boolean",
 }
 
 export type Modalite = {
@@ -68,6 +70,16 @@ export const DATA_TYPES: {
     value: DataType.DATE,
     label: "Date",
     description: "Dates avec limites optionnelles",
+  },
+  {
+    value: DataType.TIME,
+    label: "Heure",
+    description: "Heure spécifique (HH:MM)",
+  },
+  {
+    value: DataType.BOOLEAN,
+    label: "Booléen",
+    description: "Choix binaire (Oui/Non, Vrai/Faux)",
   },
 ];
 

@@ -68,6 +68,9 @@ def get_query_builder_config(db: Session = Depends(get_db)):
             field_def["inputType"] = "checkbox"
             field_def["values"] = [{"name": "true", "label": "Oui"}, {"name": "false", "label": "Non"}]
 
+        elif var.data_type == VariableDataType.TIME:
+            field_def["inputType"] = "time"
+
         # Gestion des opérateurs exclus (ex: pas de ">" pour une ville)
         if var.excluded_operators:
              field_def["excludedOperators"] = var.excluded_operators

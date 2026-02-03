@@ -133,6 +133,7 @@ function getDataTypeLabel(dataType: string): string {
     text: "Texte",
     date: "Date",
     boolean: "Booléen",
+    time: "Heure",
   };
   return labels[dataType.toLowerCase()] || dataType;
 }
@@ -147,6 +148,7 @@ function getDataTypeBadge(dataType: string): string {
     date: "border-orange-500/20 text-orange-700 dark:text-orange-300 hover:border-orange-500/30",
     boolean:
       "border-gray-500/20 text-gray-700 dark:text-gray-300 hover:border-gray-500/30",
+    time: "border-teal-500/20 text-teal-700 dark:text-teal-300 hover:border-teal-500/30",
   };
   return (
     styles[dataType.toLowerCase()] ||

@@ -51,10 +51,6 @@ export default function useVariableForm(initialValues?: VariableDataType) {
 
   const onLabelChange = (newLabel: string) => {
     setLabel(newLabel);
-    // Générer le slug automatiquement si vide
-    if (!slug.trim()) {
-      setSlug(generateSlug(newLabel));
-    }
   };
 
   // Mise à jour de la configuration UI

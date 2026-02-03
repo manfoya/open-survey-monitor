@@ -14,6 +14,7 @@ class VariableDataType(str, enum.Enum):
     DATE = "date"       # Date (Date de naissance)
     BOOLEAN = "boolean" # Vrai/Faux (Est en zone rurale ?)
     LIST = "list"       # Choix unique ou multiple (Sexe, Région)
+    TIME = "time"       # Heure (Heure de début)
 
 class Variable(Base):
     """

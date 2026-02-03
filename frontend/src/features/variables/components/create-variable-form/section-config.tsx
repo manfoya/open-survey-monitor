@@ -87,9 +87,46 @@ function renderDynamicConfigByType(
       return <DateDynamicConfig {...handlers} />;
     case DataType.TEXT:
       return <TextDynamicConfig {...handlers} />;
+    case DataType.TIME:
+      return <TimeDynamicConfig {...handlers} />;
+    case DataType.BOOLEAN:
+      return <BooleanDynamicConfig />;
     default:
       return null;
   }
+}
+
+function BooleanDynamicConfig() {
+  return (
+    <div className="text-sm text-muted-foreground p-4 border rounded-md bg-muted/20 text-center">
+      Ce type de variable ne nécessite pas de configuration spécifique.
+      <br />
+      Les valeurs seront automatiquement &quot;true&quot; (Oui) et
+      &quot;false&quot; (Non).
+    </div>
+  );
+}
+
+function TimeDynamicConfig({
+  uiConfig,
+  updateUIConfig,
+}: {
+  uiConfig: UIConfig;
+  updateUIConfig: PropertySetter<UIConfig>;
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="placeholder">Placeholder (Optionnel)</Label>
+        <Input
+          id="placeholder"
+          placeholder="ex: 14:00"
+          value={uiConfig.placeholder || ""}
+          onChange={(e) => updateUIConfig("placeholder", e.target.value)}
+        />
+      </div>
+    </div>
+  );
 }
 
 function NumberDynamicConfig({
@@ -159,7 +196,7 @@ function NumberDynamicConfig({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="placeholder">Placeholder</Label>
+          <Label htmlFor="placeholder">Placeholder (Optionnel)</Label>
           <Input
             id="placeholder"
             placeholder="Entrez l'âge en années"
@@ -306,7 +343,7 @@ function TextDynamicConfig({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="textPlaceholder">Placeholder</Label>
+        <Label htmlFor="textPlaceholder">Placeholder (Optionnel)</Label>
         <Input
           id="textPlaceholder"
           placeholder="Entrez votre réponse..."
