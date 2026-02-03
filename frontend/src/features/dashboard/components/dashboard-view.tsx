@@ -1,7 +1,10 @@
+"use client";
+
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { DashboardStats, SurveyListResponse, SurveyPoint } from "../types";
 import { StatsCards } from "./stats-cards";
 import { QuotaProgress } from "./quota-progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SurveysDataTable } from "./surveys-data-table";
 import { OverviewMap } from "./overview-map";
 import { LayoutDashboard, TableProperties, Map as MapIcon } from "lucide-react";
@@ -14,9 +17,33 @@ interface DashboardViewProps {
   initialPoints: SurveyPoint[];
 }
 
-export function DashboardView({ stats, initialSurveys, initialPoints }: DashboardViewProps) {
+export function DashboardView({
+  stats,
+  initialSurveys,
+  initialPoints,
+}: DashboardViewProps) {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { replace } = useRouter();
+
+  const currentTab = searchParams.get("tab") || "stats";
+
+  const handleTabChange = (value: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (value === "stats") {
+      params.delete("tab");
+    } else {
+      params.set("tab", value);
+    }
+    replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   return (
-    <Tabs defaultValue="stats" className="space-y-6">
+    <Tabs
+      value={currentTab}
+      onValueChange={handleTabChange}
+      className="space-y-6"
+    >
       <TabsList className="grid w-full grid-cols-3 max-w-[400px]">
         <TabsTrigger value="stats" className="flex items-center gap-2">
           <LayoutDashboard className="h-4 w-4" />

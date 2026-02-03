@@ -108,7 +108,11 @@ async function VariablesTableAsync({
   }
 
   // Utiliser la nouvelle API avec pagination côté serveur
-  const paginatedVariables = await getVariables(paginationParams, isQuota, usedOnly);
+  const paginatedVariables = await getVariables(
+    paginationParams,
+    isQuota,
+    usedOnly,
+  );
 
   if (paginatedVariables.meta.total_items === 0) {
     return <VariablesEmptyState query={query} />;

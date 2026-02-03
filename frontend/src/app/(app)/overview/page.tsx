@@ -1,4 +1,8 @@
-import { getDashboardStats, getSurveys, getSurveysPoints } from "@/features/dashboard/services";
+import {
+  getDashboardStats,
+  getSurveys,
+  getSurveysPoints,
+} from "@/features/dashboard/services";
 import PageHeader from "@/components/page-header";
 import { DashboardRefreshButton } from "@/features/dashboard/components/dashboard-refresh-button";
 import { DashboardView } from "@/features/dashboard/components/dashboard-view";
@@ -24,7 +28,11 @@ export default async function Page() {
         actions={<DashboardRefreshButton />}
       />
       <div className="mt-6">
-        <DashboardView stats={stats} initialSurveys={surveys} initialPoints={points} />
+        <DashboardView
+          stats={stats}
+          initialSurveys={surveys}
+          initialPoints={points}
+        />
       </div>
     </div>
   );

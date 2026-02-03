@@ -16,7 +16,9 @@ export default function RuleBuilder({
   disabled = false,
 }: RuleBuilderProps) {
   return (
-    <div className={`border rounded-md bg-muted/10 p-4 ${disabled ? "opacity-60 grayscale-[0.5] pointer-events-none" : ""}`}>
+    <div
+      className={`border rounded-md bg-muted/10 p-4 ${disabled ? "opacity-60 grayscale-[0.5] pointer-events-none" : ""}`}
+    >
       <RuleGroup
         group={value} // QuotaDefinition structure matches QuotaGroup
         variables={variables}

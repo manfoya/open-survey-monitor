@@ -29,7 +29,8 @@ export default function UpdateQuotaForm({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const isUsed = quota.user_quotas && quota.user_quotas.some((uq) => uq.effectif_actuel > 0);
+  const isUsed =
+    quota.user_quotas && quota.user_quotas.some((uq) => uq.effectif_actuel > 0);
 
   // Form State
   const { state: formState, actions: formActions } = useQuotaForm(quota);
@@ -79,11 +80,13 @@ export default function UpdateQuotaForm({
       {isUsed && (
         <Alert className="border-amber-200 text-amber-200">
           <AlertCircle className="h-4 w-4 text-amber-600" />
-          <AlertTitle className="text-amber-200">Quota en cours d'utilisation</AlertTitle>
+          <AlertTitle className="text-amber-200">
+            Quota en cours d'utilisation
+          </AlertTitle>
           <AlertDescription className="text-amber-200">
-            Ce quota est déjà utilisé par des agents. Pour garantir la cohérence des données, 
-            sa définition (règles) et son statut ne peuvent plus être modifiés. 
-            Seule la description peut être mise à jour.
+            Ce quota est déjà utilisé par des agents. Pour garantir la cohérence
+            des données, sa définition (règles) et son statut ne peuvent plus
+            être modifiés. Seule la description peut être mise à jour.
           </AlertDescription>
         </Alert>
       )}

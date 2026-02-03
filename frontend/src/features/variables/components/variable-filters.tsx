@@ -30,7 +30,9 @@ export function VariableFilters() {
         <Checkbox
           id="used_only"
           checked={usedOnly}
-          onCheckedChange={(checked) => handleFilterChange("used_only", checked as boolean)}
+          onCheckedChange={(checked) =>
+            handleFilterChange("used_only", checked as boolean)
+          }
         />
         <Label
           htmlFor="used_only"
@@ -44,7 +46,9 @@ export function VariableFilters() {
         <Checkbox
           id="is_quota"
           checked={isQuota}
-          onCheckedChange={(checked) => handleFilterChange("is_quota", checked as boolean)}
+          onCheckedChange={(checked) =>
+            handleFilterChange("is_quota", checked as boolean)
+          }
         />
         <Label
           htmlFor="is_quota"

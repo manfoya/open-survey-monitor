@@ -38,7 +38,12 @@ export default function QuotaUserList({ userQuotas }: QuotaUserListProps) {
                 <TableRow key={uq.user_id}>
                   <TableCell>{uq.user.id}</TableCell>
                   <TableCell className="font-medium">
-                    <Link className="hover:underline" href={`/users/${uq.user.id}`}>{uq.user.username}</Link>
+                    <Link
+                      className="hover:underline"
+                      href={`/users/${uq.user.id}`}
+                    >
+                      {uq.user.username}
+                    </Link>
                   </TableCell>
                   <TableCell>{uq.effectif_actuel}</TableCell>
                   <TableCell>{uq.effectif_cible}</TableCell>

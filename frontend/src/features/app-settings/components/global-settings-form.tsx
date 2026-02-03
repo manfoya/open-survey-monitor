@@ -32,7 +32,6 @@ export default function GlobalSettingsForm({
     success: false,
   });
 
-
   // État pour les jours interdits (conversion string -> array)
   const [joursInterdits, setJoursInterdits] = useState<string[]>(
     initialSettings.jours_interdits

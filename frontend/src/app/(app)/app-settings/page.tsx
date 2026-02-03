@@ -46,11 +46,8 @@ async function AppSettingsFormAsync() {
   let error = null;
 
   try {
-    const [fetchedSettings, fetchedVariables, fetchedTables] = await Promise.all([
-      getGlobalSettings(),
-      getAllVariables(),
-      getTables(),
-    ]);
+    const [fetchedSettings, fetchedVariables, fetchedTables] =
+      await Promise.all([getGlobalSettings(), getAllVariables(), getTables()]);
     settings = fetchedSettings;
     variables = fetchedVariables;
     tables = fetchedTables;
@@ -72,6 +69,10 @@ async function AppSettingsFormAsync() {
   }
 
   return (
-    <GlobalSettingsForm initialSettings={settings} variables={variables} tables={tables} />
+    <GlobalSettingsForm
+      initialSettings={settings}
+      variables={variables}
+      tables={tables}
+    />
   );
 }

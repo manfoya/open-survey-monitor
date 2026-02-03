@@ -19,7 +19,9 @@ export function VariableSelector({
   variables,
   disabled,
 }: VariableSelectorProps) {
-  const [currentValue, setCurrentValue] = React.useState(initialValue || "__none__");
+  const [currentValue, setCurrentValue] = React.useState(
+    initialValue || "__none__",
+  );
 
   const items: ComboboxItem[] = [
     { value: "__none__", label: "Aucune" },

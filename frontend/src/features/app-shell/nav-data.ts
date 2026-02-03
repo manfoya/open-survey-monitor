@@ -50,22 +50,6 @@ export const navGroups: NavGroup[] = [
         icon: Database,
         roles: [UserRole.DIRECTEUR],
       },
-      {
-        title: "Quotas",
-        url: "/quotas",
-        icon: Ruler,
-        roles: [UserRole.DIRECTEUR],
-      },
-      {
-        title: "Liste des enquêtes",
-        url: "/overview/surveys",
-        icon: TableProperties,
-      },
-      {
-        title: "Carte des enquêtes",
-        url: "/overview/surveys/map",
-        icon: Map,
-      },
     ],
   },
   {

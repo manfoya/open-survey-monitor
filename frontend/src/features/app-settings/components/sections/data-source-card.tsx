@@ -27,7 +27,9 @@ export function DataSourceCard({
   disabled,
   tables,
 }: DataSourceCardProps) {
-  const [selectedTable, setSelectedTable] = useState(defaultValues.target_table_name || "");
+  const [selectedTable, setSelectedTable] = useState(
+    defaultValues.target_table_name || "",
+  );
 
   const tableItems: ComboboxItem[] = tables.map((table) => ({
     value: table,

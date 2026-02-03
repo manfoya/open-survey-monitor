@@ -33,11 +33,26 @@ export function QCResultsViewer({ results }: QCResultsViewerProps) {
   const getStatusBadge = (status: SurveyQCResult["status"]) => {
     switch (status) {
       case "pass":
-        return <Badge variant="outline" className="border-success text-success">Pass</Badge>;
+        return (
+          <Badge variant="outline" className="border-success text-success">
+            Pass
+          </Badge>
+        );
       case "fail":
-        return <Badge variant="outline" className="border-destructive text-destructive">Fail</Badge>;
+        return (
+          <Badge
+            variant="outline"
+            className="border-destructive text-destructive"
+          >
+            Fail
+          </Badge>
+        );
       case "warn":
-        return <Badge variant="outline" className="border-warning text-warning">Warning</Badge>;
+        return (
+          <Badge variant="outline" className="border-warning text-warning">
+            Warning
+          </Badge>
+        );
     }
   };
 
@@ -54,14 +69,19 @@ export function QCResultsViewer({ results }: QCResultsViewerProps) {
         <TableBody>
           {resultEntries.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={3} className="text-center h-24 text-muted-foreground">
+              <TableCell
+                colSpan={3}
+                className="text-center h-24 text-muted-foreground"
+              >
                 Aucun résultat de contrôle disponible.
               </TableCell>
             </TableRow>
           ) : (
             resultEntries.map(([key, result]) => (
               <TableRow key={key}>
-                <TableCell className="font-medium capitalize">{key.replace(/_/g, " ")}</TableCell>
+                <TableCell className="font-medium capitalize">
+                  {key.replace(/_/g, " ")}
+                </TableCell>
                 <TableCell>{String(result.val)}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-2">

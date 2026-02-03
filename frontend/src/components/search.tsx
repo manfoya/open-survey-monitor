@@ -5,10 +5,10 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 import { cn } from "@/lib/utils";
 
-export default function Search({ 
-  placeholder, 
-  className 
-}: { 
+export default function Search({
+  placeholder,
+  className,
+}: {
   placeholder: string;
   className?: string;
 }) {

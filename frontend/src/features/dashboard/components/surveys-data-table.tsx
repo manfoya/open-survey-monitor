@@ -41,7 +41,8 @@ export function SurveysDataTable({ paginatedSurveys }: SurveysTableProps) {
   const { items: surveys, meta: paginationMeta } = paginatedSurveys;
 
   const currentSort = searchParams.get("sort_by") || "id";
-  const currentOrder = (searchParams.get("sort_order") as "asc" | "desc") || "asc";
+  const currentOrder =
+    (searchParams.get("sort_order") as "asc" | "desc") || "asc";
 
   return (
     <DataTable
@@ -49,7 +50,9 @@ export function SurveysDataTable({ paginatedSurveys }: SurveysTableProps) {
       paginationMeta={paginationMeta}
       columns={availableColumns}
       columnVisibility={columnVisibility as ColumnVisibility}
-      onColumnVisibilityChange={updateColumnVisibility as (visibility: ColumnVisibility) => void}
+      onColumnVisibilityChange={
+        updateColumnVisibility as (visibility: ColumnVisibility) => void
+      }
       currentSort={currentSort}
       currentOrder={currentOrder}
       entityLabel="enquête"
@@ -80,7 +83,9 @@ function getCellValue(survey: SurveyItem, columnKey: string) {
       return (
         <div className="flex flex-col">
           <span className="font-medium text-sm">{survey.agent_name}</span>
-          <span className="text-xs text-muted-foreground">{survey.agent_code || "N/A"}</span>
+          <span className="text-xs text-muted-foreground">
+            {survey.agent_code || "N/A"}
+          </span>
         </div>
       );
 
@@ -103,7 +108,11 @@ function getCellValue(survey: SurveyItem, columnKey: string) {
     case "date":
       return (
         <div className="flex flex-col text-sm">
-          <span>{format(new Date(survey.date_entretien), "dd/MM/yyyy", { locale: fr })}</span>
+          <span>
+            {format(new Date(survey.date_entretien), "dd/MM/yyyy", {
+              locale: fr,
+            })}
+          </span>
           <span className="text-xs text-muted-foreground">
             {format(new Date(survey.date_entretien), "HH:mm", { locale: fr })}
           </span>
@@ -125,7 +134,9 @@ function getCellValue(survey: SurveyItem, columnKey: string) {
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Résultats des contrôles - Enquête #{survey.id}</DialogTitle>
+                <DialogTitle>
+                  Résultats des contrôles - Enquête #{survey.id}
+                </DialogTitle>
               </DialogHeader>
               <div className="mt-4">
                 <QCResultsViewer results={survey.qc_results} />
@@ -143,9 +154,17 @@ function getCellValue(survey: SurveyItem, columnKey: string) {
 const getStatusBadge = (status: SurveyStatus) => {
   switch (status) {
     case "complet":
-      return <Badge className="bg-success hover:bg-success/80 text-white">Complet</Badge>;
+      return (
+        <Badge className="bg-success hover:bg-success/80 text-white">
+          Complet
+        </Badge>
+      );
     case "partiel":
-      return <Badge className="bg-warning hover:bg-warning/80 text-white">Partiel</Badge>;
+      return (
+        <Badge className="bg-warning hover:bg-warning/80 text-white">
+          Partiel
+        </Badge>
+      );
     case "refus":
       return <Badge variant="destructive">Refus</Badge>;
     default:

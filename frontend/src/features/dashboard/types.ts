@@ -1,4 +1,3 @@
-
 export interface ProgressionQuota {
   id: number;
   nom: string;
@@ -63,7 +62,5 @@ export type SurveyPoint = {
   id: number;
   latitude: number;
   longitude: number;
-  status: SurveyStatus;
-}
-
-
+  is_valid: boolean;
+};
