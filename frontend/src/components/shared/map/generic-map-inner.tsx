@@ -11,7 +11,7 @@ import {
 } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import L from "leaflet";
-import { GenericMapProps } from "./types";
+import { GenericMapProps, MapPoint } from "./types";
 import "leaflet/dist/leaflet.css";
 
 // Petit utilitaire pour recentrer la carte quand les props changent
@@ -50,8 +50,41 @@ export default function GenericMapInner({
     });
   }, []);
 
+  const getIcon = (p: MapPoint) => {
+    if (p.iconHtml) {
+      return L.divIcon({
+        className: "custom-div-icon",
+        html: p.iconHtml,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -16],
+      });
+    }
+
+    if (p.iconUrl) {
+      return L.icon({
+        iconUrl: p.iconUrl,
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+      });
+    }
+
+    if (p.color) {
+      return L.divIcon({
+        className: "custom-div-icon",
+        html: `<svg width="25" height="41" viewBox="0 0 25 41" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.5 0C5.59645 0 0 5.59645 0 12.5C0 21.875 12.5 41 12.5 41C12.5 41 25 21.875 25 12.5C25 5.59645 19.4036 0 12.5 0ZM12.5 17C10.0147 17 8 14.9853 8 12.5C8 10.0147 10.0147 8 12.5 8C14.9853 8 17 10.0147 17 12.5C17 14.9853 14.9853 17 12.5 17Z" fill="${p.color}"/></svg>`,
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+      });
+    }
+
+    return new L.Icon.Default();
+  };
+
   const PointContent = points.map((p) => (
-    <Marker key={p.id} position={[p.latitude, p.longitude]}>
+    <Marker key={p.id} position={[p.latitude, p.longitude]} icon={getIcon(p)}>
       {p.popupContent && <Popup>{p.popupContent}</Popup>}
     </Marker>
   ));

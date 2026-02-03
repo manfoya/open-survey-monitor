@@ -6,6 +6,8 @@ export interface MapPoint {
   longitude: number;
   popupContent?: ReactNode;
   iconUrl?: string; // Pour changer l'image du marqueur si besoin
+  color?: string; // Pour changer la couleur via un SVG/DivIcon
+  iconHtml?: string; // Pour passer du HTML personnalisé (SVG, etc.)
 }
 
 export interface MapArea {

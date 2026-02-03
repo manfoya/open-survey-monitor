@@ -39,4 +39,8 @@ export const API_ENDPOINTS = {
     ASSIGNMENT_BY_ID: (id: number) => `/quotas/assignments/${id}`,
     BULK_ASSIGNMENTS: "/quotas/assignments/bulk",
   },
+  SURVEYS: {
+    BASE: "/surveys/",
+    POINTS: "/surveys/map",
+  },
 } as const;
