@@ -32,9 +32,9 @@ def read_surveys_map(
 ):
     """
     Récupérer tous les points d'enquête pour la carte.
-    Retourne uniquement le strict nécessaire (id, lat, long, status).
+    Retourne uniquement le strict nécessaire (id, lat, long, is_valid).
     """
-    query = db.query(SurveyData.id, SurveyData.latitude, SurveyData.longitude, SurveyData.status)
+    query = db.query(SurveyData.id, SurveyData.latitude, SurveyData.longitude, SurveyData.is_valid)
     
     # Même logique de visibilité que la liste
     if current_user.role == RoleEnum.directeur:
@@ -49,7 +49,7 @@ def read_surveys_map(
     
     # Conversion en liste de dictionnaires pour coller au format attendu
     return [
-        {"id": r.id, "latitude": r.latitude, "longitude": r.longitude, "status": r.status} 
+        {"id": r.id, "latitude": r.latitude, "longitude": r.longitude, "is_valid": r.is_valid} 
         for r in results if r.latitude is not None and r.longitude is not None
     ]
 
