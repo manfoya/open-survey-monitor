@@ -51,6 +51,7 @@
 - La pagination doit gérer le cas où page est trop grand ou trop petit
 - (dev) Utiliser `urlcat` pour éviter les problèmes avec les slashs
 - Pouvoir filtrer spécialement selon les rôles
+- Les ComboxBox doivent être améliorées en les couplant avec le backend pour récupérer les données (sans tout charger en une seule fois)
 
 ## Fonctionnalités futures
 
