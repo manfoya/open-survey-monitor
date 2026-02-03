@@ -9,6 +9,8 @@ import {
   Mail,
   Ruler,
   Target,
+  TableProperties,
+  Map,
 } from "lucide-react";
 import { UserRole } from "../auth/types";
 
@@ -53,6 +55,16 @@ export const navGroups: NavGroup[] = [
         url: "/quotas",
         icon: Ruler,
         roles: [UserRole.DIRECTEUR],
+      },
+      {
+        title: "Liste des enquêtes",
+        url: "/overview/surveys",
+        icon: TableProperties,
+      },
+      {
+        title: "Carte des enquêtes",
+        url: "/overview/surveys/map",
+        icon: Map,
       },
     ],
   },

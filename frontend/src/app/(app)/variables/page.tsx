@@ -12,6 +12,7 @@ import PageHeader from "@/components/page-header";
 import { PaginationQuery } from "@/lib/api-types";
 import { VariablesTableSkeleton } from "@/features/variables/components/variables-table-skeleton";
 import { VariablesEmptyState } from "@/features/variables/components/variables-empty-state";
+import { VariableFilters } from "@/features/variables/components/variable-filters";
 
 export default async function VariablesPage(props: {
   searchParams?: Promise<{
@@ -20,6 +21,8 @@ export default async function VariablesPage(props: {
     size?: string;
     sort_by?: string;
     sort_order?: "asc" | "desc";
+    used_only?: string;
+    is_quota?: string;
   }>;
 }) {
   const searchParams = await props.searchParams;
@@ -28,6 +31,8 @@ export default async function VariablesPage(props: {
   const size = searchParams?.size || "10";
   const sort_by = searchParams?.sort_by || "id";
   const sort_order = searchParams?.sort_order || "asc";
+  const usedOnly = searchParams?.used_only === "true";
+  const isQuota = searchParams?.is_quota === "true";
 
   return (
     <div className="container mx-auto py-6">
@@ -46,8 +51,9 @@ export default async function VariablesPage(props: {
         }
       />
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col justify-between mb-6 gap-4">
         <Search placeholder="Rechercher une variable..." />
+        <VariableFilters />
       </div>
 
       <Suspense fallback={<VariablesTableSkeleton />}>
@@ -57,6 +63,8 @@ export default async function VariablesPage(props: {
           size={size}
           sort_by={sort_by}
           sort_order={sort_order}
+          usedOnly={usedOnly}
+          isQuota={isQuota}
         />
       </Suspense>
     </div>
@@ -69,17 +77,21 @@ async function VariablesTableAsync({
   size,
   sort_by,
   sort_order,
+  usedOnly,
+  isQuota,
 }: {
   query: string;
   page: string;
   size: string;
   sort_by?: string;
   sort_order: "asc" | "desc";
+  usedOnly: boolean;
+  isQuota: boolean;
 }) {
   const currentUser = await getMe();
 
   if (!currentUser) {
-    return <div>Erreur lors du chargement du profil utilisateur.</div>;
+    return <div>Se connecter pour accéder à cette page</div>;
   }
 
   // Construire les paramètres pour l'API
@@ -96,7 +108,7 @@ async function VariablesTableAsync({
   }
 
   // Utiliser la nouvelle API avec pagination côté serveur
-  const paginatedVariables = await getVariables(paginationParams);
+  const paginatedVariables = await getVariables(paginationParams, isQuota, usedOnly);
 
   if (paginatedVariables.meta.total_items === 0) {
     return <VariablesEmptyState query={query} />;

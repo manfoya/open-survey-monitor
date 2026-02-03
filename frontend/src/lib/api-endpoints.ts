@@ -19,7 +19,8 @@ export const API_ENDPOINTS = {
     BY_ID: (id: number) => `/variables/${id}`,
   },
   SETTINGS: {
-    GLOBAL: "/api/global-settings",
+    BASE: "/settings",
+    TABLES: "/settings/tables",
   },
   AFFECTATIONS: {
     BASE: "/maps/affectations/",

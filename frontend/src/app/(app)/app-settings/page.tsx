@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getGlobalSettings } from "@/features/app-settings/services";
+import { getGlobalSettings, getTables } from "@/features/app-settings/services";
 import GlobalSettingsForm from "@/features/app-settings/components/global-settings-form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
@@ -42,21 +42,24 @@ export default async function AppSettingsPage() {
 async function AppSettingsFormAsync() {
   let settings;
   let variables;
+  let tables;
   let error = null;
 
   try {
-    const [fetchedSettings, fetchedVariables] = await Promise.all([
+    const [fetchedSettings, fetchedVariables, fetchedTables] = await Promise.all([
       getGlobalSettings(),
       getAllVariables(),
+      getTables(),
     ]);
     settings = fetchedSettings;
     variables = fetchedVariables;
+    tables = fetchedTables;
   } catch (err) {
     console.error("Erreur lors du chargement des paramètres:", err);
     error = err;
   }
 
-  if (error || !settings || !variables) {
+  if (error || !settings || !variables || !tables) {
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
@@ -69,6 +72,6 @@ async function AppSettingsFormAsync() {
   }
 
   return (
-    <GlobalSettingsForm initialSettings={settings} variables={variables} />
+    <GlobalSettingsForm initialSettings={settings} variables={variables} tables={tables} />
   );
 }

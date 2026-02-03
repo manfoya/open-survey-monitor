@@ -1,12 +1,6 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+import * as React from "react";
 import { VariableDataType } from "@/features/variables/types";
+import { FormCombobox, ComboboxItem } from "@/components/form-combobox";
 
 interface VariableSelectorProps {
   name: string;
@@ -20,31 +14,31 @@ interface VariableSelectorProps {
 export function VariableSelector({
   name,
   label,
-  value,
+  value: initialValue,
   placeholder = "Sélectionner une variable",
   variables,
   disabled,
 }: VariableSelectorProps) {
+  const [currentValue, setCurrentValue] = React.useState(initialValue || "__none__");
+
+  const items: ComboboxItem[] = [
+    { value: "__none__", label: "Aucune" },
+    ...variables.map((v) => ({
+      value: v.slug,
+      label: v.label,
+      subLabel: v.slug,
+    })),
+  ];
+
   return (
-    <div className="space-y-2">
-      <Label htmlFor={name}>{label}</Label>
-      <Select
-        name={name}
-        defaultValue={value || "__none__"}
-        disabled={disabled}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="__none__">Aucune</SelectItem>
-          {variables.map((v) => (
-            <SelectItem key={v.id} value={v.slug}>
-              {v.label} ({v.slug})
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <FormCombobox
+      label={label}
+      name={name}
+      value={currentValue}
+      onChange={setCurrentValue}
+      items={items}
+      disabled={disabled}
+      placeholder={placeholder}
+    />
   );
 }

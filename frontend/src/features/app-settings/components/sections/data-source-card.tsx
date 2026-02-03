@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -11,13 +12,13 @@ import { Database } from "lucide-react";
 import { VariableDataType } from "@/features/variables/types";
 import { VariableSelector } from "../variable-selector";
 import { GlobalSettings } from "../../types";
+import { FormCombobox, ComboboxItem } from "@/components/form-combobox";
 
 interface DataSourceCardProps {
   defaultValues: GlobalSettings;
   variables: VariableDataType[];
   disabled: boolean;
   tables: string[];
-  loadingTables: boolean;
 }
 
 export function DataSourceCard({
@@ -25,8 +26,14 @@ export function DataSourceCard({
   variables,
   disabled,
   tables,
-  loadingTables,
 }: DataSourceCardProps) {
+  const [selectedTable, setSelectedTable] = useState(defaultValues.target_table_name || "");
+
+  const tableItems: ComboboxItem[] = tables.map((table) => ({
+    value: table,
+    label: table,
+  }));
+
   return (
     <Card>
       <CardHeader>
@@ -40,30 +47,16 @@ export function DataSourceCard({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="target_table_name">Table Source</Label>
-          <select
-            id="target_table_name"
-            name="target_table_name"
-            defaultValue={defaultValues.target_table_name || ""}
-            className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={disabled || loadingTables}
-          >
-            <option value="" disabled>
-              Sélectionner une table...
-            </option>
-            {tables.map((table) => (
-              <option key={table} value={table}>
-                {table}
-              </option>
-            ))}
-          </select>
-          {loadingTables && (
-            <p className="text-xs text-muted-foreground">
-              Chargement des tables...
-            </p>
-          )}
-        </div>
+        <FormCombobox
+          label="Table Source"
+          name="target_table_name"
+          value={selectedTable}
+          onChange={setSelectedTable}
+          items={tableItems}
+          disabled={disabled}
+          placeholder="Sélectionner une table..."
+          searchPlaceholder="Rechercher une table..."
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t">
           <div className="space-y-4">

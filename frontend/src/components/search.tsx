@@ -3,8 +3,15 @@
 import { Search as SearchIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
+import { cn } from "@/lib/utils";
 
-export default function Search({ placeholder }: { placeholder: string }) {
+export default function Search({ 
+  placeholder, 
+  className 
+}: { 
+  placeholder: string;
+  className?: string;
+}) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
@@ -21,7 +28,7 @@ export default function Search({ placeholder }: { placeholder: string }) {
   }, 300);
 
   return (
-    <div className="relative flex flex-1 flex-shrink-0">
+    <div className={cn("relative flex flex-1 flex-shrink-0", className)}>
       <label htmlFor="search" className="sr-only">
         Search
       </label>

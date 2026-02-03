@@ -81,19 +81,50 @@ def get_query_builder_config(db: Session = Depends(get_db)):
 # 2. ZONE ADMINISTRATION (CRUD Variables)
 # --------------------------------------------------------------------------
 
+def _get_settings_variable_slugs(db: Session) -> set:
+    """Helper to find all variable slugs used in GlobalSettings"""
+    from app.models.settings import GlobalSettings
+    from app.models.quotas import Quota
+    import json
+    
+    used_slugs = set()
+    
+    # Slugs from GlobalSettings
+    settings = db.query(GlobalSettings).first()
+    if settings:
+        mapping_fields = [
+            "variable_duree_start", "variable_duree_end",
+            "variable_gps_lat", "variable_gps_lon",
+            "variable_date_enquete", "variable_indicateur_partiel",
+            "variable_id_interne", "variable_code_agent",
+            "variable_heure_enquete"
+        ]
+        for field in mapping_fields:
+            val = getattr(settings, field)
+            if val:
+                used_slugs.add(val)
+            
+    return used_slugs
+
 @router.get("/all", response_model=List[VariableOut])
 def read_all_variables(
     quota_only: bool = False,
+    used_only: bool = False,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """
     Lister TOUTES les variables (Sans pagination).
     Option ?quota_only=true pour ne voir que celles activées pour les quotas.
+    Option ?used_only=true pour ne voir que celles utilisées dans les réglages ou quotas.
     """
     query = db.query(Variable)
     if quota_only:
         query = query.filter(Variable.is_quota == True)
+    
+    if used_only:
+        used_slugs = _get_settings_variable_slugs(db)
+        query = query.filter(or_(Variable.slug.in_(used_slugs), Variable.is_quota == True))
     
     # On trie par slug alphabétique pour que ce soit propre
     return query.order_by(Variable.slug).all()
@@ -101,6 +132,8 @@ def read_all_variables(
 
 @router.get("/", response_model=PaginatedResponse[VariableOut])
 def read_variables(
+    used_only: bool = False,
+    quota_only: bool = False,
     pagination: PaginationParams = Depends(create_pagination_params),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -109,12 +142,22 @@ def read_variables(
     Lister les variables avec PAGINATION.
     
     Paramètres :
+    - used_only: filtrer les variables utilisées uniquement
+    - quota_only: filtrer les variables activables pour les quotas
     - page: numéro de page
     - size: taille de page
     - sort_by: champ de tri
     - search: recherche textuelle
     """
     query = db.query(Variable)
+    
+    if used_only:
+        used_slugs = _get_settings_variable_slugs(db)
+        query = query.filter(or_(Variable.slug.in_(used_slugs), Variable.is_quota == True))
+        
+    if quota_only:
+        query = query.filter(Variable.is_quota == True)
+        
     return paginate_sqlalchemy_query(
         query,
         pagination,

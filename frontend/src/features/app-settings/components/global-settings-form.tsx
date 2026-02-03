@@ -2,7 +2,6 @@
 
 import { useState, useActionState, useEffect } from "react";
 import { updateSettingsAction } from "@/features/app-settings/actions";
-import { getTables } from "@/features/app-settings/services";
 import { GlobalSettings } from "@/features/app-settings/types";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -21,35 +20,18 @@ import { TimeRulesCard } from "./sections/time-rules-card";
 interface GlobalSettingsFormProps {
   initialSettings: GlobalSettings;
   variables: VariableDataType[];
+  tables: string[];
 }
 
 export default function GlobalSettingsForm({
   initialSettings,
   variables,
+  tables,
 }: GlobalSettingsFormProps) {
   const [state, formAction, isPending] = useActionState(updateSettingsAction, {
     success: false,
   });
 
-  const [tables, setTables] = useState<string[]>([]);
-  const [loadingTables, setLoadingTables] = useState(false);
-
-  // Load tables on mount
-  useEffect(() => {
-    async function loadTables() {
-      try {
-        setLoadingTables(true);
-        const data = await getTables();
-        setTables(data);
-      } catch (error) {
-        toast.error("Erreur lors du chargement des tables");
-        console.error(error);
-      } finally {
-        setLoadingTables(false);
-      }
-    }
-    loadTables();
-  }, []);
 
   // État pour les jours interdits (conversion string -> array)
   const [joursInterdits, setJoursInterdits] = useState<string[]>(
@@ -104,7 +86,6 @@ export default function GlobalSettingsForm({
           variables={variables}
           disabled={isPending}
           tables={tables}
-          loadingTables={loadingTables}
         />
 
         <TimeRulesCard

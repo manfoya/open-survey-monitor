@@ -15,6 +15,7 @@ const getHeaders = async () => {
 export const getVariables = async (
   params: PaginationQuery = {},
   quota_only = false,
+  used_only = false,
 ): Promise<PaginatedResponse<VariableDataType>> => {
   const headers = await getHeaders();
   if (!headers) {
@@ -36,6 +37,7 @@ export const getVariables = async (
   if (params.sort_order) searchParams.set("sort_order", params.sort_order);
   if (params.search) searchParams.set("search", params.search);
   if (quota_only) searchParams.set("quota_only", quota_only.toString());
+  if (used_only) searchParams.set("used_only", used_only.toString());
 
   const url = `${API_ENDPOINTS.VARIABLES.BASE}?${searchParams.toString()}`;
 
@@ -59,13 +61,18 @@ export const getVariables = async (
 
 export const getAllVariables = async (
   quota_only = false,
+  used_only = false,
 ): Promise<VariableDataType[]> => {
   const headers = await getHeaders();
   if (!headers) return [];
 
+  const searchParams = new URLSearchParams();
+  if (quota_only) searchParams.set("quota_only", quota_only.toString());
+  if (used_only) searchParams.set("used_only", used_only.toString());
+
   try {
     return await apiClient<VariableDataType[]>(
-      `${API_ENDPOINTS.VARIABLES.ALL}?quota_only=${quota_only}`,
+      `${API_ENDPOINTS.VARIABLES.ALL}?${searchParams.toString()}`,
       {
         headers,
       },

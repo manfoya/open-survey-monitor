@@ -1,4 +1,4 @@
-import { getDashboardStats } from "@/features/dashboard/services";
+import { getDashboardStats, getSurveys, getSurveysPoints } from "@/features/dashboard/services";
 import PageHeader from "@/components/page-header";
 import { DashboardRefreshButton } from "@/features/dashboard/components/dashboard-refresh-button";
 import { DashboardView } from "@/features/dashboard/components/dashboard-view";
@@ -6,9 +6,13 @@ import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default async function Page() {
-  const stats = await getDashboardStats();
+  const [stats, surveys, points] = await Promise.all([
+    getDashboardStats(),
+    getSurveys({ page: 1, size: 10 }),
+    getSurveysPoints(),
+  ]);
 
-  if (!stats) {
+  if (!stats || !surveys || !points) {
     return <FallbackPage />;
   }
 
@@ -20,7 +24,7 @@ export default async function Page() {
         actions={<DashboardRefreshButton />}
       />
       <div className="mt-6">
-        <DashboardView stats={stats} />
+        <DashboardView stats={stats} initialSurveys={surveys} initialPoints={points} />
       </div>
     </div>
   );
