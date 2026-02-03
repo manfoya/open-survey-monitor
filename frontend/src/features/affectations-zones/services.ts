@@ -91,3 +91,25 @@ export const getAffectations = async (
     return [];
   }
 };
+
+export const getAffectationsById = async (
+  id: number,
+): Promise<Affectation[]> => {
+  const headers = await getHeaders();
+  if (!headers) return [];
+
+  try {
+    return await apiClient<Affectation[]>(
+      API_ENDPOINTS.AFFECTATIONS.BY_USER_ID(id),
+      {
+        headers,
+      },
+    );
+  } catch (error) {
+    console.error(
+      `Erreur lors de la récupération de l'affectation ${id}:`,
+      error,
+    );
+    return [];
+  }
+};

@@ -25,10 +25,12 @@ export const API_ENDPOINTS = {
   AFFECTATIONS: {
     BASE: "/maps/affectations/",
     BY_ID: (id: number) => `/maps/affectations/${id}`,
+    BY_USER_ID: (id: number) => `/maps/affectations/user/${id}`,
   },
   MESSAGES: {
     BASE: "/messages/",
     SENT: "/messages/sent",
+    DAY: "/messages/day-message",
   },
   STATS: {
     DASHBOARD: "/stats/dashboard",

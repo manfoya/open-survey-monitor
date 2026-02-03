@@ -9,6 +9,7 @@ import {
   UserRole,
 } from "@/features/auth/types";
 import { PaginatedResponse, PaginationQuery } from "@/lib/api-types";
+import { Affectation } from "../affectations-zones/types";
 
 export const getSubordinates = async (
   params: PaginationQuery = {},
@@ -148,4 +149,21 @@ export const deleteUser = async (id: number): Promise<UserProfile | null> => {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });
+};
+
+export const getUserZonesAffectations = async (): Promise<Affectation[]> => {
+  const token = await getAccessToken();
+  if (!token) return [];
+
+  try {
+    return await apiClient<Affectation[]>(API_ENDPOINTS.AFFECTATIONS.BASE, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des affectations des zones:\n",
+      error,
+    );
+    return [];
+  }
 };

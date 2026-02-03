@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { Metadata } from "next";
 import { getZones } from "@/features/zones/services";
 import ZonesDataTable from "@/features/zones/components/zones-data-table";
 import { getMe } from "@/features/auth/services/auth";
@@ -12,6 +13,11 @@ import PageHeader from "@/components/page-header";
 import { PaginationQuery } from "@/lib/api-types";
 import { ZonesTableSkeleton } from "@/features/zones/components/zones-table-skeleton";
 import { ZonesEmptyState } from "@/features/zones/components/zones-empty-state";
+
+export const metadata: Metadata = {
+  title: "Zones géographiques",
+  description: "Gérez les zones de collecte de données de votre enquête.",
+};
 
 export default async function ZonesPage(props: {
   searchParams?: Promise<{

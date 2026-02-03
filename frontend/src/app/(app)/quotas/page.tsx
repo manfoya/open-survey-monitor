@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { Metadata } from "next";
 import { getQuotas } from "@/features/quotas/services";
 import QuotasDataTable from "@/features/quotas/components/quotas-data-table";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,11 @@ import { QuotasTableSkeleton } from "@/features/quotas/components/quotas-table-s
 import { QuotasEmptyState } from "@/features/quotas/components/quotas-empty-state";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Gestion des quotas",
+  description: "Gérez les objectifs de représentativité pour vos enquêtes.",
+};
 
 export default async function QuotasPage(props: {
   searchParams?: Promise<{

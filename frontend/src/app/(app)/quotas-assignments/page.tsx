@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getQuotaAssignments } from "@/features/quotas-assignments/services";
@@ -14,8 +15,13 @@ import { QuotaAssignmentsEmptyState } from "@/features/quotas-assignments/compon
 import { getAgents } from "@/features/users/services";
 import { getQuotas } from "@/features/quotas/services";
 import CreateQuotaAssignmentDialog from "@/features/quotas-assignments/components/create-quota-assignment-dialog";
-
 import { ActiveFilterCheckbox } from "@/components/active-filter-checkbox";
+
+export const metadata: Metadata = {
+  title: "Assignations de quotas",
+  description:
+    "Consultez les assignations de quotas aux agents et leur progression.",
+};
 
 export default async function QuotaAssignmentsPage(props: {
   searchParams?: Promise<{

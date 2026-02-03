@@ -59,7 +59,7 @@ export const navGroups: NavGroup[] = [
         title: "Affectations de zones",
         url: "/affectations-zones",
         icon: MapPin,
-        roles: [UserRole.DIRECTEUR],
+        roles: [UserRole.DIRECTEUR, UserRole.SUPERVISEUR],
       },
       {
         title: "Assignations de quotas",

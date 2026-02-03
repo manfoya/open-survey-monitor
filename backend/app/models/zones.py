@@ -1,6 +1,6 @@
 # backend/app/models/zones.py
 
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Boolean, JSON
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Boolean, JSON, UniqueConstraint
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 
@@ -35,6 +35,7 @@ class Affectation(Base):
     zone avec tel objectif".
     """
     __tablename__ = "affectations"
+    __table_args__ = (UniqueConstraint('controleur_id', 'zone_id', name='uq_controleur_zone'),)
 
     id = Column(Integer, primary_key=True, index=True)
     

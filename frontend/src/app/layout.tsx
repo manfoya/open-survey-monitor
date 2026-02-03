@@ -5,8 +5,18 @@ import { inter } from "@/lib/fonts";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 
+if (process.env.NODE_ENV === "production") {
+  console.log = () => {};
+  console.debug = () => {};
+  console.info = () => {};
+  // We keep console.warn and console.error for production issues
+}
+
 export const metadata: Metadata = {
-  title: "Open Survey Monitor",
+  title: {
+    default: "Open Survey Monitor",
+    template: "%s | Open Survey Monitor",
+  },
   description: "Surveillance de sondages en temps réel",
 };
 

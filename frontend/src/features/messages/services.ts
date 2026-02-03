@@ -61,3 +61,20 @@ export const getMyMessages = async (
     return [];
   }
 };
+
+export const getDayMessage = async (): Promise<string | null> => {
+  const token = await getAccessToken();
+  if (!token) return null;
+
+  try {
+    return await apiClient<string>(API_ENDPOINTS.MESSAGES.DAY, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération du message du jour:\n",
+      error,
+    );
+    return null;
+  }
+};

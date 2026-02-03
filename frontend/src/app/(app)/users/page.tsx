@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { Metadata } from "next";
 import { getSubordinates } from "@/features/users/services";
 import UsersDataTable from "@/features/users/components/users-data-table";
 import { getMe } from "@/features/auth/services/auth";
@@ -12,6 +13,11 @@ import PageHeader from "@/components/page-header";
 import { PaginationQuery } from "@/lib/api-types";
 import { UsersTableSkeleton } from "@/features/users/components/users-table-skeleton";
 import { UsersEmptyState } from "@/features/users/components/users-empty-state";
+
+export const metadata: Metadata = {
+  title: "Gestion des utilisateurs",
+  description: "Liste et gestion des membres de l'équipe de collecte.",
+};
 
 export default async function UsersPage(props: {
   searchParams?: Promise<{

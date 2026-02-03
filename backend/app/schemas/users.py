@@ -1,8 +1,9 @@
 # backend/app/schemas/users.py
 
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from app.models.users import RoleEnum
+from app.schemas.maps import AffectationOut
 
 # SCHEMAS UTILISATEURS (DTO - Data Transfer Objects)
 
@@ -37,6 +38,7 @@ class UserOutMinimal(UserBase):
 class UserOut(UserBase):
     id: int
     chef: Optional['UserOutMinimal'] = None
+    affectations: Optional[List['AffectationOut']] = None
 
     class Config:
         # Permet à Pydantic de lire les objets SQLAlchemy

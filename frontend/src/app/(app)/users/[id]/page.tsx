@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { Metadata } from "next";
 import { Card } from "@/components/ui/card";
 import { notFound } from "next/navigation";
 import { getMe } from "@/features/auth/services/auth";
@@ -8,8 +9,18 @@ import PageHeader from "@/components/page-header";
 import ErrorState from "@/components/error-state";
 import { ShieldCheck } from "lucide-react";
 import { UserDetailsHeader } from "@/features/users/components/user-details/header";
-import { UserDetailsInfo } from "@/features/users/components/user-details/info";
+import {
+  UserAffectationList,
+  UserDetailsInfo,
+} from "@/features/users/components/user-details/info";
 import { UserDetailsSkeleton } from "@/features/users/components/user-details/skeleton";
+import { CsproWarning } from "@/features/users/components/profile/cspro-warning";
+import { getAffectationsById } from "@/features/affectations-zones/services";
+
+export const metadata: Metadata = {
+  title: "Détails de l'utilisateur",
+  description: "Consultation et modification du profil utilisateur.",
+};
 
 export default async function UserDetailsPage(props: {
   params: Promise<{ id: string }>;
@@ -41,12 +52,14 @@ async function UserDetailsAsync({ userId }: { userId: number }) {
   let user;
   let currentUser;
   let subordinates;
+  let affectations;
 
   try {
-    [user, currentUser, subordinates] = await Promise.all([
+    [user, currentUser, subordinates, affectations] = await Promise.all([
       getUserById(userId),
       getMe(),
       getAllSubordinates(),
+      getAffectationsById(userId),
     ]);
   } catch (error) {
     console.error("Erreur lors du chargement de l'utilisateur:", error);
@@ -63,7 +76,7 @@ async function UserDetailsAsync({ userId }: { userId: number }) {
     notFound();
   }
 
-  // Vérifier les permissions
+  // Vérifier les permissions (normalement à faire côté serveur)
   const subordinateIds = subordinates.map((u) => u.id);
   const canView =
     currentUser.role === UserRole.DIRECTEUR ||
@@ -99,15 +112,13 @@ async function UserDetailsAsync({ userId }: { userId: number }) {
         />
         <UserDetailsInfo user={user} />
       </Card>
+      {/* Affectaions: ne concerne que les agents et contrôleurs */}
+      {user.role === UserRole.AGENT || user.role === UserRole.CONTROLEUR ? (
+        <UserAffectationList affectations={affectations} />
+      ) : null}
 
       {/* Message d'information pour les codes CSPro */}
-      <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 p-4 rounded-lg flex gap-3">
-        <ShieldCheck className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0" />
-        <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
-          Le <strong>Code CSPro</strong> est requis pour la synchronisation des
-          données terrain. Il doit être unique dans le système.
-        </p>
-      </div>
+      <CsproWarning />
     </div>
   );
 }

@@ -1,13 +1,17 @@
 import { Suspense } from "react";
 import { getMe } from "@/features/auth/services/auth";
 import { Card, CardContent } from "@/components/ui/card";
-import { RoleGuard } from "@/features/auth/components/role-guard";
 import PageHeader from "@/components/page-header";
 import ErrorState from "@/components/error-state";
 import { ProfileHeader } from "@/features/users/components/profile/header";
 import { CsproWarning } from "@/features/users/components/profile/cspro-warning";
 import { ProfileSkeleton } from "@/features/users/components/profile/skeleton";
-import { UserDetailsInfo } from "@/features/users/components/user-details/info";
+import {
+  UserAffectationList,
+  UserDetailsInfo,
+} from "@/features/users/components/user-details/info";
+import { getAffectations } from "@/features/affectations-zones/services";
+import { UserRole } from "@/features/auth/types";
 
 export default async function ProfilePage() {
   return (
@@ -25,10 +29,10 @@ export default async function ProfilePage() {
 }
 
 async function ProfileAsync() {
-  let user;
+  let user, affectations;
 
   try {
-    user = await getMe();
+    [user, affectations] = await Promise.all([getMe(), getAffectations()]);
   } catch (error) {
     console.error("Erreur lors du chargement du profil:", error);
     return (
@@ -57,7 +61,9 @@ async function ProfileAsync() {
         <ProfileHeader user={user} />
         <UserDetailsInfo user={user} />
       </Card>
-
+      {[UserRole.AGENT, UserRole.CONTROLEUR].includes(user.role) && (
+        <UserAffectationList affectations={affectations} />
+      )}
       <CsproWarning />
     </div>
   );

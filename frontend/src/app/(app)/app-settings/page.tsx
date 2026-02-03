@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { Metadata } from "next";
 import { getGlobalSettings, getTables } from "@/features/app-settings/services";
 import GlobalSettingsForm from "@/features/app-settings/components/global-settings-form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -9,6 +10,11 @@ import ErrorState from "@/components/error-state";
 import PageHeader from "@/components/page-header";
 import { getAllVariables } from "@/features/variables/services";
 import { AppSettingsSkeleton } from "@/features/app-settings/components/skeleton";
+
+export const metadata: Metadata = {
+  title: "Paramètres système",
+  description: "Configuration globale de l'application et des règles métiers.",
+};
 
 export default async function AppSettingsPage() {
   return (

@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import {
   getDashboardStats,
   getSurveys,
@@ -8,12 +9,20 @@ import { DashboardRefreshButton } from "@/features/dashboard/components/dashboar
 import { DashboardView } from "@/features/dashboard/components/dashboard-view";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { getDayMessage } from "@/features/messages/services";
+
+export const metadata: Metadata = {
+  title: "Tableau de bord",
+  description:
+    "Aperçu global de l'activité de collecte et de la qualité des données.",
+};
 
 export default async function Page() {
-  const [stats, surveys, points] = await Promise.all([
+  const [stats, surveys, points, dayMessage] = await Promise.all([
     getDashboardStats(),
     getSurveys({ page: 1, size: 10 }),
     getSurveysPoints(),
+    getDayMessage(),
   ]);
 
   if (!stats || !surveys || !points) {
@@ -27,6 +36,13 @@ export default async function Page() {
         description="Aperçu global de l'activité de collecte et de la qualité des données."
         actions={<DashboardRefreshButton />}
       />
+      {dayMessage && (
+        <Alert className="mt-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Message du jour</AlertTitle>
+          <AlertDescription>{dayMessage}</AlertDescription>
+        </Alert>
+      )}
       <div className="mt-6">
         <DashboardView
           stats={stats}

@@ -15,6 +15,7 @@ from app.api.v1.pagination import (
     create_pagination_params,
     paginate_sqlalchemy_query
 )
+from app.api.v1.users import get_all_subordinates_recursive
 
 router = APIRouter()
 
@@ -164,7 +165,18 @@ def create_affectation(
     if not zone:
         raise HTTPException(status_code=404, detail="Zone introuvable.")
 
-    # 3. Création (Pydantic gère la validation du json quota grâce au schéma QuotaConfig)
+    # 3. Vérifier l'unicité du couple (Contrôleur, Zone)
+    existing_aff_pair = db.query(Affectation).filter(
+        Affectation.controleur_id == aff_in.controleur_id,
+        Affectation.zone_id == aff_in.zone_id
+    ).first()
+    if existing_aff_pair:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Ce contrôleur est déjà affecté à cette zone. Essayez de modifier l'affectation existante."
+        )
+
+    # 4. Création (Pydantic gère la validation du json quota grâce au schéma QuotaConfig)
     # Note: on utilise model_dump() pour convertir le Pydantic model en dict compatible json
     aff_data = aff_in.model_dump()
     
@@ -225,12 +237,20 @@ def read_affectations(
     Voir les missions en cours.
     - Directeur : Tout voir.
     - Contrôleur : Voir ses propres missions.
+    - Agent : Voir les missions de son chef direct.
     """
     if current_user.role == RoleEnum.directeur:
         query = db.query(Affectation).all()
-    else:
+    elif current_user.role == RoleEnum.controleur:
         # Si je suis contrôleur, je ne vois que mes zones
         query = db.query(Affectation).filter(Affectation.controleur_id == current_user.id).all()
+    elif current_user.role == RoleEnum.agent:
+        # Si je suis agent, je ne vois que mes zones
+        query = db.query(Affectation).filter(Affectation.controleur_id == current_user.chef_id).all()
+    elif current_user.role == RoleEnum.superviseur:
+        # Si je suis superviseur, je ne vois que les zones de mes contrôleurs
+        subordonnes = db.query(User).filter(User.chef_id == current_user.id).all()
+        query = db.query(Affectation).filter(Affectation.controleur_id.in_([user.id for user in subordonnes])).all()
 
     # On enrichit la réponse avec les noms (pour l'affichage frontend)
     results = []
@@ -241,6 +261,57 @@ def read_affectations(
         results.append(aff)
         
     return results
+
+@router.get("/affectations/user/{user_id}", response_model=List[AffectationOut])
+def read_user_affectations(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Récupérer les affectations d'un utilisateur spécifique.
+    - Directeur : Tout voir.
+    - Soi-même : Voir ses propres affectations.
+    - Subordonnés : Voir les affectations de ses subordonnés.
+    - Agent : Voir les affectations de son chef direct (zone d'équipe).
+    """
+    # 1. On cherche l'utilisateur cible
+    target_user = db.query(User).filter(User.id == user_id).first()
+    if not target_user:
+        raise HTTPException(status_code=404, detail="Utilisateur introuvable.")
+    
+    # Seuls les agents et les controlleurs ont de zones assignées
+    if target_user.role not in [RoleEnum.agent, RoleEnum.controleur]:
+        raise HTTPException(status_code=400, detail="Seuls les agents et les controlleurs ont de zones assignées")
+
+    #! 2. Vérification des droits 
+    # Accès si : Directeur, Soi-même, Chef direct, ou Chef du chef (Superviseur)
+    has_access = (current_user.role == RoleEnum.directeur or # accès directeur
+                 current_user.id == user_id or   # accès soi-même (agent ou controleur)
+                 current_user.id == target_user.chef_id) # accès chef (controleur)
+
+    # Vérification pour le superviseur (chef du chef)
+    if not has_access and target_user.chef and target_user.chef.chef_id:
+        has_access = current_user.id == target_user.chef.chef_id
+
+    if not has_access:
+        raise HTTPException(status_code=403, detail="Vous n'avez pas accès aux affectations de cet utilisateur.")
+
+    # 3. Récupération des affectations
+    query = db.query(Affectation)
+    if target_user.role == RoleEnum.agent:
+        query = query.filter(Affectation.controleur_id == target_user.chef_id)
+    else:  # controleur
+        query = query.filter(Affectation.controleur_id == user_id)
+
+    affectations = query.all()
+
+    # 4. Enrichissement
+    for aff in affectations:
+        aff.nom_zone = aff.zone.nom_zone
+        aff.nom_controleur = aff.controleur.username
+
+    return affectations
 
 @router.get("/affectations/{affectation_id}", response_model=AffectationOut)
 def read_affectation(

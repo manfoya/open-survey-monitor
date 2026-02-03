@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { Metadata } from "next";
 import { getVariables } from "@/features/variables/services";
 import VariablesDataTable from "@/features/variables/components/variables-data-table";
 import { getMe } from "@/features/auth/services/auth";
@@ -13,6 +14,11 @@ import { PaginationQuery } from "@/lib/api-types";
 import { VariablesTableSkeleton } from "@/features/variables/components/variables-table-skeleton";
 import { VariablesEmptyState } from "@/features/variables/components/variables-empty-state";
 import { VariableFilters } from "@/features/variables/components/variable-filters";
+
+export const metadata: Metadata = {
+  title: "Variables de données",
+  description: "Liste et gestion des variables de collecte.",
+};
 
 export default async function VariablesPage(props: {
   searchParams?: Promise<{
