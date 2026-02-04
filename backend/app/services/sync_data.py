@@ -2,7 +2,8 @@
 
 import sys
 import os
-from datetime import datetime, time
+from datetime import datetime, time, date, timedelta
+from decimal import Decimal
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
@@ -13,6 +14,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 from app.core.database import SessionLocal
 from app.models.users import User, RoleEnum
 from app.models.quotas import UserQuota
+from app.services.quota_engine import QuotaEngine
 from app.models.zones import Affectation
 from app.models.settings import GlobalSettings
 from app.models.survey import SurveyData, SurveyStatus
@@ -62,6 +64,20 @@ def calculate_distance(lat1, lon1, lat2, lon2):
         return c * r * 1000
     except:
         return None
+
+def clean_for_json(obj):
+    """Recursive helper to make sure all types are JSON serializable"""
+    if isinstance(obj, dict):
+        return {k: clean_for_json(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [clean_for_json(v) for v in obj]
+    if isinstance(obj, (datetime, date, time)):
+        return str(obj)
+    if isinstance(obj, timedelta):
+        return str(obj)
+    if isinstance(obj, Decimal):
+        return float(obj)
+    return obj
 
 def sync_surveys():
     print(f"[{datetime.now()}] Démarrage synchronisation optimisée...")
@@ -166,7 +182,7 @@ def sync_surveys():
                 
                 # Mise à jour des champs
                 survey.agent_code = agent_code_str
-                survey.answers = data
+                survey.answers = clean_for_json(data)
                 
                 # Liaison Agent (Memory Lookup - Ultra rapide)
                 if agent_code_str and agent_code_str in agents_map:
@@ -254,7 +270,20 @@ def sync_surveys():
                     survey.status = SurveyStatus.complet
 
                 survey.is_valid = is_valid
-                survey.qc_results = qc_results
+                survey.qc_results = clean_for_json(qc_results)
+
+                # --- MISE À JOUR DES QUOTAS (GLOBAL) ---
+                # On incrémente si l'enquête est VALIDE
+                if is_valid and agent_code_str in agents_obj_map:
+                    agent_obj = agents_obj_map[agent_code_str]
+                    # On charge les quotas actifs de l'agent
+                    # Note: Pour que 'user_quotas' soit accessible, il faut que la session soit active (ce qui est le cas)
+                    # ou qu'il soit eager loaded. Ici c'est lazy loading mais db sessional.
+                    for uq in agent_obj.user_quotas:
+                        if uq.is_active:
+                             # On vérifie si l'enquête correspond à la définition du quota
+                             if QuotaEngine.check(uq.quota.definition, clean_for_json(data)):
+                                 uq.effectif_actuel += 1
 
                 total_processed += 1
             
