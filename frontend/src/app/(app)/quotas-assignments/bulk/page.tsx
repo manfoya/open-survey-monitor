@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getAgents } from "@/features/users/services";
+import { getFieldWorkers } from "@/features/users/services";
 import { getQuotas } from "@/features/quotas/services";
 import { RoleGuard } from "@/features/auth/components/role-guard";
 import { UserRole } from "@/features/auth/types";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default async function BulkAssignmentPage() {
-  const [users, quotas] = await Promise.all([getAgents(), getQuotas()]);
+  const [users, quotas] = await Promise.all([getFieldWorkers(), getQuotas()]);
 
   return (
     <RoleGuard allowedRoles={[UserRole.DIRECTEUR]}>

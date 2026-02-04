@@ -97,6 +97,24 @@ export const getControllers = async (): Promise<UserProfile[]> => {
   return getUsersByRole(UserRole.CONTROLEUR);
 };
 
+export const getFieldWorkers = async (): Promise<UserProfile[]> => {
+  const token = await getAccessToken();
+  if (!token) return [];
+
+  try {
+    const allUsers = await apiClient<UserProfile[]>(API_ENDPOINTS.USERS.ALL, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    // Filter to only include Agents and Controllers (field workers)
+    return allUsers.filter(
+      (u) => u.role === UserRole.AGENT || u.role === UserRole.CONTROLEUR
+    );
+  } catch (error) {
+    console.error("Erreur lors de la récupération des agents de terrain:\n", error);
+    return [];
+  }
+};
+
 export const getUserById = async (id: number): Promise<UserProfile | null> => {
   const token = await getAccessToken();
   if (!token) return null;

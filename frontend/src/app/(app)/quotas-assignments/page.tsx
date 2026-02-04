@@ -12,7 +12,7 @@ import PageHeader from "@/components/page-header";
 import { QuotaAssignmentsTableSkeleton } from "@/features/quotas-assignments/components/quota-assignments-table-skeleton";
 import { QuotaAssignmentsEmptyState } from "@/features/quotas-assignments/components/quota-assignments-empty-state";
 
-import { getAgents } from "@/features/users/services";
+import { getFieldWorkers } from "@/features/users/services";
 import { getQuotas } from "@/features/quotas/services";
 import CreateQuotaAssignmentDialog from "@/features/quotas-assignments/components/create-quota-assignment-dialog";
 import { ActiveFilterCheckbox } from "@/components/active-filter-checkbox";
@@ -33,7 +33,7 @@ export default async function QuotaAssignmentsPage(props: {
   const query = searchParams?.query || "";
   const activeOnly = searchParams?.active_only === "true";
 
-  const [users, quotas] = await Promise.all([getAgents(), getQuotas()]);
+  const [users, quotas] = await Promise.all([getFieldWorkers(), getQuotas()]);
 
   return (
     <RoleGuard allowedRoles={[UserRole.DIRECTEUR]}>
