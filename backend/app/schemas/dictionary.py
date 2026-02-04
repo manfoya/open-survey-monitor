@@ -35,10 +35,11 @@ class VariableCreate(VariableBase):
 
     @field_validator('slug')
     def slug_must_be_lowercase(cls, v):
-        return v.lower().strip().replace(" ", "_")
+        return v.strip().replace(" ", "_")
 
 class VariableUpdate(BaseModel):
     label: Optional[str] = None
+    data_type: Optional[VariableDataType] = None  # Permet de changer le type (ex: number → list)
     is_quota: Optional[bool] = None
     ui_config: Optional[Dict[str, Any]] = None
     excluded_operators: Optional[List[str]] = None
