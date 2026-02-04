@@ -12,6 +12,7 @@ class VariableDataType(str, enum.Enum):
     NUMBER = "number"   # Entiers ou décimaux (Age, Revenu)
     TEXT = "text"       # Champ libre (Nom, Commentaire)
     DATE = "date"       # Date (Date de naissance)
+    TIME = "time"       # Heure (Heure de début)
     BOOLEAN = "boolean" # Vrai/Faux (Est en zone rurale ?)
     LIST = "list"       # Choix unique ou multiple (Sexe, Région)
     TIME = "time"       # Heure (Heure de début)
