@@ -112,5 +112,5 @@ def read_day_message(
     query = db.query(GlobalSettings).first()
     if not query:
         raise HTTPException(status_code=404, detail="Paramètres globaux non trouvés.")
-    return query.message_du_jour
+    return query.message_du_jour or ""
 
