@@ -164,7 +164,7 @@ def read_variables(
     return paginate_sqlalchemy_query(
         query,
         pagination,
-        allowed_sort_fields=["slug", "label", "id", "created_at"],
+        allowed_sort_fields=["slug", "label", "id", "data_type", "is_quota", "created_at"],
         search_fields=["slug", "label"],
         text_sort_fields=["slug", "label"]
     )
@@ -279,8 +279,14 @@ def update_variable(
                 if mod_data.get("order") is not None:
                     existing_mod.order = mod_data.get("order")
             else:
-                # Optionnel : Créer une modalité si elle n'existe pas (rare ici, car géré par le script)
-                pass
+                # Créer une nouvelle modalité si elle n'existe pas encore
+                new_mod = Modalite(
+                    variable_id=var_db.id,
+                    value=mod_data.get("value"),
+                    label=mod_data.get("label"),
+                    order=mod_data.get("order", 0)
+                )
+                db.add(new_mod)
 
     db.commit()
     db.refresh(var_db)
