@@ -12,8 +12,8 @@ const updateVariableSchema = z.object({
     .string()
     .min(1, "Le code technique est requis")
     .regex(
-      /^[a-z0-9_]+$/,
-      "Format invalide (lettres minuscules, chiffres, underscores uniquement)",
+      /^[a-zA-Z0-9_]+$/,
+      "Format invalide (lettres, chiffres, underscores uniquement)",
     ),
   data_type: z.nativeEnum(DataType),
   is_quota: z.boolean(),
@@ -21,7 +21,7 @@ const updateVariableSchema = z.object({
   modalites: z
     .array(
       z.object({
-        id: z.string().optional(), // ID peut être présent pour les updates
+        id: z.union([z.string(), z.number()]).optional(), // ID peut être un nombre (DB) ou string (Frontend)
         value: z.string(),
         label: z.string(),
         order: z.number(),
