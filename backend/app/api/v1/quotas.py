@@ -59,8 +59,8 @@ def assign_quota_to_user(
     if not target_user:
         raise HTTPException(status_code=404, detail="Utilisateur cible introuvable")
         
-    if target_user.role != RoleEnum.agent:
-        raise HTTPException(status_code=400, detail="Les quotas ne peuvent être assignés qu'aux agents (enquêteurs).")
+    if target_user.role not in [RoleEnum.agent, RoleEnum.controleur]:
+        raise HTTPException(status_code=400, detail="Les quotas ne peuvent être assignés qu'aux agents et contrôleurs de terrain.")
 
     # Vérifier l'existence du quota
     quota = db.query(Quota).filter(Quota.id == assignment_in.quota_id).first()
@@ -113,8 +113,8 @@ def bulk_assign_quota(
         if not user:
             continue # On skip les ID invalides
 
-        # Restreindre aux agents uniquement
-        if user.role != RoleEnum.agent:
+        # Restreindre aux agents et contrôleurs de terrain uniquement
+        if user.role not in [RoleEnum.agent, RoleEnum.controleur]:
             continue
 
         # Gérer l'upsert (si existe déjà, on met à jour ?)
