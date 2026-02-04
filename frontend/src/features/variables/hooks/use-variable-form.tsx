@@ -31,7 +31,7 @@ export default function useVariableForm(initialValues?: VariableDataType) {
     initialValues?.modalites?.map((m, index) => ({
       ...m,
       order: m.order ?? index + 1, // Fallback si pas d'ordre
-      id: crypto.randomUUID(), // ID temporaire pour le drag & drop / listes React
+      id: crypto.randomUUID(), // ID temporaire pour le drag & drop / listes React (non implémenté pour le moment)
     })) || [],
   );
 
@@ -162,19 +162,6 @@ export default function useVariableForm(initialValues?: VariableDataType) {
       resetForm,
     },
   };
-}
-
-// Fonction pour générer le slug automatiquement
-function generateSlug(label: string): string {
-  return label
-    .toLowerCase()
-    .trim()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // Supprime les accents
-    .replace(/[^a-z0-9\s]/g, "") // Garde seulement lettres, chiffres et espaces
-    .replace(/\s+/g, "_") // Remplace espaces par underscores
-    .replace(/_{2,}/g, "_") // Supprime underscores multiples
-    .replace(/^_|_$/g, ""); // Supprime underscores début/fin
 }
 
 // Génération des données à envoyer au backend

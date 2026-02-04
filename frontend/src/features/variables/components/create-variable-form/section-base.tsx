@@ -66,9 +66,6 @@ export default function BaseInfoSection({
                 className="bg-muted font-mono text-sm"
                 placeholder="sexe_cm"
               />
-              <p className="text-xs text-muted-foreground">
-                Généré automatiquement à partir du libellé
-              </p>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 shrink-0">

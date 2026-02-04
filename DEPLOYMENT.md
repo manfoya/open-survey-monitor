@@ -3,7 +3,7 @@
 Ce projet est configuré pour être déployé facilement avec Docker et Docker Compose.
 
 > [!TIP]
-> Si vous préférez un déploiement manuel (sans Docker), consultez le guide **[DEPLOYMENT_MANUAL.md](./DEPLOYMENT_MANUAL.md)**.
+> Si vous préférez un déploiement manuel (sans Docker), consultez le guide **[DEPLOYMENT_MANUAL.md](./DEPLOYMENT_MANUAL.md)** (pas à jour).
 
 ## Prérequis
 
