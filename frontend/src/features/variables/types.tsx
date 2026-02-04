@@ -51,37 +51,37 @@ export const DATA_TYPES: {
   label: string;
   description: string;
 }[] = [
-  {
-    value: DataType.NUMBER,
-    label: "Nombre",
-    description: "Valeurs numériques (âge, revenus, quantités...)",
-  },
-  {
-    value: DataType.LIST,
-    label: "Liste de choix",
-    description: "Options prédéfinies (sexe, région, niveau d'études...)",
-  },
-  {
-    value: DataType.TEXT,
-    label: "Texte",
-    description: "Texte libre avec validation optionnelle",
-  },
-  {
-    value: DataType.DATE,
-    label: "Date",
-    description: "Dates avec limites optionnelles",
-  },
-  {
-    value: DataType.TIME,
-    label: "Heure",
-    description: "Heure spécifique (HH:MM)",
-  },
-  {
-    value: DataType.BOOLEAN,
-    label: "Booléen",
-    description: "Choix binaire (Oui/Non, Vrai/Faux)",
-  },
-];
+    {
+      value: DataType.NUMBER,
+      label: "Nombre",
+      description: "Valeurs numériques (âge, revenus, quantités...)",
+    },
+    {
+      value: DataType.LIST,
+      label: "Liste de choix",
+      description: "Options prédéfinies (sexe, région, niveau d'études...)",
+    },
+    {
+      value: DataType.TEXT,
+      label: "Texte",
+      description: "Texte libre avec validation optionnelle",
+    },
+    {
+      value: DataType.DATE,
+      label: "Date",
+      description: "Dates avec limites optionnelles",
+    },
+    {
+      value: DataType.TIME,
+      label: "Heure",
+      description: "Heure spécifique (HH:MM)",
+    },
+    {
+      value: DataType.BOOLEAN,
+      label: "Booléen",
+      description: "Choix binaire (Oui/Non, Vrai/Faux)",
+    },
+  ];
 
 // Opérateurs disponibles avec descriptions
 export const AVAILABLE_OPERATORS: {
@@ -89,53 +89,53 @@ export const AVAILABLE_OPERATORS: {
   label: string;
   description: string;
 }[] = [
-  { value: "equals", label: "Égal à (=)", description: "Valeur exacte" },
-  {
-    value: "not_equals",
-    label: "Différent de (≠)",
-    description: "Toutes valeurs sauf celle-ci",
-  },
-  {
-    value: "greater_than",
-    label: "Supérieur à (>)",
-    description: "Valeur strictement supérieure",
-  },
-  {
-    value: "less_than",
-    label: "Inférieur à (<)",
-    description: "Valeur strictement inférieure",
-  },
-  {
-    value: "greater_equal",
-    label: "Supérieur ou égal (≥)",
-    description: "Valeur supérieure ou égale",
-  },
-  {
-    value: "less_equal",
-    label: "Inférieur ou égal (≤)",
-    description: "Valeur inférieure ou égale",
-  },
-  {
-    value: "contains",
-    label: "Contient",
-    description: "Texte qui contient cette valeur",
-  },
-  {
-    value: "begins_with",
-    label: "Commence par",
-    description: "Texte qui commence par cette valeur",
-  },
-  {
-    value: "ends_with",
-    label: "Se termine par",
-    description: "Texte qui se termine par cette valeur",
-  },
-  {
-    value: "in_list",
-    label: "Dans la liste",
-    description: "Valeur présente dans une liste",
-  },
-];
+    { value: "equals", label: "Égal à (=)", description: "Valeur exacte" },
+    {
+      value: "not_equals",
+      label: "Différent de (≠)",
+      description: "Toutes valeurs sauf celle-ci",
+    },
+    {
+      value: "greater_than",
+      label: "Supérieur à (>)",
+      description: "Valeur strictement supérieure",
+    },
+    {
+      value: "less_than",
+      label: "Inférieur à (<)",
+      description: "Valeur strictement inférieure",
+    },
+    {
+      value: "greater_equal",
+      label: "Supérieur ou égal (≥)",
+      description: "Valeur supérieure ou égale",
+    },
+    {
+      value: "less_equal",
+      label: "Inférieur ou égal (≤)",
+      description: "Valeur inférieure ou égale",
+    },
+    {
+      value: "contains",
+      label: "Contient",
+      description: "Texte qui contient cette valeur",
+    },
+    {
+      value: "begins_with",
+      label: "Commence par",
+      description: "Texte qui commence par cette valeur",
+    },
+    {
+      value: "ends_with",
+      label: "Se termine par",
+      description: "Texte qui se termine par cette valeur",
+    },
+    {
+      value: "in_list",
+      label: "Dans la liste",
+      description: "Valeur présente dans une liste",
+    },
+  ];
 
 export type PropertySetter<T> = <K extends keyof T>(
   key: K,
