@@ -43,10 +43,11 @@ class User(Base):
     
     # RELATIONS
     # On utilise "Affectation" en string pour éviter les erreurs d'import circulaire (Circular Import).
-    affectations = relationship("Affectation", back_populates="controleur")
+    # Relation avec les affectations (Zones) gérées par ce contrôleur
+    affectations = relationship("Affectation", back_populates="controleur", cascade="all, delete-orphan")
     
     # Relation avec les quotas assignés à cet utilisateur
-    user_quotas = relationship("UserQuota", back_populates="user")
+    user_quotas = relationship("UserQuota", back_populates="user", cascade="all, delete-orphan")
     
     # Relation vers les enquêtes réalisées
     # relation vers les enquêtes réalisées
