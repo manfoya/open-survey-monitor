@@ -1,0 +1,55 @@
+# --- OPTION 1 : DOMAINE UNIQUE (ex: mon-site.com) ---
+# Le frontend est à la racine, l'API est sous /api
+server {
+    server_name example.com; # Remplacez par votre domaine
+
+    # Frontend (Next.js)
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # Backend API (FastAPI)
+    # L'API est déjà préfixée par /api dans le code (ex: /api/v1)
+    # Donc on redirige tout ce qui commence par /api vers le backend
+    location /api {
+        proxy_pass http://localhost:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    # Documentation API
+    location /docs {
+        proxy_pass http://localhost:8000;
+        proxy_set_header Host $host;
+    }
+
+    location /openapi.json {
+        proxy_pass http://localhost:8000;
+        proxy_set_header Host $host;
+    }
+}
+
+# --- OPTION 2 : SOUS-DOMAINES DISTINCTS (ex: app.site.com et api.site.com) ---
+# Si vous préférez séparer les deux
+#
+# server {
+#     server_name app.example.com; # FRONTEND
+#     location / {
+#         proxy_pass http://localhost:3000;
+#         # ... headers ...
+#     }
+# }
+#
+# server {
+#     server_name api.example.com; # BACKEND
+#     location / {
+#         proxy_pass http://localhost:8000;
+#         # ... headers ...
+#     }
+# }

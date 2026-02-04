@@ -1,4 +1,9 @@
-const API_URL = process.env.API_URL || "http://localhost:8000";
+// On server-side, we use the internal Docker URL (API_URL)
+// On client-side, we use the public URL (NEXT_PUBLIC_API_URL)
+const IS_SERVER = typeof window === "undefined";
+const API_URL = IS_SERVER
+  ? process.env.API_URL || "http://localhost:8000/api/v1"
+  : process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
 type FetchOptions = RequestInit & {
   params?: Record<string, string>;

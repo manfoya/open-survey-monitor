@@ -3,8 +3,6 @@
 import sys
 import os
 
-from app.models.settings import GlobalSettings
-
 # On utilise os.path.dirname pour pouvoir trouver le dossier app
 # peu importe d'où on lance le script dans le terminal.
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -13,7 +11,10 @@ from sqlalchemy.orm import Session
 from app.core.database import SessionLocal
 from app.models.users import User, RoleEnum
 from app.models.zones import Affectation, Zone
+from app.models.quotas import UserQuota, Quota
+from app.models.survey import SurveyData
 from app.core.security import get_password_hash
+from app.models.settings import GlobalSettings
 
 def init_db(db: Session):
     """
