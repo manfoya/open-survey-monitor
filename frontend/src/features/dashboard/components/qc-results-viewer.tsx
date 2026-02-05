@@ -17,6 +17,8 @@ interface QCResultsViewerProps {
 }
 
 export function QCResultsViewer({ results }: QCResultsViewerProps) {
+  if (!results) return <div className="rounded-md border p-4">Permission insuffisante (sinon aucun résultat de contrôle disponible)</div>;
+
   const resultEntries = Object.entries(results);
 
   const getStatusIcon = (status: SurveyQCResult["status"]) => {
@@ -74,6 +76,7 @@ export function QCResultsViewer({ results }: QCResultsViewerProps) {
                 className="text-center h-24 text-muted-foreground"
               >
                 Aucun résultat de contrôle disponible.
+                (ou permission insuffisante)
               </TableCell>
             </TableRow>
           ) : (
