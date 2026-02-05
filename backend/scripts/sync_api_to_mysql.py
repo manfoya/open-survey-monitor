@@ -165,12 +165,18 @@ def sync_to_database(data):
                                 flat_data[key + '_JSON'] = json.dumps(val) 
                                 flat_data[key + 'REPEATING_JSON'] = json.dumps(val) 
                             
-                            # Gestion des Dates/Heures (Timestamp -> HH:MM:SS)
+                            # Gestion des Heures CSPro (format HHMMSS comme entier, ex: 105854 = 10:58:54)
                             elif key.startswith("HEURE_") and isinstance(val, (int, float)):
                                 try:
-                                    time_val = datetime.datetime.fromtimestamp(val).strftime('%H:%M:%S')
+                                    # CSPro stocke les heures en HHMMSS collé (ex: 25616 = 2h56m16s)
+                                    val_int = int(val)
+                                    hh = val_int // 10000           
+                                    mm = (val_int % 10000) // 100   
+                                    ss = val_int % 100              
+                                    time_val = f"{hh:02d}:{mm:02d}:{ss:02d}"
                                     flat_data[key] = time_val
-                                except:
+                                except Exception as e:
+                                    print(f"Erreur parsing heure {key}={val}: {e}")
                                     flat_data[key] = None
                             else:
                                 flat_data[key] = val
