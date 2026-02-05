@@ -13,7 +13,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 from app.core.database import SessionLocal
 from app.models.users import User, RoleEnum
-from app.models.quotas import UserQuota
+from app.models.quotas import Quota, UserQuota
 from app.services.quota_engine import QuotaEngine
 from app.models.zones import Affectation
 from app.models.settings import GlobalSettings
@@ -65,19 +65,37 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     except:
         return None
 
-def clean_for_json(obj):
-    """Recursive helper to make sure all types are JSON serializable"""
-    if isinstance(obj, dict):
-        return {k: clean_for_json(v) for k, v in obj.items()}
-    if isinstance(obj, list):
-        return [clean_for_json(v) for v in obj]
-    if isinstance(obj, (datetime, date, time)):
-        return str(obj)
-    if isinstance(obj, timedelta):
-        return str(obj)
-    if isinstance(obj, Decimal):
-        return float(obj)
-    return obj
+def clean_for_json(data):
+    """
+    Nettoie récursivement un dictionnaire ou une liste pour le rendre sérialisable en JSON.
+    Gère : datetime, date, time, timedelta, Decimal.
+    """
+    if isinstance(data, dict):
+        return {k: clean_for_json(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [clean_for_json(v) for v in data]
+    elif isinstance(data, (datetime, date, time)):
+        return data.isoformat()
+    elif isinstance(data, timedelta):
+        return str(data)  # ou data.total_seconds()
+    elif isinstance(data, Decimal):
+        return float(data)
+    return data
+
+def parse_time(val):
+    """Parse time from various formats (HH:MM, HH:MM:SS, or time object)"""
+    if val is None or val == "":
+        return None
+    if isinstance(val, time):
+        return datetime.combine(datetime.today(), val)
+    val_str = str(val).strip()
+    # Essayer plusieurs formats
+    for fmt in ["%H:%M:%S", "%H:%M", "%H%M%S", "%H%M"]:
+        try:
+            return datetime.strptime(val_str, fmt)
+        except ValueError:
+            continue
+    return None
 
 def sync_surveys():
     print(f"[{datetime.now()}] Démarrage synchronisation optimisée...")
@@ -216,11 +234,15 @@ def sync_surveys():
                     duree = 0
                     if start_val and end_val:
                         try:
-                            # Parsing date basique
-                            t1 = datetime.strptime(str(start_val), "%H:%M")
-                            t2 = datetime.strptime(str(end_val), "%H:%M")
-                            duree = int((t2 - t1).total_seconds() / 60)
-                        except:
+                            # Parsing flexible désormais via fonction globale
+                            t1 = parse_time(start_val)
+                            t2 = parse_time(end_val)
+                            if t1 and t2:
+                                duree = int((t2 - t1).total_seconds() / 60)
+                                if duree < 0:  # Si fin < début (passage minuit), on ajoute 24h
+                                    duree += 24 * 60
+                        except Exception as e:
+                            print(f"Erreur parsing durée: {e}")
                             duree = 0
                     survey.duree_minutes = duree
 
@@ -230,15 +252,23 @@ def sync_surveys():
                     if lat: survey.latitude = float(lat)
                     if lon: survey.longitude = float(lon)
 
-                    # Date
+                    # Date - Parsing flexible
                     date_str = data.get(settings.variable_date_enquete) if settings.variable_date_enquete else None
                     if date_str:
-                        try:
-                            survey.date_entretien = datetime.strptime(str(date_str), "%Y-%m-%d")
-                        except:
-                             pass
+                        date_parsed = None
+                        val_str = str(date_str).strip()
+                        # Essayer plusieurs formats de date
+                        for fmt in ["%Y-%m-%d", "%d/%m/%Y", "%Y%m%d", "%d-%m-%Y"]:
+                            try:
+                                date_parsed = datetime.strptime(val_str, fmt)
+                                break
+                            except ValueError:
+                                continue
+                        if date_parsed:
+                            survey.date_entretien = date_parsed
                     else:
-                         if not survey.date_entretien: survey.date_entretien = datetime.now()
+                        if not survey.date_entretien: 
+                            survey.date_entretien = datetime.now()
 
                     survey.date_synchro = datetime.now()
 
@@ -251,7 +281,40 @@ def sync_surveys():
                         else:
                             qc_results['duree'] = {"status": "ok", "val": duree}
                     
-                    # 2. GPS (Nécessite Zone de l'agent)
+                    # 2. Heure de réalisation (check_heure)
+                    if settings.check_heure:
+                        h_val = data.get(settings.variable_heure_enquete) if settings.variable_heure_enquete else None
+                        
+                        # Si pas de variable configurée, on essaie l'heure de début
+                        if not h_val and start_val:
+                            h_val = start_val
+
+                        parsed_h = parse_time(h_val)
+                        
+                        if parsed_h:
+                            t_check = parsed_h.time()
+                            is_hour_valid = True
+                            
+                            # Vérif Début
+                            if settings.heure_debut_travail:
+                                if t_check < settings.heure_debut_travail:
+                                    is_hour_valid = False
+                            
+                            # Vérif Fin
+                            if settings.heure_fin_travail:
+                                if t_check > settings.heure_fin_travail:
+                                    is_hour_valid = False
+                            
+                            if not is_hour_valid:
+                                qc_results['heure'] = {"status": "fail", "val": str(t_check)}
+                                is_valid = False
+                            else:
+                                qc_results['heure'] = {"status": "ok", "val": str(t_check)}
+                        else:
+                             # Impossible de déterminer l'heure -> Warn ?
+                             pass
+
+                    # 3. GPS (Nécessite Zone de l'agent)
                     if settings.check_gps and agent_code_str in agents_obj_map:
                         agent_obj = agents_obj_map[agent_code_str]
                         if survey.latitude and survey.longitude:
@@ -273,6 +336,39 @@ def sync_surveys():
                 survey.qc_results = clean_for_json(qc_results)
 
                 # --- MISE À JOUR DES QUOTAS (GLOBAL) ---
+                # On incrémente SEULEMENT si l'enquête est valide
+                # (Sauf si vous voulez compter tout le monde, mais logique "Quota" = "Validé")
+                # Ici : On compte si survey.is_valid est True ? Ou si juste status complet ?
+                # Souvent pour le suivi terrain, on compte TOUT ce qui est complet.
+                
+                # Récupérer l'agent objet pour ses quotas
+                if not 'agent_obj' in locals() and agent_code_str in agents_obj_map:
+                     agent_obj = agents_obj_map[agent_code_str]
+
+                if 'agent_obj' in locals() and agent_obj and is_valid:
+                    # On charge les quotas de cet utilisateur
+                    user_quotas = db.query(UserQuota).filter(UserQuota.user_id == agent_obj.id).all()
+                    
+                    # On utilise les données "plates" (flat_data) pour le moteur
+                    flat_data_for_quota = data.copy()
+                    # On s'assure que tout est string pour le moteur (optionnel mais plus sûr)
+                    
+                    for uq in user_quotas:
+                        # Charger la définition du quota parent
+                        quota_def = db.query(Quota).filter(Quota.id == uq.quota_id).first()
+                        if quota_def and quota_def.definition:
+                            try:
+                                match = QuotaEngine.check(quota_def.definition, flat_data_for_quota)
+                                if match:
+                                    # Incrémenter !
+                                    uq.effectif_actuel = (uq.effectif_actuel or 0) + 1
+                                    db.add(uq)
+                            except Exception as e:
+                                print(f"Erreur eval quota {uq.id}: {e}")
+                    # Pas de commit ici, le commit global à la fin le fera ? 
+                    # Non il faut s'assurer que ça soit pris en compte.
+                    # Mais on est dans une transaction globale "db" passée en paramètre ou session locale?
+                    # sync_data recoit "db: Session". Donc ça sera commité à la fin si pas d'erreur.
                 # On incrémente si l'enquête est VALIDE
                 if is_valid and agent_code_str in agents_obj_map:
                     agent_obj = agents_obj_map[agent_code_str]
