@@ -17,10 +17,24 @@ export const metadata: Metadata = {
     "Aperçu global de l'activité de collecte et de la qualité des données.",
 };
 
-export default async function Page() {
+export default async function Page(props: {
+  searchParams?: Promise<{
+    query?: string;
+    page?: string;
+    size?: string;
+    sort_by?: string;
+    sort_order?: "asc" | "desc";
+  }>;
+}) {
+  const searchParams = await props.searchParams;
+  const page = searchParams?.page || "1";
+  const size = searchParams?.size || "10";
+  const sort_by = searchParams?.sort_by || "id";
+  const sort_order = searchParams?.sort_order || "asc";
+
   const [stats, surveys, points, dayMessage] = await Promise.all([
     getDashboardStats(),
-    getSurveys({ page: 1, size: 10 }),
+    getSurveys({ page, size, sort_by, sort_order }),
     getSurveysPoints(),
     getDayMessage(),
   ]);

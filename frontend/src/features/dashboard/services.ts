@@ -4,6 +4,7 @@ import { apiClient } from "@/lib/api-client";
 import { getAccessToken } from "@/features/auth/services/auth";
 import { API_ENDPOINTS } from "@/lib/api-endpoints";
 import { DashboardStats, SurveyListResponse, SurveyPoint } from "./types";
+import { PaginationQuery } from "@/lib/api-types";
 
 export const getDashboardStats = async (): Promise<DashboardStats | null> => {
   const token = await getAccessToken();
@@ -23,21 +24,13 @@ export const getDashboardStats = async (): Promise<DashboardStats | null> => {
 };
 
 export const getSurveys = async (
-  params: {
-    page?: number;
-    size?: number;
-    sort_order?: "asc" | "desc";
-  } = {},
+  params: PaginationQuery = { page: "1", size: "10", sort_order: "asc", sort_by: "id" },
 ): Promise<SurveyListResponse | null> => {
-  const { page = 1, size = 50, sort_order = "asc" } = params;
+  const { page = "1", size = "10", sort_order = "asc", sort_by = "id" } = params;
   const token = await getAccessToken();
   if (!token) return null;
 
-  const queryParams = new URLSearchParams({
-    page: page.toString(),
-    size: size.toString(),
-    sort_order,
-  });
+  const queryParams = new URLSearchParams({ page, size, sort_order, sort_by });
 
   try {
     return await apiClient<SurveyListResponse>(

@@ -96,7 +96,7 @@ def read_surveys(
     paginated = paginate_sqlalchemy_query(
         query,
         pagination,
-        allowed_sort_fields=["date_entretien", "date_synchro", "id", "duree_minutes"],
+        allowed_sort_fields=["date_entretien", "date_synchro", "id", "duree_minutes", "status", "is_valid"],
         search_fields=["questionnaire_uuid", "agent_code"]
     )
     
