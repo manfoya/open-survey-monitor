@@ -288,11 +288,14 @@ def sync_surveys():
                                 continue
                         if date_parsed:
                             survey.date_entretien = date_parsed
-                    else:
-                        if not survey.date_entretien: 
-                            survey.date_entretien = datetime.now()
+                    
+                    # MODIF: On ne met plus de date par défaut (fini les mensonges)
+                    # else:
+                    #    if not survey.date_entretien: 
+                    #        survey.date_entretien = datetime.now()
 
-                    survey.date_synchro = datetime.now()
+                    # MODIF: Suppression de la date de synchro demandée par l'utilisateur
+                    # survey.date_synchro = datetime.now()
 
                     # QC Logique
                     if settings.check_duree and settings.min_duree_minutes:
