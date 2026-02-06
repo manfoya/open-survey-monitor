@@ -23,6 +23,7 @@ router = APIRouter()
 
 @router.get("/dashboard", response_model=DashboardStats)
 def get_dashboard_stats(
+    scope: str = "team",
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -32,6 +33,10 @@ def get_dashboard_stats(
     - Contrôleur : Voit les stats de SES subordonnés (pas toute la zone, juste son équipe), sans détails d'erreurs.
     - Superviseur : Voit SES subordonnés (Contrôleurs + leurs Agents), AVEC détails.
     - Directeur : Voit TOUT.
+    
+    Paramètre scope:
+    - "team" (défaut) : comportement hiérarchique normal
+    - "me" : force la vue sur l'utilisateur connecté uniquement
     """
     
     # 1. Initialisation des requêtes
@@ -39,17 +44,23 @@ def get_dashboard_stats(
     query_quotas = db.query(UserQuota).filter(UserQuota.is_active == True)
 
     # 2. DÉFINITION DU PÉRIMÈTRE (Qui voit qui ?)
-    if current_user.role == RoleEnum.directeur:
+    
+    # Si scope="me", on force le filtre sur l'utilisateur courant, peu importe son rôle
+    if scope == "me":
+        query_surveys = query_surveys.filter(SurveyData.user_id == current_user.id)
+        query_quotas = query_quotas.filter(UserQuota.user_id == current_user.id)
+        
+    elif current_user.role == RoleEnum.directeur:
         # Le Directeur voit tout, pas de filtre
         pass
         
     elif current_user.role == RoleEnum.agent:
-        # L'agent ne voit que lui-même
+        # L'agent ne voit que lui-même (scope "team" n'a pas de sens pour lui, c'est comme "me")
         query_surveys = query_surveys.filter(SurveyData.user_id == current_user.id)
         query_quotas = query_quotas.filter(UserQuota.user_id == current_user.id)
         
     else:
-        # Pour Superviseur et Contrôleur : On récupère leur descendance hiérarchique
+        # Pour Superviseur et Contrôleur (scope="team") : On récupère leur descendance hiérarchique
         team_ids = get_team_ids_recursive(current_user)
         
         # On filtre sur cette liste d'IDs

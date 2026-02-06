@@ -24,6 +24,7 @@ export default async function Page(props: {
     size?: string;
     sort_by?: string;
     sort_order?: "asc" | "desc";
+    scope?: "me" | "team";
   }>;
 }) {
   const searchParams = await props.searchParams;
@@ -31,11 +32,12 @@ export default async function Page(props: {
   const size = searchParams?.size || "10";
   const sort_by = searchParams?.sort_by || "id";
   const sort_order = searchParams?.sort_order || "asc";
+  const scope = (searchParams?.scope as "me" | "team") || "team";
 
   const [stats, surveys, points, dayMessage] = await Promise.all([
-    getDashboardStats(),
-    getSurveys({ page, size, sort_by, sort_order }),
-    getSurveysPoints(),
+    getDashboardStats(scope),
+    getSurveys({ page, size, sort_by, sort_order, scope }),
+    getSurveysPoints(scope),
     getDayMessage(),
   ]);
 

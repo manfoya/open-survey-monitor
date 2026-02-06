@@ -27,6 +27,7 @@ router = APIRouter()
 
 @router.get("/map", response_model=List[dict])
 def read_surveys_map(
+    scope: str = "team",
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -37,7 +38,9 @@ def read_surveys_map(
     query = db.query(SurveyData.id, SurveyData.latitude, SurveyData.longitude, SurveyData.is_valid)
     
     # Même logique de visibilité que la liste
-    if current_user.role == RoleEnum.directeur:
+    if scope == "me":
+        query = query.filter(SurveyData.user_id == current_user.id)
+    elif current_user.role == RoleEnum.directeur:
         pass
     elif current_user.role == RoleEnum.agent:
         query = query.filter(SurveyData.user_id == current_user.id)
@@ -57,6 +60,7 @@ def read_surveys_map(
 def read_surveys(
     status: Optional[SurveyStatus] = None,
     is_valid: Optional[bool] = None,
+    scope: str = "team",
     pagination: PaginationParams = Depends(create_pagination_params),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -67,6 +71,7 @@ def read_surveys(
     Filtres :
     - status: 'complet', 'partiel', 'refus'
     - is_valid: true/false (QC validé ou non)
+    - scope: 'team' (défaut) ou 'me'
     
     Règles de visibilité :
     - Directeur : Tout
@@ -83,7 +88,9 @@ def read_surveys(
         query = query.filter(SurveyData.is_valid == is_valid)
         
     # 2. Visibilité Hiérarchique
-    if current_user.role == RoleEnum.directeur:
+    if scope == "me":
+        query = query.filter(SurveyData.user_id == current_user.id)
+    elif current_user.role == RoleEnum.directeur:
         pass
     elif current_user.role == RoleEnum.agent:
         query = query.filter(SurveyData.user_id == current_user.id)
