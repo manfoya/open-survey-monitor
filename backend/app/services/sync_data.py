@@ -375,10 +375,16 @@ def sync_surveys():
                      
                      for uq_item, definition_item in user_qs:
                          try:
-                             # Debug log temporaire pour le premier passage
-                             # if total_processed == 0:
-                             #    print(f"DEBUG: Checking Quota {uq_item.quota_id} for Agent {agent_code_str}")
-                             #    print(f"Match ? {QuotaEngine.check(definition_item, mapped_data)}")
+                             # Debug log pour comprendre pourquoi ça ne match pas (limité aux 5 premiers logs)
+                             if total_processed < 5:
+                                print(f"\n[DEBUG] Survey {uuid_str} | Valid={is_valid} | Agent={agent_code_str}")
+                                print(f" - Checking Quota {uq_item.quota_id} (User {agent_user_id})")
+                                print(f" - Definition: {definition_item}")
+                                # On affiche quelques clés de mapped_data pour vérifier
+                                sample_keys = list(mapped_data.keys())[:5]
+                                print(f" - Data Keys (sample): {sample_keys}")
+                                match_result = QuotaEngine.check(definition_item, mapped_data)
+                                print(f" -> Match Result: {match_result}")
 
                              if QuotaEngine.check(definition_item, mapped_data):
                                  uq_item.effectif_actuel += 1
