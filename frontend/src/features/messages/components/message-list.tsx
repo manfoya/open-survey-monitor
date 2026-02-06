@@ -70,24 +70,37 @@ function MessageItem({
     >
       <CardHeader>
         <div className="flex justify-between items-start gap-4">
-          <div className="space-y-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <CardTitle className="text-base font-semibold truncate">
+          <div className="space-y-1 min-w-0 flex-1">
+            <div className="flex items-center gap-2 justify-between w-full">
+              <CardTitle className="text-base font-semibold truncate flex-1">
                 {message.title}
               </CardTitle>
-              <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0">
+              <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0 ml-2">
                 {formatDate(message.created_at)}
               </span>
             </div>
-            <CardDescription className="text-xs truncate">
-              Par:{" "}
-              <span className="font-medium text-foreground">
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-muted-foreground">De:</span>
+              <span
+                className="font-medium text-foreground truncate max-w-[120px]"
+                title={message.sender_username}
+              >
                 {message.sender_username}
               </span>
-            </CardDescription>
+
+              <span className="text-muted-foreground mx-1">→</span>
+
+              <span className="text-muted-foreground">À:</span>
+              <span
+                className="font-medium text-foreground truncate max-w-[120px]"
+                title={message.recipient_name}
+              >
+                {message.recipient_name || message.target_role || "Tous"}
+              </span>
+            </div>
           </div>
           <div className="flex shrink-0">
-            {message.target_role && (
+            {message.target_role ? (
               <Badge
                 variant="secondary"
                 className="flex items-center gap-1 text-[10px] h-5 px-1.5"
@@ -95,14 +108,21 @@ function MessageItem({
                 <Users className="h-3 w-3" />
                 {message.target_role}
               </Badge>
-            )}
-            {message.target_user_id && (
+            ) : message.target_user_id ? (
               <Badge
                 variant="outline"
                 className="flex items-center gap-1 text-[10px] h-5 px-1.5"
               >
                 <User className="h-3 w-3" />
-                User #{message.target_user_id}
+                Perso
+              </Badge>
+            ) : (
+              <Badge
+                variant="outline"
+                className="flex items-center gap-1 text-[10px] h-5 px-1.5"
+              >
+                <Users className="h-3 w-3" />
+                Global
               </Badge>
             )}
           </div>

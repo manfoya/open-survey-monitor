@@ -9,6 +9,7 @@ export interface Message {
   target_user_id: number | null;
   created_at: string;
   sender_username: string; // Calculated field
+  recipient_name?: string; // Calculated field
 }
 
 export interface MessageCreate {

@@ -98,22 +98,22 @@ export function NewMessageForm({ onSuccess }: NewMessageFormProps) {
 
     // Convert Markdown to HTML before sending
     // We treat the conversion as part of the submission process
-    startTransition(async () => {
-      try {
-        const htmlContent = await markdownToHtml(content);
+    try {
+      const htmlContent = await markdownToHtml(content);
 
-        const payload: CreateMessageValues = {
-          title,
-          content: htmlContent,
-          target_role: targetType === "role" ? selectedRole : null,
-          target_user_id: targetType === "user" ? parseInt(targetUserId) : null,
-        };
+      const payload: CreateMessageValues = {
+        title,
+        content: htmlContent,
+        target_role: targetType === "role" ? selectedRole : null,
+        target_user_id: targetType === "user" ? parseInt(targetUserId) : null,
+      };
 
+      startTransition(() => {
         action(payload);
-      } catch (error) {
-        toast.error("Erreur lors de la préparation du message.");
-      }
-    });
+      });
+    } catch (error) {
+      toast.error("Erreur lors de la préparation du message.");
+    }
   };
 
   return (

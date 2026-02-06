@@ -18,6 +18,7 @@ class MessageOut(MessageBase):
     sender_id: int
     created_at: datetime
     sender_username: str # champ calculé pour affichage
+    recipient_name: Optional[str] = None # champ calculé pour affichage (si cible precise)
 
     class Config:
         from_attributes = True

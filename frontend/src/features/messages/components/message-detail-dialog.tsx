@@ -27,16 +27,29 @@ export function MessageDetailDialog({
       <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl">{message.title}</DialogTitle>
-          <DialogDescription className="flex flex-col gap-1 mt-2">
-            <span className="font-medium text-foreground">
-              De : {message.sender_username}
-            </span>
-            <span className="text-xs">
-              {new Intl.DateTimeFormat("fr-FR", {
-                dateStyle: "full",
-                timeStyle: "short",
-              }).format(new Date(message.created_at))}
-            </span>
+          <DialogDescription asChild>
+            <div className="flex flex-col gap-1 mt-2 text-sm text-muted-foreground">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <span className="w-8">De :</span>
+                  <span className="font-medium text-foreground">
+                    {message.sender_username}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-8">À :</span>
+                  <span className="font-medium text-foreground">
+                    {message.recipient_name || message.target_role || "Tous"}
+                  </span>
+                </div>
+              </div>
+              <span className="text-xs mt-2">
+                {new Intl.DateTimeFormat("fr-FR", {
+                  dateStyle: "full",
+                  timeStyle: "short",
+                }).format(new Date(message.created_at))}
+              </span>
+            </div>
           </DialogDescription>
         </DialogHeader>
 

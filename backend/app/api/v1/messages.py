@@ -43,6 +43,26 @@ def send_message(
     new_msg.sender_username = current_user.username
     return new_msg
 
+def _get_recipient_name(m: Message) -> str:
+    """
+    récupère le nom du destinataire du message.
+    """
+    names_map = {
+        "agent": "Agents",
+        "controleur": "Contrôleurs",
+        "superviseur": "Superviseurs"
+    }
+    if m.target_user_id:
+        # Si target_user est chargé via relation
+        if m.target_user:
+            return m.target_user.username
+        else:
+            return f"User #{m.target_user_id}"
+    elif m.target_role:
+        return names_map.get(m.target_role, m.target_role)
+    else:
+        return "Tout le monde"
+
 @router.get("/sent", response_model=List[MessageOut])
 def read_sent_messages(
     db: Session = Depends(get_db),
@@ -59,9 +79,10 @@ def read_sent_messages(
         Message.sender_id == current_user.id
     ).order_by(desc(Message.created_at)).limit(limit).all()
     
-    # injection du nom de l'expéditeur (soi-même)
+    # injection du nom de l'expéditeur (soi-même) et du destinataire
     for m in messages:
         m.sender_username = current_user.username
+        m.recipient_name = _get_recipient_name(m)
         
     return messages
 
@@ -78,9 +99,6 @@ def read_my_messages(
     - messages privés
     """
     
-    # directeur voit tout ce qu'il a envoyé ? ou sa boite de réception ?
-    # supposons boite de réception standard + messages globaux
-    
     query = db.query(Message).filter(
         or_(
             # 1. messages pour tout le monde
@@ -96,7 +114,20 @@ def read_my_messages(
     
     # injection du nom de l'expéditeur
     for m in messages:
-        m.sender_username = m.sender.username
+        if m.sender:
+            m.sender_username = f"{m.sender.username} #{m.sender.id}"
+        else:
+             m.sender_username = f"Admin #{m.sender_id}"
+             
+        # Pour le destinataire (du point de vue réception)
+        if m.target_user_id == current_user.id:
+            m.recipient_name = "Moi"
+        elif m.target_role == current_user.role.value:
+            m.recipient_name = f"Rôle: {m.target_role}"
+        elif m.target_role is None and m.target_user_id is None:
+            m.recipient_name = "Tous (Global)"
+        else:
+            m.recipient_name = "Autre"
         
     return messages
 
