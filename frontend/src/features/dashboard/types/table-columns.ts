@@ -7,7 +7,7 @@ export const availableColumns: TableColumn[] = [
   { key: "validation", label: "Validation", sortable: true, sortKey: "is_valid" },
   { key: "date", label: "Date", sortable: true, sortKey: "date_entretien" },
   { key: "duree", label: "Durée", sortable: true, sortKey: "duree_minutes" },
-  { key: "actions", label: "Actions", sortable: false },
+  { key: "actions", label: "Actions", sortable: false, required: true, className: "text-right" },
 ];
 
 export const defaultSurveyColumnVisibility = {

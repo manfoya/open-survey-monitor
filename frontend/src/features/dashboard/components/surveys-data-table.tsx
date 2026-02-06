@@ -64,7 +64,7 @@ export function SurveysDataTable({ paginatedSurveys }: SurveysTableProps) {
           className="hover:bg-muted/50 transition-colors"
         >
           {visibleColumns.map((column) => (
-            <TableCell key={column.key}>
+            <TableCell key={column.key} className={column.className}>
               {getCellValue(survey, column.key)}
             </TableCell>
           ))}

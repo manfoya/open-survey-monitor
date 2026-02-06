@@ -28,7 +28,7 @@ export const availableColumns: TableColumn[] = [
     sortable: true,
     sortKey: "cspro_code",
   },
-  { key: "chef", label: "Chef", sortable: true, sortKey: "id" },
+  { key: "chef", label: "Chef", sortable: false },
   { key: "actions", label: "Actions", className: "text-right", required: true },
 ];
 

@@ -201,6 +201,42 @@ def paginate_sqlalchemy_query(
         )
 
 # Fonction d'aide pour les listes Python (non-SQLAlchemy)
+def _get_value_from_item(item: Any, key: str) -> Any:
+    """
+    Extrait une valeur d'un item (dict ou objet) de manière sûre.
+    """
+    if isinstance(item, dict):
+        return item.get(key)
+    return getattr(item, key, None)
+
+
+def _sort_items(items: List[T], sort_by: str, sort_order: str) -> List[T]:
+    """
+    Trie une liste d'éléments selon une clé et un ordre donnés.
+    Gère les valeurs nulles et le tri insensible à la casse pour les chaînes.
+    """
+    reverse = sort_order.lower() == "desc"
+    
+    def sort_key(item: Any) -> tuple:
+        val = _get_value_from_item(item, sort_by)
+        
+        # Gestion des valeurs nulles : toujours à la fin si ascendant
+        if val is None:
+            return (1, "") if not reverse else (-1, "")
+            
+        # Tri insensible à la casse pour les chaînes
+        if isinstance(val, str):
+            return (0, val.lower())
+            
+        return (0, val)
+
+    try:
+        return sorted(items, key=sort_key, reverse=reverse)
+    except Exception:
+        # En cas d'erreur de comparaison (types incompatibles), on retourne la liste telle quelle
+        return items
+
+
 def paginate_list(
     items: List[T],
     params: PaginationParams
@@ -216,11 +252,16 @@ def paginate_list(
     Returns:
         PaginatedResponse avec la sous-liste paginée
     """
+    # 1. Tri (si demandé)
+    if params.sort_by:
+        items = _sort_items(items, params.sort_by, params.sort_order)
+
+    # 2. Pagination
     total_count = len(items)
     start_index = (params.page - 1) * params.size
     end_index = start_index + params.size
     
-    # Extraire la sous-liste pour cette page
+    # 3. Extraction de la page
     page_items = items[start_index:end_index]
     
     return paginate_response(page_items, total_count, params)
