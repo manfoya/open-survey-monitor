@@ -17,7 +17,12 @@ interface QCResultsViewerProps {
 }
 
 export function QCResultsViewer({ results }: QCResultsViewerProps) {
-  if (!results) return <div className="rounded-md border p-4">Permission insuffisante (sinon aucun résultat de contrôle disponible)</div>;
+  if (!results)
+    return (
+      <div className="rounded-md border p-4">
+        Permission insuffisante (sinon aucun résultat de contrôle disponible)
+      </div>
+    );
 
   const resultEntries = Object.entries(results);
 
@@ -75,8 +80,8 @@ export function QCResultsViewer({ results }: QCResultsViewerProps) {
                 colSpan={3}
                 className="text-center h-24 text-muted-foreground"
               >
-                Aucun résultat de contrôle disponible.
-                (ou permission insuffisante)
+                Aucun résultat de contrôle disponible. (ou permission
+                insuffisante)
               </TableCell>
             </TableRow>
           ) : (

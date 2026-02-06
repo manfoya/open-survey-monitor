@@ -80,11 +80,11 @@ export function DashboardView({
             <span className="sm:hidden">Carte</span>
           </TabsTrigger>
         </TabsList>
-        
+
         {!isAgent && (
           <div className="flex items-center space-x-2">
-            <Switch 
-              id="scope-mode" 
+            <Switch
+              id="scope-mode"
               checked={currentScope === "me"}
               onCheckedChange={handleScopeChange}
             />

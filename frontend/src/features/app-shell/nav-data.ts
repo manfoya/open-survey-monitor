@@ -8,7 +8,7 @@ import {
   Database,
   Mail,
   Ruler,
-  Target
+  Target,
 } from "lucide-react";
 import { UserRole } from "../auth/types";
 

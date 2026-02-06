@@ -107,10 +107,13 @@ export const getFieldWorkers = async (): Promise<UserProfile[]> => {
     });
     // Filter to only include Agents and Controllers (field workers)
     return allUsers.filter(
-      (u) => u.role === UserRole.AGENT || u.role === UserRole.CONTROLEUR
+      (u) => u.role === UserRole.AGENT || u.role === UserRole.CONTROLEUR,
     );
   } catch (error) {
-    console.error("Erreur lors de la récupération des agents de terrain:\n", error);
+    console.error(
+      "Erreur lors de la récupération des agents de terrain:\n",
+      error,
+    );
     return [];
   }
 };
