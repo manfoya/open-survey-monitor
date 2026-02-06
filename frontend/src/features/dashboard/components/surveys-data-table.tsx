@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { QCResultsViewer } from "./qc-results-viewer";
+import { useCurrentUser } from "@/features/auth/contexts/user-context";
+import { UserRole } from "@/features/auth/types";
 
 interface SurveysTableProps {
   paginatedSurveys: SurveyListResponse;
@@ -38,17 +40,26 @@ export function SurveysDataTable({ paginatedSurveys }: SurveysTableProps) {
     });
 
   const searchParams = useSearchParams();
+  const currentUser = useCurrentUser();
   const { items: surveys, meta: paginationMeta } = paginatedSurveys;
 
   const currentSort = searchParams.get("sort_by") || "id";
   const currentOrder =
     (searchParams.get("sort_order") as "asc" | "desc") || "asc";
 
+  const isRoleRestricted =
+    currentUser?.role === UserRole.AGENT ||
+    currentUser?.role === UserRole.CONTROLEUR;
+
+  const filteredColumns = availableColumns.filter(
+    (col) => !(col.key === "duree" && isRoleRestricted),
+  );
+
   return (
     <DataTable
       data={surveys}
       paginationMeta={paginationMeta}
-      columns={availableColumns}
+      columns={filteredColumns}
       columnVisibility={columnVisibility as ColumnVisibility}
       onColumnVisibilityChange={
         updateColumnVisibility as (visibility: ColumnVisibility) => void

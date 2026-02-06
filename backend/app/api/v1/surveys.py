@@ -123,13 +123,15 @@ def read_surveys(
     )
     
     # 4. Enrichissement (Agent Name)
-    # 4. Enrichissement (Agent Name) & Masquage QC
+    # 4. Enrichissement (Agent Name) & Masquage QC / Durée
     # On modifie les items retournés pour :
     # a) Injecter le nom "propre"
     # b) Masquer les détails QC pour les rôles non autorisés (Agent, Contrôleur)
+    # c) Masquer la durée pour les rôles non autorisés (Agent, Contrôleur)
     
     vip_roles = [RoleEnum.directeur, RoleEnum.superviseur]
     can_see_qc = current_user.role in vip_roles
+    can_see_duration = current_user.role in vip_roles
     
     for survey in paginated.items:
         # a) Nom de l'agent
@@ -141,5 +143,10 @@ def read_surveys(
         # b) Masquage QC
         if not can_see_qc:
             survey.qc_results = None
+
+        # c) Masquage Durée
+        if not can_see_duration:
+            # On met une valeur sentinelle (ex: -1) pour indiquer que c'est masqué
+            survey.duree_minutes = -1
             
     return paginated
