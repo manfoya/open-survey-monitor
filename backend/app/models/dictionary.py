@@ -29,6 +29,10 @@ class Variable(Base):
     # C'est ce champ qui sera utilisé dans le JSON du Query Builder ("field": "age")
     slug = Column(String, unique=True, index=True, nullable=False)
     
+    # Mapping Source : Nom de la colonne dans la base MySQL source (ex: "WB_Q01_GENRE")
+    # Permet de faire le lien entre le slug interne ("genre") et la donnée brute.
+    source_column = Column(String, nullable=True)
+    
     # Le label humain (ex: "Âge du répondant")
     label = Column(String, nullable=False)
     
