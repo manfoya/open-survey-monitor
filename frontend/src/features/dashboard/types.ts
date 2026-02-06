@@ -63,4 +63,7 @@ export type SurveyPoint = {
   latitude: number;
   longitude: number;
   is_valid: boolean;
+  status: SurveyStatus;
+  date: string;
+  agent: string;
 };

@@ -32,10 +32,17 @@ def read_surveys_map(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Récupérer tous les points d'enquête pour la carte.
-    Retourne uniquement le strict nécessaire (id, lat, long, is_valid).
+    Récupérer tous les points d'enquête pour la carte pour l'affichage des tooltips.
     """
-    query = db.query(SurveyData.id, SurveyData.latitude, SurveyData.longitude, SurveyData.is_valid)
+    query = db.query(
+        SurveyData.id, 
+        SurveyData.latitude, 
+        SurveyData.longitude, 
+        SurveyData.is_valid,
+        SurveyData.status,
+        SurveyData.date_entretien,
+        User.username.label("agent_name")
+    ).join(User, SurveyData.user_id == User.id)
     
     # Même logique de visibilité que la liste
     if scope == "me":
@@ -50,9 +57,17 @@ def read_surveys_map(
         
     results = query.all()
     
-    # Conversion en liste de dictionnaires pour coller au format attendu
+    # Conversion en liste de dictionnaires
     return [
-        {"id": r.id, "latitude": r.latitude, "longitude": r.longitude, "is_valid": r.is_valid} 
+        {
+            "id": r.id, 
+            "latitude": r.latitude, 
+            "longitude": r.longitude, 
+            "is_valid": r.is_valid,
+            "status": r.status,
+            "date": r.date_entretien,
+            "agent": r.agent_name
+        } 
         for r in results if r.latitude is not None and r.longitude is not None
     ]
 

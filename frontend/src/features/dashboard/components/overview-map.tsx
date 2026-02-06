@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 import { MapPoint } from "@/components/shared/map/types";
 import { SurveyPoint } from "../types";
+import { SurveyMapPopup } from "./map-popup";
 
 const GenericMap = dynamic(
   () => import("@/components/shared/map/generic-map"),
@@ -50,14 +51,7 @@ export function OverviewMap({ points }: { points: SurveyPoint[] }) {
     latitude: point.latitude,
     longitude: point.longitude,
     iconHtml: getValidationIcon(point.is_valid),
-    popupContent: (
-      <div className="p-1">
-        <div className="font-bold">Enquête {point.id}</div>
-        <div className="text-xs text-muted-foreground">
-          {point.is_valid ? "Valide" : "Non valide / Suspect"}
-        </div>
-      </div>
-    ),
+    popupContent: <SurveyMapPopup point={point} />,
   }));
   const center = points.reduce(
     (acc, point) => {
