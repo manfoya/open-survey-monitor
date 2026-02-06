@@ -10,10 +10,7 @@ class SurveyStatus(str, enum.Enum):
     partiel = "partiel" # En cours ou abandonné
     refus = "refus"     # Ménage a refusé
 
-class GenderEnum(str, enum.Enum):
-    M = "M" # pour masculin
-    F = "F" # naturellement  ceci pour féminin
-    Inconnu = "Inconnu" # Il faut être prudent dans la vie, il pourrait avoir les deux mêmes
+
 
 class SurveyData(Base):
     """
@@ -35,7 +32,6 @@ class SurveyData(Base):
     
     # métadonnées extraites
     status = Column(Enum(SurveyStatus), default=SurveyStatus.partiel)
-    respondent_sex = Column(Enum(GenderEnum), default=GenderEnum.Inconnu)
     
     # géolocalisation réelle
     latitude = Column(Float, nullable=True)

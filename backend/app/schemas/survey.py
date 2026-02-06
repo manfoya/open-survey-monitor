@@ -3,13 +3,12 @@
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
 from datetime import datetime
-from app.models.survey import SurveyStatus, GenderEnum
+from app.models.survey import SurveyStatus
 
 class SurveyBase(BaseModel):
     questionnaire_uuid: str
     agent_code: Optional[str] = None
     status: SurveyStatus = SurveyStatus.partiel
-    respondent_sex: GenderEnum = GenderEnum.Inconnu
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     duree_minutes: Optional[int] = None
