@@ -23,6 +23,20 @@ class QuotaEngine:
         "beginsWith": lambda val, sub: str(val).lower().startswith(str(sub).lower()),
         "null": lambda val, _: val is None or val == "",
         "notNull": lambda val, _: val is not None and val != "",
+        
+        # Mapping verbeux (QueryBuilder style)
+        "equals": operator.eq,
+        "not_equals": operator.ne,
+        "less": operator.lt,
+        "less_or_equal": operator.le,
+        "greater": operator.gt,
+        "greater_or_equal": operator.ge,
+        "in_list": lambda val, lst: str(val) in [str(x) for x in (lst if isinstance(lst, list) else [lst])],
+        "not_in_list": lambda val, lst: str(val) not in [str(x) for x in (lst if isinstance(lst, list) else [lst])],
+        "begins_with": lambda val, sub: str(val).lower().startswith(str(sub).lower()),
+        "ends_with": lambda val, sub: str(val).lower().endswith(str(sub).lower()),
+        "is_null": lambda val, _: val is None or val == "",
+        "is_not_null": lambda val, _: val is not None and val != "",
     }
 
     @classmethod
@@ -74,7 +88,7 @@ class QuotaEngine:
 
         # --- TYPAGE DYNAMIQUE ---
         # Essayer de convertir en nombres si l'opérateur est mathématique
-        if op_key in ["<", "<=", ">", ">="]:
+        if op_key in ["<", "<=", ">", ">=", "less", "less_or_equal", "greater", "greater_or_equal"]:
             try:
                 return op_func(float(user_val), float(target_val))
             except (ValueError, TypeError):
@@ -82,7 +96,7 @@ class QuotaEngine:
 
         # Comparaison par défaut (String ou Egalité stricte)
         # On cast en string pour éviter les problèmes "1" vs 1
-        if op_key in ["=", "!=", "in", "notIn"]:
+        if op_key in ["=", "!=", "in", "notIn", "equals", "not_equals", "in_list", "not_in_list"]:
              # Note: pour =, on pourrait tenter le float aussi si pertinent
              return op_func(str(user_val), str(target_val))
              
